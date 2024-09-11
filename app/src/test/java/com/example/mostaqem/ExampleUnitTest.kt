@@ -1,4 +1,4 @@
-package com.example.mostaqem
+package com.mostaqem
 
 import org.junit.Test
 

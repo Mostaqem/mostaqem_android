@@ -1,19 +1,31 @@
-package com.example.mostaqem.ui.theme
+package com.mostaqem.ui.theme
 
+import android.util.Log
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.googlefonts.Font
+import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
+import com.mostaqem.R
+import kotlinx.coroutines.CoroutineExceptionHandler
+
+
+private val provider = GoogleFont.Provider(
+    providerAuthority = "com.google.android.gms.fonts",
+    providerPackage = "com.google.android.gms",
+    certificates = R.array.com_google_android_gms_fonts_certs
+)
+private val kufam = GoogleFont("Kufam")
+private val fontFamily = FontFamily(Font(googleFont = kufam, fontProvider = provider))
 
 // Set of Material typography styles to start with
 val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
+    displayLarge = TextStyle(
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.W600,
+        fontSize = 17.sp,
     )
     /* Other default text styles to override
     titleLarge = TextStyle(
