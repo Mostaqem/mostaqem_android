@@ -1,6 +1,16 @@
-package com.mostaqem.screens.home.data
+package com.mostaqem.screens.home.data.surah
 
 import com.google.gson.annotations.SerializedName
+
+data class SurahResponse(
+    @SerializedName("data")
+    val response: SurahObject,
+)
+
+data class SurahObject(
+    @SerializedName("surah")
+    val surahData: List<Surah>
+)
 
 data class Surah(
     val id: Int,

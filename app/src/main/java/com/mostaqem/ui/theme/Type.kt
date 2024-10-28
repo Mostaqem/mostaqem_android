@@ -1,6 +1,5 @@
 package com.mostaqem.ui.theme
 
-import android.util.Log
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -9,7 +8,6 @@ import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
 import com.mostaqem.R
-import kotlinx.coroutines.CoroutineExceptionHandler
 
 
 private val provider = GoogleFont.Provider(
@@ -24,8 +22,8 @@ private val fontFamily = FontFamily(Font(googleFont = kufam, fontProvider = prov
 val Typography = Typography(
     displayLarge = TextStyle(
         fontFamily = fontFamily,
-        fontWeight = FontWeight.W600,
-        fontSize = 17.sp,
+        fontWeight = FontWeight.Bold,
+        fontSize = 18.sp,
     )
     /* Other default text styles to override
     titleLarge = TextStyle(

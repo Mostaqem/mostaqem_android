@@ -8,3 +8,6 @@ object HomeScreen
 @Serializable
 object SettingsScreen
 
+@Serializable
+object PlayerScreen
+

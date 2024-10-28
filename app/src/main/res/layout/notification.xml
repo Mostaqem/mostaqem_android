@@ -1,0 +1,43 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/exo_play"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/song_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Endless Summer"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp" />
+
+    <TextView
+        android:id="@+id/song_artist"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Wild Heart"
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:layout_below="@id/song_title"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="4dp" />
+
+    <!-- Add buttons for playback controls and other actions -->
+    <ImageButton
+        android:id="@+id/button_play_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/media3_icon_album"
+        android:background="?android:attr/selectableItemBackground"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp" />
+
+</RelativeLayout>

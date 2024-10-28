@@ -1,53 +1,53 @@
 package com.mostaqem
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.mostaqem.core.navigation.BottomScreens
-import com.mostaqem.screens.home.HomeScreen
 import com.mostaqem.core.navigation.HomeScreen
 import com.mostaqem.core.navigation.SettingsScreen
+import com.mostaqem.screens.home.HomeScreen
+import com.mostaqem.screens.home.viewmodel.HomeViewModel
 import com.mostaqem.screens.settings.SettingsScreen
-
 import com.mostaqem.ui.theme.MostaqemTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
             MostaqemTheme {
+
                 MostaqemApp()
+
+
             }
         }
     }
@@ -56,67 +56,65 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun MostaqemApp() {
-    val navController = rememberNavController()
+fun MostaqemApp() {
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = { BottomNavigationBar(navController = navController) }
-    ) { innerPadding ->
-        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-            NavHost(
-                navController = navController,
-                startDestination = HomeScreen,
-                modifier = Modifier.padding(innerPadding)
-            ) {
-                composable<HomeScreen> {
-                    HomeScreen()
-                }
-                composable<SettingsScreen> {
-                    SettingsScreen()
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun BottomNavigationBar(navController: NavController) {
-    val selectedItem = remember {
+    var selectedItem by rememberSaveable {
         mutableIntStateOf(0)
     }
-    val items = listOf(BottomScreens.Settings,BottomScreens.Home)
+    val items = listOf(BottomScreens.Home, BottomScreens.Settings)
+    val navController = rememberNavController()
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+    val currentRoute = navBackStackEntry?.destination?.route ?: HomeScreen::class.qualifiedName
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
 
-    NavigationBar {
-        items.forEach { screen ->
-            val isSelected =
-                currentDestination?.hierarchy?.any { it.route == screen.route::class.qualifiedName } == true
+        NavigationSuiteScaffold(modifier = Modifier.fillMaxSize(), navigationSuiteItems = {
+            items.forEach { screen ->
+                Log.d("Routes", "MostaqemApp: ${screen.route} | ${currentRoute}")
+                item(
+                    selected = screen.route::class.qualifiedName == currentRoute,
+                    onClick = {
+                        navController.navigate(screen.route) {
 
-            NavigationBarItem(
-                selected = isSelected,
-                onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                },
-                icon = {
-                    Icon(
-                        imageVector = ImageVector.vectorResource(id = screen.icon),
-                        contentDescription = screen.name
-                    )
-                },
-                label = { Text(text = screen.name)},
-                alwaysShowLabel = false,
+
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(id = screen.icon),
+                            contentDescription = screen.name
+                        )
+                    },
+                    label = { Text(text = screen.name) },
+                    alwaysShowLabel = false,
                 )
 
 
+            }
+        }) {
+            NavHost(navController = navController, startDestination = HomeScreen) {
+                composable<HomeScreen> {
+                    val viewModel: HomeViewModel = hiltViewModel()
+
+                    HomeScreen(viewModel = viewModel)
+                }
+
+                composable<SettingsScreen> { SettingsScreen() }
+
+
+            }
+
+
         }
     }
+
 }
+
+
 

@@ -1,8 +1,5 @@
 package com.mostaqem.core.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import com.mostaqem.R
 import kotlinx.serialization.Serializable
 
@@ -14,5 +11,6 @@ sealed class BottomScreens<T>(val name:String, val icon: Int, val route: T){
 
     @Serializable
     data object Settings: BottomScreens<SettingsScreen>(name = "اعدادات", icon = R.drawable.outline_settings_24, route = SettingsScreen)
+
 
 }
