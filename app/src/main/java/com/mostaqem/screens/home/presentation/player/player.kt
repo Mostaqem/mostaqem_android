@@ -1,4 +1,4 @@
-package com.mostaqem.screens.player
+package com.mostaqem.screens.home.presentation.player
 
 import android.content.pm.ActivityInfo
 import androidx.activity.compose.BackHandler
@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mostaqem.R
 import com.mostaqem.screens.home.data.player.PlayerSurah
+import com.mostaqem.screens.home.presentation.toHoursMinutesSeconds
 import com.mostaqem.utils.LockScreenOrientation
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,12 +42,14 @@ import com.mostaqem.utils.LockScreenOrientation
 fun PlayerScreen(
     sheetState: MutableState<Boolean>,
     playerSurah: PlayerSurah,
-    progress: Float,
+    progressPercentage: Float,
     onProgressCallback: (Float) -> Unit,
     onPlay: () -> Unit,
     onSeekNext: () -> Unit,
+    progress: Float,
     onSeekPrevious: () -> Unit,
-    playerIcon: Int
+    playerIcon: Int,
+    duration: Float
 
 ) {
 
@@ -92,8 +95,9 @@ fun PlayerScreen(
             Text(text = playerSurah.reciter.arabicName)
         }
         Slider(
-            value = progress,
+            value = progressPercentage,
             onValueChange = onProgressCallback,
+            valueRange = 0f..100f,
             modifier = Modifier.padding(horizontal = 20.dp)
         )
         Row(
@@ -102,8 +106,8 @@ fun PlayerScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp)
         ) {
-            Text(text = "2:20")
-            Text(text = "4:20")
+            Text(text = progress.toHoursMinutesSeconds())
+            Text(text = duration.toHoursMinutesSeconds())
         }
 
         Row(
@@ -140,3 +144,5 @@ fun PlayerScreen(
 
 
 }
+
+

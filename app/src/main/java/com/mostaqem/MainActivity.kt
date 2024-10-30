@@ -1,7 +1,6 @@
 package com.mostaqem
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -20,7 +19,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,8 +27,7 @@ import androidx.navigation.compose.rememberNavController
 import com.mostaqem.core.navigation.BottomScreens
 import com.mostaqem.core.navigation.HomeScreen
 import com.mostaqem.core.navigation.SettingsScreen
-import com.mostaqem.screens.home.HomeScreen
-import com.mostaqem.screens.home.viewmodel.HomeViewModel
+import com.mostaqem.screens.home.presentation.HomeScreen
 import com.mostaqem.screens.settings.SettingsScreen
 import com.mostaqem.ui.theme.MostaqemTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -42,12 +39,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
             MostaqemTheme {
-
                 MostaqemApp()
-
-
             }
         }
     }
@@ -57,7 +50,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MostaqemApp() {
-
     var selectedItem by rememberSaveable {
         mutableIntStateOf(0)
     }
@@ -70,7 +62,6 @@ fun MostaqemApp() {
 
         NavigationSuiteScaffold(modifier = Modifier.fillMaxSize(), navigationSuiteItems = {
             items.forEach { screen ->
-                Log.d("Routes", "MostaqemApp: ${screen.route} | ${currentRoute}")
                 item(
                     selected = screen.route::class.qualifiedName == currentRoute,
                     onClick = {
@@ -100,13 +91,10 @@ fun MostaqemApp() {
         }) {
             NavHost(navController = navController, startDestination = HomeScreen) {
                 composable<HomeScreen> {
-                    val viewModel: HomeViewModel = hiltViewModel()
 
-                    HomeScreen(viewModel = viewModel)
+                    HomeScreen()
                 }
-
                 composable<SettingsScreen> { SettingsScreen() }
-
 
             }
 

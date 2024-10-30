@@ -1,7 +1,7 @@
-package com.mostaqem.screens.home.viewmodel
+package com.mostaqem.screens.home.presentation
 
+import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,6 +17,9 @@ import com.mostaqem.screens.home.data.player.PlayerSurah
 import com.mostaqem.screens.home.domain.repository.HomeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -41,9 +44,19 @@ class HomeViewModel @Inject constructor(
 
     val isPlayerVisible = mutableStateOf(false)
 
-    private val mediaController = mutableStateOf<MediaController?>(null)
+    private var mediaController: MediaController? = null
 
-    val playerIcon = mutableIntStateOf(R.drawable.outline_play_arrow_24)
+    private val _playPauseIcon = MutableStateFlow(R.drawable.outline_pause_24)
+    val playPauseIcon: StateFlow<Int> = _playPauseIcon
+
+    private val _currentPosition = MutableStateFlow(0L)
+    val currentPosition: StateFlow<Long> = _currentPosition
+
+    private val _positionPercentage = MutableStateFlow<Float>(0f)
+    val positionPercentage: StateFlow<Float> = _positionPercentage
+
+    private val _duration = MutableStateFlow(0L)
+    val duration: StateFlow<Long> = _duration
 
 
     init {
@@ -64,27 +77,43 @@ class HomeViewModel @Inject constructor(
 
         mediaControllerFuture.addListener(
             {
-                mediaController.value = mediaControllerFuture.get()
+                mediaController = mediaControllerFuture.get()
+                mediaController?.addListener(object : Player.Listener {
+                    override fun onIsPlayingChanged(isPlaying: Boolean) {
+                        if (isPlaying) {
+                            _playPauseIcon.value = R.drawable.outline_pause_24
+                        } else {
+                            _playPauseIcon.value = R.drawable.outline_play_arrow_24
+                        }
+                    }
+
+                })
             },
             MoreExecutors.directExecutor()
         )
 
-        mediaController.value?.addListener(object : Player.Listener {
-            override fun onIsPlayingChanged(isPlaying: Boolean) {
-                if (isPlaying) {
-                    playerIcon.intValue = R.drawable.outline_pause_24
-                } else {
-                    playerIcon.intValue = R.drawable.outline_play_arrow_24
-                }
-            }
+        viewModelScope.launch {
+            while (true) {
+                val duration = mediaController?.duration ?: 0L
+                _duration.value = duration
+                val position = mediaController?.currentPosition ?: 0L
+                _currentPosition.value = position
+                _positionPercentage.value = if (duration > 0) {
+                    (position / duration.toFloat()) * 100f
+                } else 0f
 
-        })
+                delay(1000)
+            }
+        }
+
+
     }
 
 
     private fun playerSetItem(url: String) {
-        mediaController.value?.setMediaItem(MediaItem.fromUri(url))
-        mediaController.value?.prepare()
+        mediaController?.setMediaItem(MediaItem.fromUri(url))
+        mediaController?.prepare()
+
     }
 
     fun fetchMediaUrl() {
@@ -96,19 +125,40 @@ class HomeViewModel @Inject constructor(
                 surahID = surahID, reciterID = reciterID, recitationID = null
             ).response.url
             playerSetItem(url)
+            mediaController?.play()
+
 
         }
     }
 
     fun handlePlayPause() {
-        if (mediaController.value?.isPlaying == true) {
-            mediaController.value?.pause()
+        if (mediaController?.isPlaying == true) {
+            mediaController?.pause()
         } else {
-            mediaController.value?.play()
+            mediaController?.play()
         }
     }
 
+    fun seekToPosition(position: Float) {
+        _positionPercentage.value = position
+        val scaledPosition = (position * (mediaController?.duration ?: 0L) / 100f).toLong()
+        mediaController?.seekTo(scaledPosition)
 
+    }
+}
+
+@SuppressLint("DefaultLocale")
+fun Number.toHoursMinutesSeconds(): String {
+    val millis = this.toLong()
+    val hours = (millis / 1000) / 3600
+    val minutes = ((millis / 1000) % 3600) / 60
+    val seconds = (millis / 1000) % 60
+
+    return if (hours > 0) {
+        String.format("%02d:%02d:%02d", hours, minutes, seconds)
+    } else {
+        String.format("%02d:%02d", minutes, seconds)
+    }
 }
 
 
