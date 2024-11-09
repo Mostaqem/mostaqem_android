@@ -4,6 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -89,7 +93,12 @@ fun MostaqemApp() {
 
             }
         }) {
-            NavHost(navController = navController, startDestination = HomeScreen) {
+            NavHost(navController = navController, startDestination = HomeScreen,
+                enterTransition = { slideInHorizontally { -it } + fadeIn() },
+                exitTransition = { slideOutHorizontally { it } + fadeOut() },
+                popEnterTransition = { slideInHorizontally { it } + fadeIn() },
+                popExitTransition = { slideOutHorizontally { -it } + fadeOut() }
+            ) {
                 composable<HomeScreen> {
 
                     HomeScreen()
@@ -103,6 +112,3 @@ fun MostaqemApp() {
     }
 
 }
-
-
-
