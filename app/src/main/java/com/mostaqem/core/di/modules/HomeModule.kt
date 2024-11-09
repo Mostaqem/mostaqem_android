@@ -16,6 +16,8 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -26,12 +28,29 @@ object HomeModule {
 
     @Provides
     @Singleton
-    fun provideHomeService(): HomeService {
+    fun provideLoggingInterceptor(): HttpLoggingInterceptor {
+        return HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+    }
+
+    @Provides
+    fun provideOkHttpClient(loggingInterceptor: HttpLoggingInterceptor): OkHttpClient {
+        return OkHttpClient.Builder().addInterceptor(loggingInterceptor).build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideHomeService(
+        okHttpClient: OkHttpClient
+    ): HomeService {
         val retrofit: Retrofit =
             Retrofit.Builder().baseUrl("https://mostaqem-api.onrender.com/api/v1/")
                 .addConverterFactory(
                     GsonConverterFactory.create()
-                ).build()
+                )
+                .client(okHttpClient)
+                .build()
         return retrofit.create(HomeService::class.java)
     }
 
