@@ -26,7 +26,7 @@ fun SurahCard(image: Any, name: String, onClick: () -> Unit) {
             contentDescription = "surah",
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(16.dp))
                 .height(170.dp)
                 .width(140.dp)
                 .clickable {

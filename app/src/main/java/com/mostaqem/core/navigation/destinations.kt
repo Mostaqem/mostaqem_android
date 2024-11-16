@@ -9,5 +9,5 @@ object HomeScreen
 object SettingsScreen
 
 @Serializable
-object PlayerScreen
+object SurahsScreen
 
