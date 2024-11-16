@@ -4,8 +4,12 @@
 
 ### Screenshots (but it's not over yet):
 
-![home screen](screenshots/home.png)
-![player screen](screenshots/player.png)
+
+<div style="display: flex; gap: 10px; justify-content: center;">
+    <img src="screenshots/home_screen.png" alt="Screenshot 1" width="400" />
+    <img src="screenshots/surah_screen.png" alt="Screenshot 3" width="400" />
+    <img src="screenshots/player.png" alt="Screenshot 2" width="400" />
+</div>
 
 ### Credits
 

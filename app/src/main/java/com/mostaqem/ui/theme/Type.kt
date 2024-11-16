@@ -16,15 +16,23 @@ private val provider = GoogleFont.Provider(
     certificates = R.array.com_google_android_gms_fonts_certs
 )
 private val kufam = GoogleFont("Kufam")
-private val fontFamily = FontFamily(Font(googleFont = kufam, fontProvider = provider))
+val kufamFontFamily = FontFamily(Font(googleFont = kufam, fontProvider = provider))
 
 // Set of Material typography styles to start with
 val Typography = Typography(
-    displayLarge = TextStyle(
-        fontFamily = fontFamily,
-        fontWeight = FontWeight.Bold,
-        fontSize = 18.sp,
+    titleLarge = TextStyle(
+        fontFamily = kufamFontFamily,
+        fontSize = 22.sp,
+        fontWeight = FontWeight.W500
+    ),
+    headlineLarge = TextStyle(
+        fontFamily = kufamFontFamily,
+        fontSize = 34.sp,
     )
+
+
+
+
     /* Other default text styles to override
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
