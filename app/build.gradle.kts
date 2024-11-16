@@ -90,6 +90,7 @@ dependencies {
     implementation(libs.androidx.material3.adaptive.navigation.suite.android)
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.logging.interceptor)
     kapt(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
