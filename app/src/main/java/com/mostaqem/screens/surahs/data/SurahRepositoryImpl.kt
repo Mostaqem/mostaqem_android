@@ -13,12 +13,12 @@ import javax.inject.Singleton
 
 @Singleton
 class SurahRepositoryImpl(
-    private val api: SurahService
+    private val api: SurahService,
 ) : SurahRepository {
     override suspend fun getRemoteSurahs(): Flow<PagingData<Surah>> {
         return Pager(
             config = PagingConfig(pageSize = 10),
-            pagingSourceFactory = {SurahPagingSource(api)}
+            pagingSourceFactory = { SurahPagingSource(api = api) }
         ).flow
     }
 
@@ -27,6 +27,9 @@ class SurahRepositoryImpl(
         return api.getAudio(surahID = surahID, reciterID = reciterID, recitationID = recitationID)
     }
 
+    override suspend fun getSurahs(query: String?): SurahResponse {
+        return api.getQuerySurah(query)
+    }
 
 
 }

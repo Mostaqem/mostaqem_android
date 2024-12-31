@@ -3,7 +3,9 @@ package com.mostaqem.screens.reciters.data.reciter
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity
 data class Reciter(
     @PrimaryKey

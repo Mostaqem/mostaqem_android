@@ -1,6 +1,7 @@
 package com.mostaqem.screens.home.presentation
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mostaqem.core.database.dao.ReciterDao
@@ -32,17 +33,29 @@ class HomeViewModel @Inject constructor(
     private var _savedReciters = MutableStateFlow<List<Reciter>>(emptyList())
     var savedReciters: StateFlow<List<Reciter>> = _savedReciters
 
+    var loading = mutableStateOf<Boolean>(false)
+
     init {
 
+
         viewModelScope.launch(errorHandler) {
+            loading.value = true
+
             surahDao.getSurahs().collect { surahs ->
                 _savedSurahs.value = surahs
+                loading.value = false
             }
+
         }
+
         viewModelScope.launch(errorHandler) {
+            loading.value = true
             reciterDao.getReciters().collect { reciters ->
                 _savedReciters.value = reciters
+                loading.value = false
+
             }
+
         }
 
     }

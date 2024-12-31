@@ -7,7 +7,7 @@ import javax.inject.Inject
 
 
 class SurahPagingSource(
-    private val api: SurahService
+    private val api: SurahService,
 ) : PagingSource<Int, Surah>() {
     override fun getRefreshKey(state: PagingState<Int, Surah>): Int? {
        return null

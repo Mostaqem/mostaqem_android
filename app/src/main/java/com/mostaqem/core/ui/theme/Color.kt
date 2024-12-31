@@ -1,4 +1,4 @@
-package com.mostaqem.ui.theme
+package com.mostaqem.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,6 +1,7 @@
 [versions]
 agp = "8.5.2"
 coilCompose = "2.7.0"
+coilSvg = "3.0.3"
 gson = "2.11.0"
 hiltAndroid = "2.51.1"
 hiltNavigationCompose = "1.2.0"
@@ -10,12 +11,11 @@ junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.6.1"
-activityCompose = "1.8.0"
-composeBom = "2024.04.01"
+activityCompose = "1.10.0-beta01"
+composeBom = "2024.11.00"
 lifecycleViewmodelCompose = "2.8.4"
 media3Ui = "1.4.1"
 pagingCompose = "3.3.2"
-pagingRuntimeVersion = "3.3.2"
 retrofit = "2.11.0"
 roomKtx = "2.6.1"
 roomRuntime = "2.6.1"
@@ -32,6 +32,7 @@ media3Session = "1.4.1"
 loggingInterceptor = "5.0.0-alpha.14"
 hiltCommon = "1.2.0"
 workRuntimeKtx = "2.10.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltNavigationCompose" }
@@ -49,7 +50,8 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit"}
+coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coilSvg" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
@@ -67,10 +69,9 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "pagingRuntimeVersion" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacroJunit4" }
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }

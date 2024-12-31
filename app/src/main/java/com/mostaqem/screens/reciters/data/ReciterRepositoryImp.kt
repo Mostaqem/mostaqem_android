@@ -12,9 +12,13 @@ import javax.inject.Singleton
 
 @Singleton
 class ReciterRepositoryImp(private val api: ReciterService) : ReciterRepository {
-    override suspend fun getRemoteReciters(): Flow<PagingData<Reciter>> {
-        return Pager(config = PagingConfig(pageSize = 5),
-            pagingSourceFactory = { ReciterPagingSource(api) }).flow
+    override suspend fun getRemoteReciters(query: String?): Flow<PagingData<Reciter>> {
+        return Pager(config = PagingConfig(pageSize = 20),
+            pagingSourceFactory = { ReciterPagingSource(api = api, query = query) }).flow
+    }
+
+    override suspend fun getRemoteRecitations(reciterID: Int): Recitation {
+        return api.getRecitations(reciterID)
     }
 
 }

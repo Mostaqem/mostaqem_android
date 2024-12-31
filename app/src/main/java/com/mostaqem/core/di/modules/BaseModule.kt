@@ -59,4 +59,5 @@ object BaseModule {
         return HomeRepository(surahDao = surahDao, reciterDao = reciterDao)
     }
 
+
 }

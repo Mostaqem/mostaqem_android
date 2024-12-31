@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mostaqem.R
-import com.mostaqem.ui.theme.MostaqemTheme
+import com.mostaqem.core.ui.theme.MostaqemTheme
 
 @Composable
 fun PlayerBar(

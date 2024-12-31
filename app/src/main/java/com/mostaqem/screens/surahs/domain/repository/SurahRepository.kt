@@ -1,8 +1,6 @@
 package com.mostaqem.screens.surahs.domain.repository
 
-import androidx.paging.Pager
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
 import com.mostaqem.screens.surahs.data.Surah
 import com.mostaqem.screens.surahs.data.SurahAudio
 import com.mostaqem.screens.surahs.data.SurahResponse
@@ -13,6 +11,5 @@ interface SurahRepository {
 
     suspend fun getSurahUrl(surahID: Int, reciterID: Int, recitationID: Int?): SurahAudio
 
-
-
+    suspend fun getSurahs(query: String?) : SurahResponse
 }
