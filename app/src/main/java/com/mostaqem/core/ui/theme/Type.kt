@@ -1,4 +1,4 @@
-package com.mostaqem.ui.theme
+package com.mostaqem.core.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -15,6 +15,7 @@ private val provider = GoogleFont.Provider(
     providerPackage = "com.google.android.gms",
     certificates = R.array.com_google_android_gms_fonts_certs
 )
+
 private val kufam = GoogleFont("Kufam")
 val kufamFontFamily = FontFamily(Font(googleFont = kufam, fontProvider = provider))
 
@@ -25,12 +26,6 @@ val Typography = Typography(
         fontSize = 22.sp,
         fontWeight = FontWeight.W500
     ),
-    headlineLarge = TextStyle(
-        fontFamily = kufamFontFamily,
-        fontSize = 34.sp,
-    )
-
-
 
 
     /* Other default text styles to override

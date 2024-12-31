@@ -1,4 +1,4 @@
-package com.mostaqem.ui.theme
+package com.mostaqem.core.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

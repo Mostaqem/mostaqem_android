@@ -6,12 +6,10 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.mostaqem.core.database.dao.ReciterDao
-import com.mostaqem.core.database.dao.SurahDao
+import com.mostaqem.screens.reciters.data.RecitationData
 import com.mostaqem.screens.reciters.data.reciter.Reciter
 import com.mostaqem.screens.reciters.domain.ReciterEvents
 import com.mostaqem.screens.reciters.domain.ReciterRepository
-import com.mostaqem.screens.surahs.data.Surah
-import com.mostaqem.screens.surahs.domain.repository.SurahRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,12 +31,20 @@ class ReciterViewModel @Inject constructor(
         MutableStateFlow(value = PagingData.empty())
     val reciterState: StateFlow<PagingData<Reciter>> = _reciterState
 
+    private val _recitationState: MutableStateFlow<List<RecitationData>> =
+        MutableStateFlow(value = emptyList())
+    val recitationState: StateFlow<List<RecitationData>> = _recitationState
+
+
     init {
         viewModelScope.launch(errorHandler) {
-            repository.getRemoteReciters().distinctUntilChanged().cachedIn(viewModelScope).collect {
-                _reciterState.value = it
-            }
+            repository.getRemoteReciters(null).distinctUntilChanged().cachedIn(viewModelScope)
+                .collect {
+                    _reciterState.value = it
+                }
         }
+
+
     }
 
     fun onReciterEvents(event: ReciterEvents) {
@@ -56,5 +62,23 @@ class ReciterViewModel @Inject constructor(
             }
         }
     }
+
+    fun onSearchReciters(query: String?) {
+        viewModelScope.launch(errorHandler) {
+            repository.getRemoteReciters(query).distinctUntilChanged().cachedIn(viewModelScope)
+                .collect {
+                    _reciterState.value = it
+                }
+        }
+    }
+
+    fun getRecitations(reciterID: Int){
+        viewModelScope.launch(errorHandler) {
+            val recitations = repository.getRemoteRecitations(reciterID)
+            _recitationState.value = recitations.response
+
+        }
+    }
+
 
 }

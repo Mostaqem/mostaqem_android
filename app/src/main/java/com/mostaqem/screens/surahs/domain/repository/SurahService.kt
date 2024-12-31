@@ -1,5 +1,6 @@
 package com.mostaqem.screens.surahs.domain.repository
 
+import com.mostaqem.screens.surahs.data.Surah
 import com.mostaqem.screens.surahs.data.SurahAudio
 import com.mostaqem.screens.surahs.data.SurahResponse
 import retrofit2.http.GET
@@ -15,4 +16,11 @@ interface SurahService {
         @Query("reciter_id") reciterID: Int,
         @Query("tilawa_id") recitationID: Int?
     ): SurahAudio
+
+    @GET("surah")
+    suspend fun getSurah(@Query("id") id: Int): SurahResponse
+
+    @GET("surah?take=10&page=1")
+    suspend fun getQuerySurah(@Query("name") query: String?): SurahResponse
+
 }
