@@ -1,4 +1,4 @@
-package com.mostaqem.screens.screenshot.domain
+package com.mostaqem.screens.settings.domain
 
 fun String.toArabicNumbers(): String {
     val englishToArabicDigits = mapOf(
@@ -15,4 +15,3 @@ fun String.toArabicNumbers(): String {
     )
     return this.map { englishToArabicDigits[it] ?: it }.joinToString("")
 }
-

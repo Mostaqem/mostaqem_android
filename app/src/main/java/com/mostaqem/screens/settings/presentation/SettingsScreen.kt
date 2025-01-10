@@ -40,7 +40,7 @@ fun SettingsScreen(modifier: Modifier = Modifier, navController: NavController) 
             }),
 
         Options(name = "تحديث",
-            description = "السمات، عناصر التحكم الإضافية، عرض المحتوى",
+            description = "التحقق من التحديث",
             icon = R.drawable.outline_update_24,
             onClick = {
                 navController.navigate(UpdateDestination)

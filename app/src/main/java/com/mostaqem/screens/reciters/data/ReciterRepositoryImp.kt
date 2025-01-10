@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.mostaqem.screens.reciters.data.reciter.Reciter
+import com.mostaqem.screens.reciters.data.reciter.ReciterResponse
 import com.mostaqem.screens.reciters.domain.ReciterPagingSource
 import com.mostaqem.screens.reciters.domain.ReciterRepository
 import com.mostaqem.screens.reciters.domain.ReciterService
@@ -19,6 +20,10 @@ class ReciterRepositoryImp(private val api: ReciterService) : ReciterRepository 
 
     override suspend fun getRemoteRecitations(reciterID: Int): Recitation {
         return api.getRecitations(reciterID)
+    }
+
+    override suspend fun getReciters(query: String?): ReciterResponse {
+        return api.getQueryReciters(query)
     }
 
 }

@@ -53,7 +53,7 @@ import coil.compose.AsyncImage
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
 import com.mostaqem.screens.player.presentation.PlayerViewModel
-import com.mostaqem.screens.screenshot.domain.toArabicNumbers
+import com.mostaqem.screens.settings.domain.toArabicNumbers
 import com.mostaqem.screens.surahs.data.Surah
 import com.mostaqem.screens.surahs.presentation.components.SurahOptions
 
@@ -83,9 +83,9 @@ fun SurahsScreen(
             SearchBarDefaults.InputField(query = query,
                 onQueryChange = {
                     query = it
-                    viewModel.searchSurahs(query)
+                    viewModel.searchSurahs(it)
                 },
-                onSearch = { query ->
+                onSearch = {
                     expanded = false
                     querySurahsList.value = emptyList()
                 },

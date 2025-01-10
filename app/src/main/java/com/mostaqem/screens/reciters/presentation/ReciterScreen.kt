@@ -14,20 +14,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -44,17 +40,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.mostaqem.R
-import com.mostaqem.screens.home.data.Suggestion
 import com.mostaqem.screens.player.presentation.PlayerViewModel
 import com.mostaqem.screens.reciters.data.reciter.Reciter
 import com.mostaqem.screens.reciters.domain.ReciterEvents
+import com.mostaqem.screens.settings.domain.toArabicNumbers
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,23 +64,23 @@ fun ReciterScreen(
     var query by rememberSaveable { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
     val reciters = viewModel.reciterState.collectAsLazyPagingItems()
+    val queryReciters = viewModel.queryReciters
+    val loading by viewModel.loading.collectAsStateWithLifecycle()
 
-    val searchSuggestions: List<Suggestion> = listOf(
-        Suggestion(name = "السورة", example = "السورة: البقرة, الفاتحة"),
-        Suggestion(name = "الاية", example = "الاية: ألم, حم"),
-        Suggestion(name = "الشيخ", example = "الشيخ: عبدالباسط, المنشاوي"),
-    )
     Column(
-        modifier = Modifier
+        modifier = modifier
             .statusBarsPadding()
             .background(MaterialTheme.colorScheme.surface)
     ) {
         SearchBar(inputField = {
             SearchBarDefaults.InputField(query = query,
-                onQueryChange = { query = it },
-                onSearch = { query ->
+                onQueryChange = {
+                    query = it
+                    viewModel.searchReciters(it)
+                                },
+                onSearch = {
                     expanded = false
-                    viewModel.onSearchReciters(query)
+                    queryReciters.value = emptyList()
                 },
                 placeholder = { Text("ابحث عن الشيخ") },
                 expanded = expanded,
@@ -99,8 +97,6 @@ fun ReciterScreen(
                                 contentDescription = "delete",
                             )
                         }
-                    } else {
-                        if (!expanded) Icon(Icons.Outlined.Menu, contentDescription = "menu")
                     }
                 },
                 trailingIcon = {
@@ -125,7 +121,78 @@ fun ReciterScreen(
                 .align(Alignment.CenterHorizontally)
 
         ) {
+            if (query.isNotEmpty() && !loading && queryReciters.value.isNotEmpty()){
+                val reciters = queryReciters.value
+                val reciterCount: String = reciters.size.toString().toArabicNumbers()
+                val reciterArabic: String = if (reciters.size > 1) "شيوخ" else "شيخ"
+                Text(
+                    text = "$reciterCount $reciterArabic ",
+                    modifier = Modifier.padding(16.dp),
+                    fontWeight = FontWeight.W600,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 128.dp),
+                    verticalArrangement = Arrangement.spacedBy(13.dp),
+                    horizontalArrangement = Arrangement.spacedBy(13.dp),
+                    modifier = Modifier.padding(8.dp)
+                ) {
 
+                    items(queryReciters.value.size) { index ->
+
+
+                        val currentPlayingReciter: Reciter = playerViewModel.playerState.value.reciter
+                        Column(verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.clickable {
+                                playerViewModel.playerState.value =
+                                    playerViewModel.playerState.value.copy(reciter = reciters[index]!!, recitationID = null)
+                                playerViewModel.fetchMediaUrl()
+                                viewModel.onReciterEvents(ReciterEvents.AddReciter(reciters[index]!!))
+                            }) {
+                            Box(contentAlignment = Alignment.Center) {
+                                AsyncImage(
+                                    model = reciters[index]?.image,
+                                    contentDescription = "reciter",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .size(140.dp)
+                                        .clip(CircleShape)
+                                )
+                                if (currentPlayingReciter.arabicName == reciters[index]?.arabicName) {
+                                    Box(
+                                        contentAlignment = Alignment.Center,
+                                        modifier = Modifier
+                                            .size(140.dp)
+                                            .clip(CircleShape)
+                                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.outline_graphic_eq_24),
+                                            contentDescription = "play",
+                                            tint = MaterialTheme.colorScheme.onSurface,
+                                            modifier = Modifier.size(30.dp)
+
+                                        )
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Text(
+                                text = reciters[index].arabicName,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+
+
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(100.dp))
+                    }
+                }
+            }
         }
         Spacer(modifier = Modifier.height(24.dp))
         LazyVerticalGrid(

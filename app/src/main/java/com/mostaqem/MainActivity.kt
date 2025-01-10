@@ -1,5 +1,6 @@
 package com.mostaqem
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,6 +8,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -35,17 +40,16 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
 import com.mostaqem.core.navigation.AppearanceDestination
 import com.mostaqem.core.navigation.BottomScreens
 import com.mostaqem.core.navigation.HomeDestination
-import com.mostaqem.core.navigation.ScreenshotDestination
 import com.mostaqem.core.navigation.SettingsDestination
 import com.mostaqem.core.navigation.SurahsDestination
 import com.mostaqem.core.navigation.UpdateDestination
@@ -55,7 +59,7 @@ import com.mostaqem.core.ui.theme.MostaqemTheme
 import com.mostaqem.screens.home.presentation.HomeScreen
 import com.mostaqem.screens.player.presentation.PlayerViewModel
 import com.mostaqem.screens.player.presentation.components.PlayerBarModalSheet
-import com.mostaqem.screens.screenshot.presentation.ScreenshotScreen
+import com.mostaqem.screens.settings.domain.AppSettingsSerializer
 import com.mostaqem.screens.settings.presentation.SettingsScreen
 import com.mostaqem.screens.settings.presentation.components.AppearanceScreen
 import com.mostaqem.screens.settings.presentation.components.UpdateScreen
@@ -75,6 +79,9 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+
+val Context.dataStore by dataStore(fileName = "app-settings.json", serializer = AppSettingsSerializer)
 
 @Composable
 fun MostaqemApp() {
@@ -177,6 +184,35 @@ fun MostaqemApp() {
                         NavHost(
                             navController = navController,
                             startDestination = HomeDestination,
+
+                            enterTransition = {
+                                fadeIn(animationSpec = tween(durationMillis = 300)) +
+                                        scaleIn(
+                                            initialScale = 0.9f,
+                                            animationSpec = tween(durationMillis = 300)
+                                        )
+                            },
+                            exitTransition = {
+                                fadeOut(animationSpec = tween(durationMillis = 300)) +
+                                        scaleOut(
+                                            targetScale = 0.9f,
+                                            animationSpec = tween(durationMillis = 300)
+                                        )
+                            },
+                            popEnterTransition = {
+                                fadeIn(animationSpec = tween(durationMillis = 300)) +
+                                        scaleIn(
+                                            initialScale = 0.9f,
+                                            animationSpec = tween(durationMillis = 300)
+                                        )
+                            },
+                            popExitTransition = {
+                                fadeOut(animationSpec = tween(durationMillis = 300)) +
+                                        scaleOut(
+                                            targetScale = 0.9f,
+                                            animationSpec = tween(durationMillis = 300)
+                                        )
+                            }
                         ) {
                             composable<HomeDestination> { HomeScreen(playerViewModel) }
                             composable<SurahsDestination> {
@@ -186,18 +222,14 @@ fun MostaqemApp() {
                                 )
                             }
                             composable<SettingsDestination> { SettingsScreen(navController = navController) }
-                            composable<AppearanceDestination> { AppearanceScreen() }
-                            composable<UpdateDestination> { UpdateScreen() }
-                            composable<ScreenshotDestination> {
-                                val args = it.toRoute<ScreenshotDestination>()
-                                ScreenshotScreen(
-                                    message = args.message,
-                                    surahName = args.surahName,
-                                    verseNumber = args.verseNumber,
+                            composable<AppearanceDestination> {
+                                AppearanceScreen(
                                     navController = navController,
-                                    playerSurah = playerViewModel.playerState
+                                    playerViewModel = playerViewModel
                                 )
                             }
+                            composable<UpdateDestination> { UpdateScreen(navController = navController) }
+
                         }
 
 

@@ -4,6 +4,7 @@ import android.content.pm.ActivityInfo
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,9 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Build
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
@@ -36,19 +35,28 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.mostaqem.R
+import com.mostaqem.dataStore
 import com.mostaqem.screens.player.data.BottomSheetType
+import com.mostaqem.screens.player.domain.CustomShape
+import com.mostaqem.screens.player.domain.MaterialShapes
+import com.mostaqem.screens.player.domain.Octagon
 import com.mostaqem.screens.player.presentation.components.QueuePlaylist
 import com.mostaqem.screens.reciters.presentation.Recitations.RecitationList
 import com.mostaqem.screens.reciters.presentation.ReciterScreen
 import com.mostaqem.screens.reciters.presentation.ReciterViewModel
+import com.mostaqem.screens.settings.domain.AppSettings
 import com.mostaqem.utils.LockScreenOrientation
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,7 +68,7 @@ fun PlayerScreen(
     duration: Float,
     playerViewModel: PlayerViewModel
 
-    ) {
+) {
     LockScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -70,14 +78,12 @@ fun PlayerScreen(
     val bottomSheetType by playerViewModel.currentBottomSheet.collectAsState()
     val isPlaying: Boolean = playerIcon == R.drawable.outline_pause_24
     val animatedWidth by animateIntAsState(
-        targetValue = if (isPlaying) 120 else 70,
-        label = "animatedWidth",
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
+        targetValue = if (isPlaying) 120 else 70, label = "animatedWidth", animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow
 
         )
     )
+    val customShapeData = LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value
 
     Column(
         modifier = Modifier
@@ -91,7 +97,9 @@ fun PlayerScreen(
                 contentDescription = "",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(28.dp))
+                    .clip(
+                        MaterialShapes.entries.find { it.id == customShapeData.shapeID }?.shape ?: MaterialShapes.RECT.shape
+                    )
                     .size(300.dp)
                     .align(Alignment.CenterHorizontally)
 
@@ -108,7 +116,7 @@ fun PlayerScreen(
             }
             Slider(
                 value = progressPercentage,
-                onValueChange = {playerViewModel.seekToPosition(it)},
+                onValueChange = { playerViewModel.seekToPosition(it) },
                 modifier = Modifier.padding(horizontal = 20.dp)
             )
             Row(
@@ -127,13 +135,11 @@ fun PlayerScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
 
-                Icon(
-                    painter = painterResource(id = R.drawable.outline_skip_next_24),
+                Icon(painter = painterResource(id = R.drawable.outline_skip_next_24),
                     contentDescription = "previous",
                     modifier = Modifier.clickable {
                         playerViewModel.seekPrevious()
-                    }
-                )
+                    })
                 Spacer(modifier = Modifier.width(16.dp))
                 FilledIconButton(
                     onClick = {
@@ -148,11 +154,9 @@ fun PlayerScreen(
                 }
                 Spacer(modifier = Modifier.width(16.dp))
 
-                Icon(
-                    painter = painterResource(id = R.drawable.outline_skip_previous_24),
+                Icon(painter = painterResource(id = R.drawable.outline_skip_previous_24),
                     contentDescription = "next",
-                    modifier = Modifier.clickable { playerViewModel.seekNext()}
-                )
+                    modifier = Modifier.clickable { playerViewModel.seekNext() })
 
             }
         }
@@ -165,12 +169,14 @@ fun PlayerScreen(
                 }) {
                 when (bottomSheetType) {
                     BottomSheetType.Queue -> QueuePlaylist(
-                        playlists = playerViewModel.queuePlaylist,
-                        player = playerSurah
+                        playlists = playerViewModel.queuePlaylist, player = playerSurah
                     )
+
                     BottomSheetType.Reciters -> ReciterScreen(viewModel = reciterViewModel)
                     BottomSheetType.None -> Box {}
-                    BottomSheetType.Recitations -> RecitationList(viewModel = reciterViewModel, playerViewModel = playerViewModel)
+                    BottomSheetType.Recitations -> RecitationList(
+                        viewModel = reciterViewModel, playerViewModel = playerViewModel
+                    )
                 }
             }
         }
@@ -201,7 +207,10 @@ fun PlayerScreen(
             IconButton(onClick = {
                 playerViewModel.showBottomSheet(BottomSheetType.Recitations)
             }) {
-                Icon(Icons.Outlined.Build, contentDescription = "recitation")
+                Icon(
+                    painter = painterResource(R.drawable.outline_spa_24),
+                    contentDescription = "recitation"
+                )
             }
 
         }
@@ -210,4 +219,18 @@ fun PlayerScreen(
 
 }
 
-
+@Preview
+@Composable
+private fun Shape() {
+    
+    Box(
+        modifier = Modifier
+            .clip(
+                CustomShape(
+                    shapeType = Octagon()
+                )
+            )
+            .background(Color.LightGray)
+            .size(300.dp)
+    )
+}

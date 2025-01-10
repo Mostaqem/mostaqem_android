@@ -4,10 +4,13 @@ import android.app.Application
 import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.mostaqem.screens.home.domain.worker.DeleteWorker
+import com.mostaqem.screens.settings.domain.UpdateWorker
 
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit
@@ -19,6 +22,7 @@ class App : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         enqueueDeleteOldItemsWorker(this)
+        scheduleUpdateCheck(this)
     }
 
     @Inject
@@ -37,4 +41,22 @@ class App : Application(), Configuration.Provider {
         )
     }
 
+    fun scheduleUpdateCheck(context: Context) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val workRequest = PeriodicWorkRequestBuilder<UpdateWorker>(
+            12, TimeUnit.HOURS
+        ).setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "UpdateWorker",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            workRequest
+        )
+    }
+
 }
+

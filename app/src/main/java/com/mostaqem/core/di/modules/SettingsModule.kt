@@ -11,6 +11,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
+import okhttp3.OkHttpClient
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -18,10 +19,11 @@ object SettingsModule {
 
     @Provides
     @Singleton
-    fun provideGitHubApi(): GithubAPI {
+    fun provideGitHubApi(okHttpClient: OkHttpClient): GithubAPI {
         return Retrofit.Builder()
             .baseUrl("https://api.github.com/")
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
             .build()
             .create(GithubAPI::class.java)
     }
