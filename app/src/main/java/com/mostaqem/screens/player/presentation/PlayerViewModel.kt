@@ -1,9 +1,8 @@
 package com.mostaqem.screens.player.presentation
 
 import android.annotation.SuppressLint
-import android.net.Uri
+import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
@@ -16,23 +15,25 @@ import androidx.media3.session.MediaController
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.mostaqem.R
-import com.mostaqem.screens.player.data.Mediadata
+import com.mostaqem.core.ui.controller.SnackbarController
+import com.mostaqem.core.ui.controller.SnackbarEvents
+import com.mostaqem.dataStore
+import com.mostaqem.screens.player.data.BottomSheetType
 import com.mostaqem.screens.player.data.PlayerSurah
 import com.mostaqem.screens.reciters.data.reciter.Reciter
 import com.mostaqem.screens.surahs.data.Data
 import com.mostaqem.screens.surahs.data.Surah
 import com.mostaqem.screens.surahs.domain.repository.SurahRepository
-import com.mostaqem.core.ui.controller.SnackbarController
-import com.mostaqem.core.ui.controller.SnackbarEvents
-import com.mostaqem.screens.player.data.BottomSheetType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.log
 
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
@@ -62,9 +63,6 @@ class PlayerViewModel @Inject constructor(
     private val _currentBottomSheet = MutableStateFlow<BottomSheetType>(BottomSheetType.None)
     val currentBottomSheet: StateFlow<BottomSheetType> = _currentBottomSheet
 
-    private val _chillURL = MutableStateFlow<String?>(null)
-    val chillURL: StateFlow<String?> = _chillURL
-
     private val _duration = MutableStateFlow(0L)
     val duration: StateFlow<Long> = _duration
 
@@ -75,10 +73,10 @@ class PlayerViewModel @Inject constructor(
                 mediaController?.addListener(object : Player.Listener {
                     override fun onIsPlayingChanged(isPlaying: Boolean) {
                         if (isPlaying) {
-                            _playPauseIcon.value = R.drawable.outline_pause_24
+                            _playPauseIcon.update { R.drawable.outline_pause_24 }
                             chillPlayer.play()
                         } else {
-                            _playPauseIcon.value = R.drawable.outline_play_arrow_24
+                            _playPauseIcon.update { R.drawable.outline_play_arrow_24 }
                             chillPlayer.pause()
                         }
                     }
@@ -122,12 +120,9 @@ class PlayerViewModel @Inject constructor(
 
         viewModelScope.launch {
             while (true) {
-                Log.d("D0", "${_duration.value} ")
                 val rawDuration = mediaController?.duration ?: 0L
                 val duration = if (rawDuration < 0) 0L else rawDuration
                 _duration.value = duration
-                Log.d("D1", "${_duration.value} ")
-
                 val position = mediaController?.currentPosition ?: 0L
                 _currentPosition.value = position
                 _positionPercentage.value = if (duration > 0) {
@@ -137,7 +132,6 @@ class PlayerViewModel @Inject constructor(
             }
         }
     }
-
 
     private fun setMetadata(data: Data): MediaItem {
         val metadata: MediaMetadata =
@@ -174,22 +168,50 @@ class PlayerViewModel @Inject constructor(
     }
 
     private fun getQueueUrls(currentSurahID: Int, reciterID: Int) {
+        val previousChapters = (1..3).map { currentSurahID - it }.filter { it > 0 } // Ensure IDs are valid
         val nextChapters = (1..5).map { currentSurahID + it }
-        val mediaItems = mutableListOf<MediaItem>()
-        nextChapters.forEach { id ->
-            viewModelScope.launch(errorHandler) {
+
+        val previousMediaItems = mutableSetOf<MediaItem>()
+
+        val nextMediaItems = mutableSetOf<MediaItem>()
+        val previousJobs = previousChapters.map { id ->
+            viewModelScope.async(errorHandler) {
                 val data: Data = repository.getSurahUrl(
                     surahID = id, reciterID = reciterID, recitationID = null
                 ).response
                 val mediaItem = setMetadata(data)
-                mediaItems.add(mediaItem)
-                if (mediaItems.size == nextChapters.size) {
-                    mediaController?.addMediaItems(mediaItems)
-                }
+                previousMediaItems.add(mediaItem)
+                mediaController?.addMediaItems(0, previousMediaItems.reversed())
             }
         }
-        queuePlaylist = mediaItems
+
+        val currentMediaItem = viewModelScope.async(errorHandler) {
+            val data: Data = repository.getSurahUrl(
+                surahID = currentSurahID, reciterID = reciterID, recitationID = null
+            ).response
+            setMetadata(data)
+        }
+
+        val nextJobs = nextChapters.map { id ->
+            viewModelScope.async(errorHandler) {
+                val data: Data = repository.getSurahUrl(
+                    surahID = id, reciterID = reciterID, recitationID = null
+                ).response
+                val mediaItem = setMetadata(data)
+                nextMediaItems.add(mediaItem)
+                mediaController?.addMediaItems(nextMediaItems.toMutableList())
+            }
+        }
+        viewModelScope.launch {
+            previousJobs.awaitAll()
+            nextJobs.awaitAll()
+            val currentItem = currentMediaItem.await()
+            queuePlaylist = (previousMediaItems.reversed() + currentItem + nextMediaItems).toMutableList()
+            Log.d("QUEUEPLAYLIST", "Queue: $queuePlaylist")
+        }
+
     }
+
 
     fun handlePlayPause() {
         if (mediaController?.isPlaying == true) {
@@ -204,7 +226,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun seekToPosition(position: Float) {
-        _positionPercentage.value = position
+        _positionPercentage.update { position }
         val scaledPosition = (position * (mediaController?.duration ?: 0L) / 1f).toLong()
         mediaController?.seekTo(scaledPosition)
     }
@@ -265,11 +287,21 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun showBottomSheet(sheetType: BottomSheetType) {
-        _currentBottomSheet.value = sheetType
+        _currentBottomSheet.update { sheetType }
     }
 
     fun hideBottomSheet() {
-        _currentBottomSheet.value = BottomSheetType.None
+        _currentBottomSheet.update { BottomSheetType.None }
+    }
+
+    fun changeShape(id: String, context: Context) {
+
+        viewModelScope.launch {
+            context.dataStore.updateData {
+                it.copy(shapeID = id)
+            }
+        }
+
     }
 
 }

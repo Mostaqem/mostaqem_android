@@ -1,6 +1,7 @@
 package com.mostaqem.screens.reciters.presentation
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -10,6 +11,7 @@ import com.mostaqem.screens.reciters.data.RecitationData
 import com.mostaqem.screens.reciters.data.reciter.Reciter
 import com.mostaqem.screens.reciters.domain.ReciterEvents
 import com.mostaqem.screens.reciters.domain.ReciterRepository
+import com.mostaqem.screens.surahs.data.Surah
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,6 +36,12 @@ class ReciterViewModel @Inject constructor(
     private val _recitationState: MutableStateFlow<List<RecitationData>> =
         MutableStateFlow(value = emptyList())
     val recitationState: StateFlow<List<RecitationData>> = _recitationState
+
+    val queryReciters = mutableStateOf<List<Reciter>>(emptyList())
+
+    private val _loading: MutableStateFlow<Boolean> =
+        MutableStateFlow(value = false)
+    val loading: StateFlow<Boolean> = _loading
 
 
     init {
@@ -72,10 +80,20 @@ class ReciterViewModel @Inject constructor(
         }
     }
 
-    fun getRecitations(reciterID: Int){
+    fun getRecitations(reciterID: Int) {
         viewModelScope.launch(errorHandler) {
             val recitations = repository.getRemoteRecitations(reciterID)
             _recitationState.value = recitations.response
+
+        }
+    }
+
+    fun searchReciters(query: String?) {
+        viewModelScope.launch(errorHandler) {
+            _loading.value = true
+            val reciters = repository.getReciters(query).response.reciters
+            queryReciters.value = reciters
+            _loading.value = false
 
         }
     }
