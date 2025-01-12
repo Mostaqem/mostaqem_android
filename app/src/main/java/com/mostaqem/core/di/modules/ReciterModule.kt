@@ -15,13 +15,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object ReciterModule {
-    @Provides
-    @Singleton
-    fun provideReciterService(
-        retrofit: Retrofit
-    ): ReciterService {
-        return retrofit.create(ReciterService::class.java)
-    }
+//    @Provides
+//    @Singleton
+//    fun provideReciterService(
+//        retrofit: Retrofit
+//    ): ReciterService {
+//        return retrofit.create(ReciterService::class.java)
+//    }
 
     @Provides
     @Singleton

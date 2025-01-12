@@ -33,12 +33,4 @@ object PlayerModule {
         return MediaController.Builder(context, sessionToken).buildAsync()
     }
 
-    @Provides
-    @ViewModelScoped
-    fun provideCillPlayer(
-        @ApplicationContext context: Context,
-    ): ExoPlayer {
-        return ExoPlayer.Builder(context).build()
-    }
-
 }

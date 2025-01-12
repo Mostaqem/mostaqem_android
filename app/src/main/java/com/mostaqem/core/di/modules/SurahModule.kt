@@ -16,13 +16,13 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object SurahModule {
 
-    @Provides
-    @Singleton
-    fun provideSurahService(
-        retrofit: Retrofit
-    ): SurahService {
-        return retrofit.create(SurahService::class.java)
-    }
+//    @Provides
+//    @Singleton
+//    fun provideSurahService(
+//        retrofit: Retrofit
+//    ): SurahService {
+//        return retrofit.create(SurahService::class.java)
+//    }
 
     @Provides
     @Singleton
@@ -30,9 +30,9 @@ object SurahModule {
         return SurahRepositoryImpl(api)
     }
 
-    @Provides
-    @Singleton
-    fun provideSurahDao(database: AppDatabase): SurahDao {
-        return database.surahDao
-    }
+//    @Provides
+//    @Singleton
+//    fun provideSurahDao(database: AppDatabase): SurahDao {
+//        return database.surahDao
+//    }
 }

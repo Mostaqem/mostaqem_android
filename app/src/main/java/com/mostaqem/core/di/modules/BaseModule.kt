@@ -25,43 +25,6 @@ object BaseModule {
 
     @Provides
     @Singleton
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor {
-        return HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-    }
-
-    @Provides
-    fun provideOkHttpClient(
-        loggingInterceptor: HttpLoggingInterceptor,
-        @ApplicationContext context: Context
-    ): OkHttpClient {
-        val cacheSize = 10 * 1024 * 1024 // 10 MB
-        val cache = Cache(File(context.cacheDir, "http_cache"), cacheSize.toLong())
-        return OkHttpClient.Builder().cache(cache).addInterceptor(loggingInterceptor).build()
-    }
-
-    @Provides
-    @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        val retrofit: Retrofit =
-            Retrofit.Builder().baseUrl("https://mostaqem-api.onrender.com/api/v1/")
-                .addConverterFactory(
-                    GsonConverterFactory.create()
-                ).client(okHttpClient).build()
-        return retrofit;
-    }
-
-    @Provides
-    @Singleton
-    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
-        return Room.databaseBuilder(
-            context, AppDatabase::class.java, name = "database.db"
-        ).build()
-    }
-
-    @Provides
-    @Singleton
     fun provideHomeRepository(surahDao: SurahDao, reciterDao: ReciterDao): HomeRepository {
         return HomeRepository(surahDao = surahDao, reciterDao = reciterDao)
     }

@@ -47,6 +47,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.history.HistoryScreen
 import com.mostaqem.core.navigation.AppearanceDestination
 import com.mostaqem.core.navigation.BottomScreens
 import com.mostaqem.core.navigation.HomeDestination
@@ -214,7 +215,7 @@ fun MostaqemApp() {
                                         )
                             }
                         ) {
-                            composable<HomeDestination> { HomeScreen(playerViewModel) }
+                            composable<HomeDestination> { HistoryScreen() }
                             composable<SurahsDestination> {
                                 SurahsScreen(
                                     playerViewModel = playerViewModel,

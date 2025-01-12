@@ -22,3 +22,8 @@ dependencyResolutionManagement {
 rootProject.name = "mostaqem"
 include(":app")
 include(":baselineprofile")
+include(":feature:history")
+include(":core:data")
+include(":core:network")
+include(":core:database")
+include(":mylibrary")
