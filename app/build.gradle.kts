@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.baselineprofile)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
