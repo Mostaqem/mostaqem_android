@@ -1,24 +1,32 @@
 package com.mostaqem.screens.player.presentation.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,12 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.mostaqem.R
-import com.mostaqem.core.ui.theme.MostaqemTheme
 
 @Composable
 fun PlayerBar(
@@ -43,7 +47,9 @@ fun PlayerBar(
     reciterName: String,
     progress: Float
 ) {
-    Column {
+    Box(
+        contentAlignment = Alignment.BottomEnd
+    ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -51,13 +57,12 @@ fun PlayerBar(
                 .fillMaxWidth()
                 .padding(15.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row {
                 AsyncImage(
                     model = image,
                     contentDescription = "",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .fillMaxHeight()
                         .size(50.dp)
                         .clip(RoundedCornerShape(8.dp))
                 )
@@ -65,23 +70,24 @@ fun PlayerBar(
                 Column {
                     Text(
                         text = surahName,
-                        fontSize = 16.sp,
                         fontWeight = FontWeight.W600,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleMedium
                     )
                     Text(
                         text = reciterName,
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyMedium
                     )
+
 
                 }
             }
+
             Row {
-                IconButton(
-                    onClick = {
-                        onPlayPause()
-                    }) {
+                IconButton(onClick = {
+                    onPlayPause()
+                }) {
                     Icon(
                         painter = painterResource(id = playerIcon),
                         contentDescription = "play",
@@ -101,26 +107,21 @@ fun PlayerBar(
             }
 
         }
-
-        LinearProgressIndicator(progress = { progress }, modifier = Modifier.fillMaxWidth())
-
-    }
-
-}
-
-
-@PreviewLightDark
-@Composable
-private fun PreviewBar() {
-    MostaqemTheme {
-        PlayerBar(
-            image = "",
-            playerIcon = R.drawable.outline_play_arrow_24,
-            onPlayPause = { /*TODO*/ },
-            surahName = "Surah",
-            reciterName = "Reciter",
-            progress = 0.5f
+        val progressAnimation by animateFloatAsState(
+            targetValue = progress,
+            animationSpec = tween(easing = FastOutSlowInEasing), label = "progress",
+        )
+        LinearProgressIndicator(
+            progress = { progressAnimation },
+            trackColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
         )
     }
 
+
 }
+
+
+

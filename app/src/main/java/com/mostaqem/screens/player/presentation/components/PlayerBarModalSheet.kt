@@ -3,6 +3,7 @@ package com.mostaqem.screens.player.presentation.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -11,11 +12,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.mostaqem.screens.player.data.BottomSheetType
@@ -41,7 +44,7 @@ fun PlayerBarModalSheet(
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
             .height(80.dp)
             .fillMaxWidth()
             .clickable { onShowPlayer() }
@@ -63,8 +66,15 @@ fun PlayerBarModalSheet(
         ModalBottomSheet(
             onDismissRequest = onDismissPlayer,
             sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.background,
-            dragHandle = {}
+            containerColor = MaterialTheme.colorScheme.surface,
+            dragHandle = {},
+            tonalElevation = 3.dp,
+            modifier = Modifier
+                .fillMaxSize()
+                .background(
+                    color = Color.Black.copy(alpha = 0.8f)
+                ),
+            scrimColor = Color.Black.copy(alpha = 0.8f)
         ) {
             PlayerScreen(
                 progress = currentPosition.toFloat(),

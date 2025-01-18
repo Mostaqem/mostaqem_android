@@ -5,5 +5,6 @@ plugins {
     alias(libs.plugins.android.test) apply false
     alias(libs.plugins.baselineprofile) apply false
     id("com.google.dagger.hilt.android") version "2.51.1" apply false
-    id("com.google.devtools.ksp") version "1.9.0-1.0.13" apply false
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27" apply false
+    alias(libs.plugins.compose.compiler) apply false
 }

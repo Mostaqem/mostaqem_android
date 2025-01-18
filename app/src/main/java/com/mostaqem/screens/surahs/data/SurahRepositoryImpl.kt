@@ -17,7 +17,7 @@ class SurahRepositoryImpl(
 ) : SurahRepository {
     override suspend fun getRemoteSurahs(): Flow<PagingData<Surah>> {
         return Pager(
-            config = PagingConfig(pageSize = 10),
+            config = PagingConfig(pageSize = 10, prefetchDistance = 5, initialLoadSize = 5,),
             pagingSourceFactory = { SurahPagingSource(api = api) }
         ).flow
     }

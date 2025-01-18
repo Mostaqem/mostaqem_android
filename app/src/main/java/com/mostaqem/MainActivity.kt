@@ -12,18 +12,24 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteColors
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -81,7 +87,10 @@ class MainActivity : ComponentActivity() {
 }
 
 
-val Context.dataStore by dataStore(fileName = "app-settings.json", serializer = AppSettingsSerializer)
+val Context.dataStore by dataStore(
+    fileName = "app-settings.json",
+    serializer = AppSettingsSerializer
+)
 
 @Composable
 fun MostaqemApp() {
@@ -129,6 +138,9 @@ fun MostaqemApp() {
             }
         ) { padding ->
             NavigationSuiteScaffold(
+                navigationSuiteColors = NavigationSuiteDefaults.colors(
+                    navigationBarContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                ),
                 modifier = Modifier
                     .fillMaxSize()
                     .offset {

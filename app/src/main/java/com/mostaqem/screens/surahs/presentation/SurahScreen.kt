@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Refresh
@@ -50,6 +51,7 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
 import com.mostaqem.screens.player.presentation.PlayerViewModel
@@ -65,7 +67,7 @@ fun SurahsScreen(
     navController: NavController
 ) {
     var query by rememberSaveable { mutableStateOf("") }
-    val querySurahsList = viewModel.queryState
+    val querySurahsList = remember { viewModel.queryState }
     var expanded by rememberSaveable { mutableStateOf(false) }
     val queryLoading = viewModel.loading.value
     val surahs = viewModel.surahState.collectAsLazyPagingItems()
@@ -94,6 +96,22 @@ fun SurahsScreen(
                 onExpandedChange = { expanded = it },
 
                 leadingIcon = {
+                    if (expanded) {
+                        IconButton(onClick = {
+                            query = ""
+                            viewModel.searchSurahs(null)
+                            expanded = false
+
+                        }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                contentDescription = "back"
+                            )
+                        }
+                    }
+
+                },
+                trailingIcon = {
                     if (query.isNotEmpty()) {
                         IconButton(onClick = {
                             query = ""
@@ -105,26 +123,13 @@ fun SurahsScreen(
                                 contentDescription = "delete",
                             )
                         }
-                    }
-                },
-                trailingIcon = {
-                    if (expanded) {
-                        IconButton(onClick = {
-                            query = ""
-                            viewModel.searchSurahs(null)
-                            expanded = false
-
-                        }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
-                                contentDescription = "back"
-                            )
-                        }
                     } else {
                         Icon(
                             imageVector = Icons.Outlined.Search, contentDescription = "search"
                         )
                     }
+
+
                 })
         },
             expanded = expanded,
@@ -157,7 +162,7 @@ fun SurahsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Text(text = "Empty")
+                    Text(text = "لا يوجد سورة بهذا الاسم")
 
                 }
             }
@@ -181,7 +186,7 @@ fun SurahsScreen(
                             leadingContent = {
                                 Box(contentAlignment = Alignment.Center) {
                                     AsyncImage(
-                                        model = surahs[index]?.image,
+                                        model =surahs[index].image,
                                         contentDescription = "surah",
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
@@ -255,7 +260,7 @@ fun SurahsScreen(
             }
         }
         LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-            items(surahs.itemCount) { index ->
+            items(surahs.itemCount, key = { surahs[it]?.id ?: 0 }) { index ->
                 val currentPlayedSurah: Surah? = playerViewModel.playerState.value.surah
                 val isCurrentSurahPlayed: Boolean =
                     currentPlayedSurah != null && currentPlayedSurah.arabicName == surahs[index]?.arabicName

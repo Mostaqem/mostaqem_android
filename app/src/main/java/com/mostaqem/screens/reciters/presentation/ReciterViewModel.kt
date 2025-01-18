@@ -93,6 +93,7 @@ class ReciterViewModel @Inject constructor(
             _loading.value = true
             val reciters = repository.getReciters(query).response.reciters
             queryReciters.value = reciters
+            Log.d("Reciters", "Got Reciters: $reciters")
             _loading.value = false
 
         }
