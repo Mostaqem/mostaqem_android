@@ -10,7 +10,7 @@ class SurahPagingSource(
     private val api: SurahService,
 ) : PagingSource<Int, Surah>() {
     override fun getRefreshKey(state: PagingState<Int, Surah>): Int? {
-       return null
+        return null
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Surah> {

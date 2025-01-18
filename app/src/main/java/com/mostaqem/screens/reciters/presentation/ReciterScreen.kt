@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Refresh
@@ -28,14 +29,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
@@ -48,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import com.mostaqem.R
 import com.mostaqem.screens.player.presentation.PlayerViewModel
 import com.mostaqem.screens.reciters.data.reciter.Reciter
@@ -64,64 +70,73 @@ fun ReciterScreen(
     var query by rememberSaveable { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
     val reciters = viewModel.reciterState.collectAsLazyPagingItems()
-    val queryReciters = viewModel.queryReciters
+    val queryReciters = remember { viewModel.queryReciters }
     val loading by viewModel.loading.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
             .statusBarsPadding()
-            .background(MaterialTheme.colorScheme.surface)
     ) {
-        SearchBar(inputField = {
-            SearchBarDefaults.InputField(query = query,
-                onQueryChange = {
-                    query = it
-                    viewModel.searchReciters(it)
-                                },
-                onSearch = {
-                    expanded = false
-                    queryReciters.value = emptyList()
-                },
-                placeholder = { Text("ابحث عن الشيخ") },
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
+        SearchBar(
+            colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+            inputField = {
+                SearchBarDefaults.InputField(query = query,
+                    onQueryChange = {
+                        query = it
+                        viewModel.searchReciters(it)
+                    },
+                    onSearch = {
+                        expanded = false
+                        queryReciters.value = emptyList()
+                    },
+                    placeholder = { Text("ابحث عن الشيخ") },
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
 
-                leadingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = {
-                            query = ""
-                            viewModel.onSearchReciters(null)
-                        }) {
+                    leadingIcon = {
+                        if (expanded) {
+                            IconButton(onClick = { expanded = false }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                    contentDescription = "back"
+                                )
+                            }
+                        }
+
+                    },
+                    trailingIcon = {
+                        if (query.isNotEmpty()) {
+                            IconButton(onClick = {
+                                query = ""
+                                viewModel.onSearchReciters(null)
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Close,
+                                    contentDescription = "delete",
+                                )
+                            }
+                        } else {
                             Icon(
-                                imageVector = Icons.Outlined.Close,
-                                contentDescription = "delete",
+                                imageVector = Icons.Outlined.Search, contentDescription = "search"
                             )
                         }
-                    }
-                },
-                trailingIcon = {
-                    if (expanded) {
-                        IconButton(onClick = { expanded = false }) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
-                                contentDescription = "back"
-                            )
-                        }
-                    } else {
-                        Icon(
-                            imageVector = Icons.Outlined.Search, contentDescription = "search"
-                        )
-                    }
-                })
-        },
+                    })
+            },
             expanded = expanded,
             onExpandedChange = { expanded = it },
             modifier = Modifier
                 .semantics { traversalIndex = 0f }
                 .align(Alignment.CenterHorizontally)
+                .then(
+                    if (!expanded) {
+                        Modifier.padding(horizontal = 8.dp)
+                    } else {
+                        Modifier
+                    }
+                )
 
         ) {
-            if (query.isNotEmpty() && !loading && queryReciters.value.isNotEmpty()){
+            if (query.isNotEmpty() && !loading && queryReciters.value.isNotEmpty()) {
                 val reciters = queryReciters.value
                 val reciterCount: String = reciters.size.toString().toArabicNumbers()
                 val reciterArabic: String = if (reciters.size > 1) "شيوخ" else "شيخ"
@@ -141,25 +156,29 @@ fun ReciterScreen(
                     items(queryReciters.value.size) { index ->
 
 
-                        val currentPlayingReciter: Reciter = playerViewModel.playerState.value.reciter
+                        val currentPlayingReciter: Reciter =
+                            playerViewModel.playerState.value.reciter
                         Column(verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.clickable {
                                 playerViewModel.playerState.value =
-                                    playerViewModel.playerState.value.copy(reciter = reciters[index]!!, recitationID = null)
+                                    playerViewModel.playerState.value.copy(
+                                        reciter = reciters[index],
+                                        recitationID = null
+                                    )
                                 playerViewModel.fetchMediaUrl()
-                                viewModel.onReciterEvents(ReciterEvents.AddReciter(reciters[index]!!))
+                                viewModel.onReciterEvents(ReciterEvents.AddReciter(reciters[index]))
                             }) {
                             Box(contentAlignment = Alignment.Center) {
                                 AsyncImage(
-                                    model = reciters[index]?.image,
+                                    model = reciters[index].image,
                                     contentDescription = "reciter",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
                                         .size(140.dp)
                                         .clip(CircleShape)
                                 )
-                                if (currentPlayingReciter.arabicName == reciters[index]?.arabicName) {
+                                if (currentPlayingReciter.arabicName == reciters[index].arabicName) {
                                     Box(
                                         contentAlignment = Alignment.Center,
                                         modifier = Modifier
@@ -201,14 +220,17 @@ fun ReciterScreen(
             horizontalArrangement = Arrangement.spacedBy(13.dp),
             modifier = Modifier.padding(8.dp)
         ) {
-            items(reciters.itemCount) { index ->
+            items(reciters.itemCount, key = { reciters[it]?.id ?: 0 }) { index ->
                 if (reciters[index] != null) {
                     val currentPlayingReciter: Reciter = playerViewModel.playerState.value.reciter
                     Column(verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.clickable {
                             playerViewModel.playerState.value =
-                                playerViewModel.playerState.value.copy(reciter = reciters[index]!!, recitationID = null)
+                                playerViewModel.playerState.value.copy(
+                                    reciter = reciters[index]!!,
+                                    recitationID = null
+                                )
                             playerViewModel.fetchMediaUrl()
                             viewModel.onReciterEvents(ReciterEvents.AddReciter(reciters[index]!!))
                         }) {

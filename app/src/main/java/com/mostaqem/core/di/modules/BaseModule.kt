@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.mostaqem.core.database.AppDatabase
 import com.mostaqem.core.database.dao.ReciterDao
 import com.mostaqem.core.database.dao.SurahDao
+import com.mostaqem.core.network.ignoreAllSSLErrors
 import com.mostaqem.screens.home.domain.HomeRepository
 import dagger.Module
 import dagger.Provides
@@ -33,19 +34,19 @@ object BaseModule {
 
     @Provides
     fun provideOkHttpClient(
-        loggingInterceptor: HttpLoggingInterceptor,
-        @ApplicationContext context: Context
+        loggingInterceptor: HttpLoggingInterceptor, @ApplicationContext context: Context
     ): OkHttpClient {
-        val cacheSize = 10 * 1024 * 1024 // 10 MB
+        val cacheSize = 10 * 1024 * 1024
         val cache = Cache(File(context.cacheDir, "http_cache"), cacheSize.toLong())
-        return OkHttpClient.Builder().cache(cache).addInterceptor(loggingInterceptor).build()
+        return OkHttpClient.Builder().cache(cache).ignoreAllSSLErrors()
+            .addInterceptor(loggingInterceptor).build()
     }
 
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         val retrofit: Retrofit =
-            Retrofit.Builder().baseUrl("https://mostaqem-api.onrender.com/api/v1/")
+            Retrofit.Builder().baseUrl("https://209.38.241.76/api/v1/")
                 .addConverterFactory(
                     GsonConverterFactory.create()
                 ).client(okHttpClient).build()
@@ -68,3 +69,5 @@ object BaseModule {
 
 
 }
+
+

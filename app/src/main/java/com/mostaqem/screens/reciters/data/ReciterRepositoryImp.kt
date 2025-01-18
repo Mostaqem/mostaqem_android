@@ -14,7 +14,7 @@ import javax.inject.Singleton
 @Singleton
 class ReciterRepositoryImp(private val api: ReciterService) : ReciterRepository {
     override suspend fun getRemoteReciters(query: String?): Flow<PagingData<Reciter>> {
-        return Pager(config = PagingConfig(pageSize = 20),
+        return Pager(config = PagingConfig(pageSize = 12, initialLoadSize = 6, prefetchDistance = 3),
             pagingSourceFactory = { ReciterPagingSource(api = api, query = query) }).flow
     }
 
