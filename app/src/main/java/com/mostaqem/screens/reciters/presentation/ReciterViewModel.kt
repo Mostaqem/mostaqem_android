@@ -99,5 +99,11 @@ class ReciterViewModel @Inject constructor(
         }
     }
 
+    fun changeDefaultReciter(reciter:Reciter){
+        viewModelScope.launch(errorHandler) {
+            repository.saveDefaultReciter(reciter)
+        }
+    }
+
 
 }

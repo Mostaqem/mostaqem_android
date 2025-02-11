@@ -1,88 +1,101 @@
 package com.mostaqem.screens.player.presentation.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.mostaqem.screens.player.data.BottomSheetType
-import com.mostaqem.screens.player.presentation.PlayerScreen
+import androidx.navigation.NavController
+import com.mostaqem.core.navigation.models.PlayerDestination
+import com.mostaqem.dataStore
 import com.mostaqem.screens.player.presentation.PlayerViewModel
-import com.mostaqem.screens.surahs.data.Surah
+import com.mostaqem.screens.settings.domain.AppSettings
+import com.mostaqem.screens.settings.domain.Language
+import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PlayerBarModalSheet(
-    surah: Surah,
-    isPlayerShown: Boolean,
-    onShowPlayer: () -> Unit,
-    onDismissPlayer: () -> Unit,
-    playerViewModel: PlayerViewModel
+    modifier: Modifier = Modifier,
+    hidePlayer: MutableState<Boolean>,
+    navController: NavController,
+    playerViewModel: PlayerViewModel,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val playerIcon by playerViewModel.playPauseIcon.collectAsState()
-    val positionPercentage by playerViewModel.positionPercentage.collectAsState()
-    val currentPosition by playerViewModel.currentPosition.collectAsState()
-    val duration by playerViewModel.duration.collectAsState()
+    val surah = playerViewModel.playerState.value.surah
+    val reciter = playerViewModel.playerState.value.reciter
+    val progress by playerViewModel.positionPercentage.collectAsState()
+    var offset by remember { mutableFloatStateOf(0f) }
 
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
-            .height(80.dp)
-            .fillMaxWidth()
-            .clickable { onShowPlayer() }
-    ) {
-        PlayerBar(
-            modifier = Modifier
-                .background(Color.Black)
-                .padding(16.dp),
-            image = surah.image,
-            playerIcon = playerIcon,
-            onPlayPause = { playerViewModel.handlePlayPause() },
-            surahName = surah.arabicName,
-            reciterName = playerViewModel.playerState.value.reciter.arabicName,
-            progress = positionPercentage
-        )
-    }
+    val dismissThreshold = 100
+    Box(modifier = modifier
+            .offset { IntOffset(0, offset.roundToInt()) }
+        .pointerInput(Unit) {
+            detectTapGestures(
+                onTap = {
+                    hidePlayer.value = true
+                    navController.navigate(PlayerDestination)
 
-    if (isPlayerShown) {
-        ModalBottomSheet(
-            onDismissRequest = onDismissPlayer,
-            sheetState = sheetState,
-            containerColor = MaterialTheme.colorScheme.surface,
-            dragHandle = {},
-            tonalElevation = 3.dp,
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    color = Color.Black.copy(alpha = 0.8f)
-                ),
-            scrimColor = Color.Black.copy(alpha = 0.8f)
-        ) {
-            PlayerScreen(
-                progress = currentPosition.toFloat(),
-                playerIcon = playerIcon,
-                progressPercentage = positionPercentage,
-                duration = duration.toFloat(),
-                playerViewModel = playerViewModel
+                }
             )
         }
+        .pointerInput(Unit) {
+            // Handle drag gestures
+            detectVerticalDragGestures(
+                onVerticalDrag = { _, dragAmount ->
+                    offset += dragAmount
+                },
+                onDragEnd = {
+                    if (offset > dismissThreshold) {
+                        playerViewModel.clear()
+                    } else {
+                        hidePlayer.value = true
+                        navController.navigate(PlayerDestination)
+                        offset = 0f
+                    }
+                }
+            )
+        }
+        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+        .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+        .height(80.dp)
+        .fillMaxWidth()
+
+    ) {
+        PlayerBar(
+            image = surah!!.image,
+            playerIcon = playerIcon,
+            onPlayPause = { playerViewModel.handlePlayPause() },
+            surahName = surah.arabicName ,
+            reciterName = reciter.arabicName,
+            progress = progress,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedVisibilityScope = animatedVisibilityScope
+        )
+
     }
 }

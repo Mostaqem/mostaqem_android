@@ -17,12 +17,15 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "0.2.0"
+        versionName = "0.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+
+
+
     }
 
     buildTypes {
@@ -33,6 +36,14 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        create("benchmark") {
+            initWith(buildTypes.getByName("release"))
+            signingConfig = signingConfigs.getByName("debug")
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
+            proguardFiles("benchmark-rules.pro")
+
         }
     }
     compileOptions {
@@ -63,19 +74,23 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.coil.compose)
     implementation(libs.navigation.compose)
     implementation(libs.androidx.room.runtime)
-    implementation (libs.androidx.datastore)
+    implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.datastore)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.hilt.common)
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.coil.svg)
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.kotlinx.serialization.json)
@@ -107,3 +122,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 }
 
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}

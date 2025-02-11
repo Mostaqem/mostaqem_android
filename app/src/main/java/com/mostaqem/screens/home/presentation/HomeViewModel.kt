@@ -6,21 +6,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mostaqem.core.database.dao.ReciterDao
 import com.mostaqem.core.database.dao.SurahDao
+import com.mostaqem.core.network.NetworkConnectivityObserver
+import com.mostaqem.core.network.models.NetworkResult
+import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.screens.home.domain.HomeRepository
 import com.mostaqem.screens.reciters.data.reciter.Reciter
+import com.mostaqem.screens.surahs.data.AudioData
 import com.mostaqem.screens.surahs.data.Surah
+import com.mostaqem.screens.surahs.data.SurahRepositoryImpl
+import com.mostaqem.screens.surahs.domain.repository.SurahRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import retrofit2.Response
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val surahDao: SurahDao,
     private val reciterDao: ReciterDao,
-
+    private val surahRepository: SurahRepository,
 ) : ViewModel() {
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         exception.printStackTrace()
@@ -34,6 +43,9 @@ class HomeViewModel @Inject constructor(
     var savedReciters: StateFlow<List<Reciter>> = _savedReciters
 
     var loading = mutableStateOf<Boolean>(false)
+    private var _randomSurahs =
+        MutableStateFlow<NetworkResult<List<AudioData>>>(NetworkResult.Loading())
+    var randomSurah: StateFlow<NetworkResult<List<AudioData>>> = _randomSurahs
 
     init {
 
@@ -57,11 +69,22 @@ class HomeViewModel @Inject constructor(
             }
 
         }
+        fetchData()
 
+    }
+
+    fun fetchData(){
+        viewModelScope.launch(errorHandler) {
+            _randomSurahs.value = NetworkResult.Loading()
+            _randomSurahs.value =
+                surahRepository.getRandomSurahs(limit = 6)
+
+        }
     }
 
 
 }
+
 
 
 

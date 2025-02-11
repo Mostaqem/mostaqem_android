@@ -28,10 +28,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,9 +67,11 @@ import com.mostaqem.screens.settings.domain.toArabicNumbers
 @Composable
 fun ReciterScreen(
     modifier: Modifier = Modifier,
-    viewModel: ReciterViewModel,
+    viewModel: ReciterViewModel = hiltViewModel(),
+    playerViewModel: PlayerViewModel,
+    isDefaultBtn: Boolean = false,
+    bottomSheet: MutableState<Boolean>? = null
 ) {
-    val playerViewModel: PlayerViewModel = hiltViewModel()
     var query by rememberSaveable { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
     val reciters = viewModel.reciterState.collectAsLazyPagingItems()
@@ -138,7 +143,7 @@ fun ReciterScreen(
         ) {
             if (query.isNotEmpty() && !loading && queryReciters.value.isNotEmpty()) {
                 val reciters = queryReciters.value
-                val reciterCount: String = reciters.size.toString().toArabicNumbers()
+                val reciterCount: String = reciters.size.toArabicNumbers()
                 val reciterArabic: String = if (reciters.size > 1) "شيوخ" else "شيخ"
                 Text(
                     text = "$reciterCount $reciterArabic ",
@@ -154,20 +159,25 @@ fun ReciterScreen(
                 ) {
 
                     items(queryReciters.value.size) { index ->
-
-
                         val currentPlayingReciter: Reciter =
                             playerViewModel.playerState.value.reciter
                         Column(verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.clickable {
-                                playerViewModel.playerState.value =
-                                    playerViewModel.playerState.value.copy(
-                                        reciter = reciters[index],
-                                        recitationID = null
-                                    )
-                                playerViewModel.fetchMediaUrl()
-                                viewModel.onReciterEvents(ReciterEvents.AddReciter(reciters[index]))
+                                if (!isDefaultBtn) {
+                                    playerViewModel.changeReciter(reciters[index])
+                                    playerViewModel.fetchMediaUrl(rId = reciters[index].id)
+                                    viewModel.onReciterEvents(ReciterEvents.AddReciter(reciters[index]))
+
+                                } else {
+                                    viewModel.changeDefaultReciter(reciters[index])
+                                    playerViewModel.changeDefaultReciter()
+                                    if (playerViewModel.playerState.value.surah != null){
+                                        playerViewModel.fetchMediaUrl(rId = reciters[index].id)
+                                    }
+                                    bottomSheet!!.value = false
+
+                                }
                             }) {
                             Box(contentAlignment = Alignment.Center) {
                                 AsyncImage(
@@ -220,19 +230,27 @@ fun ReciterScreen(
             horizontalArrangement = Arrangement.spacedBy(13.dp),
             modifier = Modifier.padding(8.dp)
         ) {
-            items(reciters.itemCount, key = { reciters[it]?.id ?: 0 }) { index ->
+            items(reciters.itemCount) { index ->
                 if (reciters[index] != null) {
                     val currentPlayingReciter: Reciter = playerViewModel.playerState.value.reciter
                     Column(verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.clickable {
-                            playerViewModel.playerState.value =
-                                playerViewModel.playerState.value.copy(
-                                    reciter = reciters[index]!!,
-                                    recitationID = null
-                                )
-                            playerViewModel.fetchMediaUrl()
-                            viewModel.onReciterEvents(ReciterEvents.AddReciter(reciters[index]!!))
+                            if (!isDefaultBtn) {
+                                playerViewModel.changeReciter(reciters[index]!!)
+                                playerViewModel.fetchMediaUrl(rId = reciters[index]!!.id)
+                                viewModel.onReciterEvents(ReciterEvents.AddReciter(reciters[index]!!))
+
+                            } else {
+                                viewModel.changeDefaultReciter(reciters[index]!!)
+                                playerViewModel.changeDefaultReciter()
+                                if (playerViewModel.playerState.value.surah != null){
+                                    playerViewModel.fetchMediaUrl(rId = reciters[index]!!.id)
+                                }
+
+                                bottomSheet!!.value = false
+
+                            }
                         }) {
                         Box(contentAlignment = Alignment.Center) {
                             AsyncImage(

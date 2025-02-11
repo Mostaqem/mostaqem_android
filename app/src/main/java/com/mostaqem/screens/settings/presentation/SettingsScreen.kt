@@ -18,22 +18,24 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mostaqem.R
-import com.mostaqem.core.navigation.AppearanceDestination
-import com.mostaqem.core.navigation.UpdateDestination
+import com.mostaqem.core.navigation.models.AppearanceDestination
+import com.mostaqem.core.navigation.models.UpdateDestination
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.screens.settings.data.Options
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(modifier: Modifier = Modifier, navController: NavController) {
-    val options = listOf<Options>(
-        Options(name = "التشغيل",
-            description = "السمات، عناصر التحكم الإضافية، عرض المحتوى",
+    val options = listOf(
+
+        Options(name = "المشغل",
+            description = "تغير شكل المشغل و الخ",
             icon = R.drawable.outline_play_arrow_24,
             onClick = {
                 navController.navigate(AppearanceDestination)

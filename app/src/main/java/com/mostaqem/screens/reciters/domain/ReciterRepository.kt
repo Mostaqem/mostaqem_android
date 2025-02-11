@@ -13,4 +13,8 @@ interface ReciterRepository {
 
     suspend fun getReciters(query: String?): ReciterResponse
 
+    suspend fun getDefaultReciter(): Flow<Reciter>?
+
+    suspend fun saveDefaultReciter(reciter: Reciter)
+
 }

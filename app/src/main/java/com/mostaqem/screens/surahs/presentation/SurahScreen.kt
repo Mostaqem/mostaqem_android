@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
@@ -29,10 +28,13 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,7 +53,6 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
 import com.mostaqem.screens.player.presentation.PlayerViewModel
@@ -77,10 +78,12 @@ fun SurahsScreen(
     var selectedSurah: Surah? by remember {
         mutableStateOf(null)
     }
+    val bottomSheetState = rememberModalBottomSheetState()
+
+    val player = playerViewModel.playerState.value
 
 
-    Column(
-    ) {
+    Column{
         SearchBar(inputField = {
             SearchBarDefaults.InputField(query = query,
                 onQueryChange = {
@@ -168,7 +171,7 @@ fun SurahsScreen(
             }
             if (query.isNotEmpty() && !queryLoading && querySurahsList.value.isNotEmpty()) {
                 val surahs = querySurahsList.value
-                val surahsCount: String = surahs.size.toString().toArabicNumbers()
+                val surahsCount: String = surahs.size.toArabicNumbers()
                 val surahArabic: String = if (surahs.size > 1) "سور" else "سورة"
                 Text(
                     text = "$surahsCount $surahArabic ",
@@ -178,7 +181,7 @@ fun SurahsScreen(
                 )
                 LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                     items(querySurahsList.value.size) { index ->
-                        val currentPlayedSurah: Surah? = playerViewModel.playerState.value.surah
+                        val currentPlayedSurah: Surah? = player.surah
                         val isCurrentSurahPlayed: Boolean =
                             currentPlayedSurah != null && currentPlayedSurah.arabicName == surahs[index].arabicName
                         ListItem(headlineContent = { Text(text = surahs[index].arabicName) },
@@ -232,8 +235,7 @@ fun SurahsScreen(
 
                                 ) else ListItemDefaults.colors(containerColor = Color.Transparent),
                             modifier = Modifier.clickable {
-                                playerViewModel.playerState.value =
-                                    playerViewModel.playerState.value.copy(surah = surahs[index])
+                                playerViewModel.changeSurah(surahs[index])
                                 playerViewModel.fetchMediaUrl()
                                 viewModel.onSurahEvents(SurahEvents.AddSurah(surahs[index]))
                             })
@@ -249,19 +251,20 @@ fun SurahsScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         if (isOptionsShown) {
-            ModalBottomSheet(onDismissRequest = { isOptionsShown = false }) {
+            ModalBottomSheet(onDismissRequest = { isOptionsShown = false }, sheetState = bottomSheetState) {
                 SurahOptions(
                     selectedSurah = selectedSurah,
                     playerViewModel = playerViewModel,
                     navController = navController
                 ) {
                     isOptionsShown = false
+
                 }
             }
         }
         LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-            items(surahs.itemCount, key = { surahs[it]?.id ?: 0 }) { index ->
-                val currentPlayedSurah: Surah? = playerViewModel.playerState.value.surah
+            items(surahs.itemCount) { index ->
+                val currentPlayedSurah: Surah? = player.surah
                 val isCurrentSurahPlayed: Boolean =
                     currentPlayedSurah != null && currentPlayedSurah.arabicName == surahs[index]?.arabicName
                 if (surahs[index] != null) {
@@ -316,8 +319,7 @@ fun SurahsScreen(
 
                             ) else ListItemDefaults.colors(),
                         modifier = Modifier.clickable {
-                            playerViewModel.playerState.value =
-                                playerViewModel.playerState.value.copy(surah = surahs[index])
+                            playerViewModel.changeSurah(surahs[index]!!)
                             playerViewModel.fetchMediaUrl()
                             viewModel.onSurahEvents(SurahEvents.AddSurah(surahs[index]!!))
                         })

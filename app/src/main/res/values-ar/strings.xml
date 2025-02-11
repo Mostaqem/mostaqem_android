@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">مستقيم</string>
+    <string name="language">اللغة</string>
+    <string name="home">الرئيسية</string>
+    <string name="chapters">السور</string>
+    <string name="settings">اعدادات</string>
+
 </resources>
