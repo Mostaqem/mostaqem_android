@@ -11,7 +11,6 @@ import com.mostaqem.screens.reciters.data.RecitationData
 import com.mostaqem.screens.reciters.data.reciter.Reciter
 import com.mostaqem.screens.reciters.domain.ReciterEvents
 import com.mostaqem.screens.reciters.domain.ReciterRepository
-import com.mostaqem.screens.surahs.data.Surah
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -99,7 +98,7 @@ class ReciterViewModel @Inject constructor(
         }
     }
 
-    fun changeDefaultReciter(reciter:Reciter){
+    fun saveDefaultReciter(reciter:Reciter){
         viewModelScope.launch(errorHandler) {
             repository.saveDefaultReciter(reciter)
         }

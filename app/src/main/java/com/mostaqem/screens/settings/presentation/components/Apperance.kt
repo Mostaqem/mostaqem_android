@@ -1,6 +1,7 @@
 package com.mostaqem.screens.settings.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -94,6 +95,9 @@ fun AppearanceScreen(
                 .clip(RoundedCornerShape(25.dp))
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .fillMaxWidth()
+                .clickable {
+                    playerViewModel.changeReciter(userSettings.reciterSaved)
+                }
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -105,7 +109,7 @@ fun AppearanceScreen(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     AsyncImage(
-                        model = userSettings.reciter.image,
+                        model = userSettings.reciterSaved.image,
                         contentDescription = "reciter",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -114,7 +118,7 @@ fun AppearanceScreen(
 
                     )
                     Spacer(Modifier.width(15.dp))
-                    Text(userSettings.reciter.arabicName)
+                    Text(userSettings.reciterSaved.arabicName)
                 }
                 IconButton(onClick = {
                     showReciters.value = true

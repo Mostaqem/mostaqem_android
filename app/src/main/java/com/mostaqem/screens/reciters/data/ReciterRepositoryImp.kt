@@ -41,12 +41,12 @@ class ReciterRepositoryImp @Inject constructor(
 
     override suspend fun getDefaultReciter(): Flow<Reciter> = context.dataStore.data
         .map {
-            it.reciter
+            it.reciterSaved
         }
 
     override suspend fun saveDefaultReciter(reciter: Reciter) {
         context.dataStore.updateData {
-            it.copy(reciter = reciter)
+            it.copy(reciterSaved = reciter)
         }
     }
 

@@ -291,7 +291,6 @@ fun HomeScreen(
 
                                 ) {
                                 playerViewModel.changeReciter(it)
-                                playerViewModel.fetchMediaUrl()
                             }
 
                         }

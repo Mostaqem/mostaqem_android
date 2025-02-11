@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class AppSettings(
     val shapeID: String = "rect",
     val language: Language = Language.ARABIC,
-    val reciter: Reciter = Reciter(
+    val reciterSaved: Reciter = Reciter(
         id = 1,
         arabicName = "عبدالباسط عبدالصمد",
         englishName = "AbdulBaset AbdulSamad",

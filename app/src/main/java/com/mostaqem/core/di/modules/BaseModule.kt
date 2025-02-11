@@ -7,12 +7,15 @@ import com.mostaqem.core.database.dao.ReciterDao
 import com.mostaqem.core.database.dao.SurahDao
 import com.mostaqem.core.network.NetworkConnectivityObserver
 import com.mostaqem.core.network.ignoreAllSSLErrors
+import com.mostaqem.dataStore
 import com.mostaqem.screens.home.domain.HomeRepository
+import com.mostaqem.screens.settings.domain.AppSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.Flow
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -84,6 +87,13 @@ object BaseModule {
     @Singleton
     fun provideNetworkObserver(@ApplicationContext context: Context): NetworkConnectivityObserver {
         return NetworkConnectivityObserver(context)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideDatastore(@ApplicationContext context: Context): Flow<AppSettings> {
+        return context.dataStore.data
     }
 
 }
