@@ -45,7 +45,7 @@ class ApkHandle(private val context: Context) {
             OkHttpClient().newCall(Request.Builder().url(url).build()).execute()
         }
         if (response.isSuccessful) {
-            response.body?.byteStream()?.use { inputStream ->
+            response.body.byteStream()?.use { inputStream ->
                 file.outputStream().use { outputStream ->
                     inputStream.copyTo(outputStream)
                 }
