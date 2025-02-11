@@ -1,5 +1,8 @@
 package com.mostaqem.screens.player.presentation.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -24,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,11 +36,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.MotionLayout
 import coil.compose.AsyncImage
+import com.mostaqem.R
+import com.mostaqem.dataStore
+import com.mostaqem.screens.player.domain.MaterialShapes
+import com.mostaqem.screens.settings.domain.AppSettings
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PlayerBar(
     modifier: Modifier = Modifier,
@@ -45,8 +56,11 @@ fun PlayerBar(
     onPlayPause: () -> Unit,
     surahName: String,
     reciterName: String,
-    progress: Float
+    progress: Float,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
+
     Box(
         contentAlignment = Alignment.BottomEnd
     ) {
@@ -58,14 +72,22 @@ fun PlayerBar(
                 .padding(15.dp)
         ) {
             Row {
-                AsyncImage(
-                    model = image,
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .size(50.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                )
+                with(sharedTransitionScope) {
+                    AsyncImage(
+                        model = image,
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .sharedElement(
+                                rememberSharedContentState(key = "image"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                            .size(50.dp)
+                            .clip(
+                                MaterialShapes.RECT.shape
+                            )
+                    )
+                }
                 Spacer(modifier = Modifier.width(10.dp))
                 Column {
                     Text(
@@ -80,20 +102,22 @@ fun PlayerBar(
                         style = MaterialTheme.typography.bodyMedium
                     )
 
-
                 }
+
+
             }
 
-            Row {
-                IconButton(onClick = {
-                    onPlayPause()
-                }) {
-                    Icon(
-                        painter = painterResource(id = playerIcon),
-                        contentDescription = "play",
-                        tint = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+
+            IconButton(onClick = {
+                onPlayPause()
+            }) {
+                Icon(
+                    painter = painterResource(id = playerIcon),
+                    contentDescription = "play",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
 //            IconButton(
 //                onClick = {},
 //            ) {
@@ -104,7 +128,7 @@ fun PlayerBar(
 //                )
 //            }
 
-            }
+
 
         }
         val progressAnimation by animateFloatAsState(
@@ -119,9 +143,9 @@ fun PlayerBar(
                 .height(1.dp)
         )
     }
-
-
 }
+
+
 
 
 

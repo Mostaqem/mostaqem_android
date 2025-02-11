@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.mostaqem.core.database.AppDatabase
 import com.mostaqem.core.database.dao.ReciterDao
 import com.mostaqem.core.database.dao.SurahDao
+import com.mostaqem.core.network.NetworkConnectivityObserver
 import com.mostaqem.core.network.ignoreAllSSLErrors
 import com.mostaqem.screens.home.domain.HomeRepository
 import dagger.Module
@@ -18,6 +19,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import java.io.IOException
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -45,12 +48,21 @@ object BaseModule {
     @Provides
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        val retrofit: Retrofit =
-            Retrofit.Builder().baseUrl("https://209.38.241.76/api/v1/")
-                .addConverterFactory(
-                    GsonConverterFactory.create()
-                ).client(okHttpClient).build()
-        return retrofit;
+        return Retrofit.Builder()
+            .baseUrl("https://209.38.241.76/api/v1/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient.newBuilder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor { chain ->
+                    try {
+                        chain.proceed(chain.request())
+                    } catch (e: Exception) {
+                        throw IOException("Please check your internet connection")
+                    }
+                }
+                .build())
+            .build()
     }
 
     @Provides
@@ -67,6 +79,12 @@ object BaseModule {
         return HomeRepository(surahDao = surahDao, reciterDao = reciterDao)
     }
 
+
+    @Provides
+    @Singleton
+    fun provideNetworkObserver(@ApplicationContext context: Context): NetworkConnectivityObserver {
+        return NetworkConnectivityObserver(context)
+    }
 
 }
 

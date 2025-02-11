@@ -1,0 +1,64 @@
+{
+  ConstraintSets: {
+    start: {
+      player_pic: {
+        width: 50,
+        height: 50,
+        start: ['parent', 'start', 10],
+        top: ['parent',  'top', 10],
+      },
+      surah_text: {
+        top: ['player_pic', 'top'],
+        bottom: ['player_pic', 'bottom'],
+        start: ['player_pic', 'end'],
+      },
+      box: {
+        height: 'spread',
+        width: 'spread',
+        start: ['parent', 'start'],
+        end: ['parent', 'end'],
+        top: ['parent', 'top'],
+        bottom: ['parent', 'bottom',-15]
+      },
+
+    },
+    end: {
+      player_pic: {
+        width:  300,
+        height: 300,
+        start: ['parent', 'start',200],
+        end: ['parent', 'end'],
+        top: ['parent',  'top', 10],
+      },
+      surah_text: {
+        top: ['player_pic', 'bottom',10],
+        end: ['parent', 'end'],
+        start: ['parent', 'start'],
+      },
+      box: {
+        height: 'spread',
+        width: 'spread',
+        start: ['parent', 'start'],
+        end: ['parent', 'end'],
+        top: ['parent', 'top'],
+        bottom: ['parent', 'bottom',-15]
+      },
+
+    }
+  },
+  Transitions: {
+    default: {
+      from: 'start',
+      to: 'end',
+      pathMotionArc: 'startVertical',
+      KeyFrames: {
+        KeyAttributes: [{
+          target: ['player_pic'],
+          frames: [0, 100],
+          translationX: [0, 100]  // animate from 0 to 100 pixels
+        }]
+      }
+
+    }
+  }
+}

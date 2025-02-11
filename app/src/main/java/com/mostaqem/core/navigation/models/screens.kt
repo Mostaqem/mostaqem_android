@@ -1,12 +1,14 @@
-package com.mostaqem.core.navigation
+package com.mostaqem.core.navigation.models
 
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
 import com.mostaqem.R
 import kotlinx.serialization.Serializable
 
 
 @Serializable
 sealed class BottomScreens<T>(
-    val name: String,
+     val name: String,
     val icon: Int,
     val route: T,
     val selectedIcon: Int,
@@ -23,10 +25,10 @@ sealed class BottomScreens<T>(
 
     @Serializable
     data object Surah : BottomScreens<SurahsDestination>(
-        name = "السور",
-        icon = R.drawable.baseline_radio_button_checked_24,
+        name = "ألسور",
+        icon = R.drawable.quran_book,
         route = SurahsDestination,
-        selectedIcon = R.drawable.baseline_radio_button_checked_24,
+        selectedIcon = R.drawable.quran_book,
         bottomBar = true
 
     )

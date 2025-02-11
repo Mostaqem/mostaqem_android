@@ -2,8 +2,6 @@ package com.mostaqem.screens.surahs.presentation.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.mostaqem.R
-import com.mostaqem.core.navigation.ReadingDestination
+import com.mostaqem.core.navigation.models.ReadingDestination
 import com.mostaqem.screens.player.presentation.PlayerViewModel
 import com.mostaqem.screens.surahs.data.Surah
 
@@ -50,10 +48,8 @@ fun SurahOptions(
                                 .clip(RoundedCornerShape(12.dp))
                         )
                     }
-
                 },
                 colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
-
             )
             HorizontalDivider()
         }
@@ -71,7 +67,6 @@ fun SurahOptions(
                     onDismiss()
                 },
                 colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
-
             )
         }
         item {
@@ -91,7 +86,25 @@ fun SurahOptions(
 
             )
         }
+        item { HorizontalDivider() }
+        item {
+            ListItem(
+                leadingContent = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_menu_book_24),
+                        contentDescription = "read"
+                    )
+                },
+                headlineContent = { Text(text = "اقرأ السورة") },
+                modifier = Modifier.clickable {
+                    val surahID = selectedSurah!!.id
+                    navController.navigate(ReadingDestination(surahID = surahID, surahName = selectedSurah.arabicName))
+                    onDismiss()
 
+                },
+                colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
 
+            )
+        }
     }
 }

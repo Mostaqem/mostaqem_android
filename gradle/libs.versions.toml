@@ -2,7 +2,9 @@
 agp = "8.7.3"
 coilCompose = "2.7.0"
 coilSvg = "3.0.3"
+constraintlayoutCompose = "1.1.0"
 datastore = "1.1.1"
+glanceAppwidget = "1.1.0"
 gson = "2.11.0"
 hiltAndroid = "2.51.1"
 hiltNavigationCompose = "1.2.0"
@@ -12,10 +14,10 @@ junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.6.1"
-activityCompose = "1.10.0-beta01"
-composeBom = "2024.11.00"
+activityCompose = "1.10.0"
+composeBom = "2025.01.01"
 lifecycleViewmodelCompose = "2.8.4"
-media3Ui = "1.4.1"
+media3Ui = "1.5.1"
 pagingCompose = "3.3.2"
 retrofit = "2.11.0"
 roomCompiler = "2.6.1"
@@ -25,19 +27,23 @@ uiTextGoogleFonts = "1.7.1"
 composeNavigation = "2.8.0"
 serialization = "1.6.3"
 uiautomator = "2.2.0"
-benchmarkMacroJunit4 = "1.2.3"
-baselineprofile = "1.2.4"
-profileinstaller = "1.3.1"
+benchmarkMacroJunit4 = "1.3.3"
+baselineprofile = "1.3.3"
+profileinstaller = "1.4.1"
 material3adaptive = "1.0.0"
 material3AdaptiveNavigationSuiteAndroid = "1.3.0"
-media3Session = "1.4.1"
+media3Session = "1.5.1"
 loggingInterceptor = "5.0.0-alpha.14"
 hiltCommon = "1.2.0"
 workRuntimeKtx = "2.10.0"
+composeAnimation = "1.7.6"
 
 [libraries]
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glanceAppwidget" }
+androidx-glance-material3 = { module = "androidx.glance:glance-material3", version.ref = "glanceAppwidget" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltNavigationCompose" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltNavigationCompose" }
@@ -74,6 +80,7 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "composeAnimation" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }

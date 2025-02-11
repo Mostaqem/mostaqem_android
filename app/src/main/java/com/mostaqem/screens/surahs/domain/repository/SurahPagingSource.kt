@@ -16,7 +16,7 @@ class SurahPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Surah> {
         try {
             val nextPage = params.key ?: 1
-            val repos: List<Surah> = api.getSurahs(page = nextPage).response.surahData
+            val repos: List<Surah> = api.getSurahs(page = nextPage).body()!!.response.surahData
             return LoadResult.Page(
                 data = repos,
                 prevKey = if (nextPage == 1) null else nextPage - 1,

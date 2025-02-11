@@ -1,6 +1,5 @@
-package com.mostaqem.core.navigation
+package com.mostaqem.core.navigation.models
 
-import com.mostaqem.screens.player.data.PlayerSurah
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -21,12 +20,14 @@ object SurahsDestination
 @Serializable
 data class ReadingDestination(
     val surahID: Int,
-    val surahName: String
+    val surahName: String,
+
 )
 
 @Serializable
-data class ScreenshotDestination(
-    val message: String,
-    val surahName: String,
-    val verseNumber: Int,
+object PlayerDestination
+
+@Serializable
+data class ShareDestination(
+    val chapterName: String
 )

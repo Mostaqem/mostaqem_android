@@ -37,7 +37,7 @@ class CustomShape(private val shapeType: ShapeType) : Shape {
 }
 
 enum class MaterialShapes(val id: String, val shape: Shape) {
-    RECT("rect", RoundedCornerShape(28.dp)),
+    RECT("rect", RoundedCornerShape(16)),
     OCTAGON("octagon", CustomShape(Octagon())),
     CIRCLE("circle", CircleShape),
 

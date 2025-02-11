@@ -1,17 +1,19 @@
 package com.mostaqem.screens.settings.domain
 
-fun String.toArabicNumbers(): String {
-    val englishToArabicDigits = mapOf(
-        '0' to '٠',
-        '1' to '١',
-        '2' to '٢',
-        '3' to '٣',
-        '4' to '٤',
-        '5' to '٥',
-        '6' to '٦',
-        '7' to '٧',
-        '8' to '٨',
-        '9' to '٩'
-    )
-    return this.map { englishToArabicDigits[it] ?: it }.joinToString("")
+fun Int.toArabicNumbers(): String {
+    return this.toString().map { digit ->
+        when (digit) {
+            '0' -> '٠'
+            '1' -> '١'
+            '2' -> '٢'
+            '3' -> '٣'
+            '4' -> '٤'
+            '5' -> '٥'
+            '6' -> '٦'
+            '7' -> '٧'
+            '8' -> '٨'
+            '9' -> '٩'
+            else -> digit
+        }
+    }.joinToString("")
 }

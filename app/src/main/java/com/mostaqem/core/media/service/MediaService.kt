@@ -1,8 +1,14 @@
 package com.mostaqem.core.media.service
 
 import android.content.Context
+import android.content.Intent
+import android.provider.Settings.Secure.putString
+import android.util.Log
 import androidx.annotation.OptIn
 import androidx.core.app.NotificationCompat
+import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.media3.common.Player
 import androidx.media3.common.Player.Command
 import androidx.media3.common.util.UnstableApi
@@ -13,6 +19,9 @@ import androidx.media3.session.MediaNotification
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
 import com.google.common.collect.ImmutableList
+import com.mostaqem.R
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class MediaService : MediaSessionService() {
     private var mediaSession: MediaSession? = null
@@ -34,6 +43,13 @@ class MediaService : MediaSessionService() {
         super.onDestroy()
     }
 
+    override fun onTaskRemoved(rootIntent: Intent?) {
+        val player = mediaSession?.player!!
+        if (player.playWhenReady) {
+            player.pause()
+        }
+        stopSelf()
+    }
 
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession? =
         mediaSession
@@ -49,8 +65,10 @@ class CustomNotificationProvider(context: Context) : DefaultMediaNotificationPro
         actionFactory: MediaNotification.ActionFactory
     ): IntArray {
         val defaultPlayPauseCommandButton: CommandButton? = mediaButtons.getOrNull(1)
-        val nextButton: CommandButton = CommandButton.Builder(CommandButton.ICON_NEXT).setPlayerCommand(Player.COMMAND_SEEK_TO_NEXT).build()
-        val previousButton: CommandButton = CommandButton.Builder(CommandButton.ICON_PREVIOUS).setPlayerCommand(Player.COMMAND_SEEK_TO_PREVIOUS).build()
+        val nextButton: CommandButton = CommandButton.Builder(CommandButton.ICON_NEXT)
+            .setPlayerCommand(Player.COMMAND_SEEK_TO_NEXT).build()
+        val previousButton: CommandButton = CommandButton.Builder(CommandButton.ICON_PREVIOUS)
+            .setPlayerCommand(Player.COMMAND_SEEK_TO_PREVIOUS).build()
 
         val notificationsButtons = if (defaultPlayPauseCommandButton != null) {
             ImmutableList.builder<CommandButton>().apply {
@@ -61,11 +79,14 @@ class CustomNotificationProvider(context: Context) : DefaultMediaNotificationPro
         } else {
             mediaButtons
         }
+
+
+
         return super.addNotificationActions(
             mediaSession,
             notificationsButtons,
-            builder,
-            actionFactory
+            builder.setSmallIcon(R.drawable.logo),
+            actionFactory,
         )
     }
 }

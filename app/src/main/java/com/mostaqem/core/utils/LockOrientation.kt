@@ -1,4 +1,4 @@
-package com.mostaqem.utils
+package com.mostaqem.core.utils
 
 import android.app.Activity
 import android.content.Context
