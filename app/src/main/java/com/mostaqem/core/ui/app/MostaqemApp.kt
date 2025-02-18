@@ -218,7 +218,12 @@ fun MostaqemApp() {
                                         animationSpec = tween(durationMillis = 300)
                                     )
                                 }) {
-                                composable<HomeDestination> { HomeScreen(playerViewModel) }
+                                composable<HomeDestination> {
+                                    HomeScreen(
+                                        playerViewModel = playerViewModel,
+                                        navController = navController
+                                    )
+                                }
                                 composable<SurahsDestination> {
                                     SurahsScreen(
                                         playerViewModel = playerViewModel,

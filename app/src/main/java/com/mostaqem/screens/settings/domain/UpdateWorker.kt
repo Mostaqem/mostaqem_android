@@ -25,8 +25,7 @@ class UpdateWorker @AssistedInject constructor(
 
                 if (isNewVersionAvailable(currentVersion, latestRelease.tagName)) {
                     val apkUrl = latestRelease.assets.first().browserDownloadUrl
-                    val apkFile = apkHandle.downloadApk(apkUrl, context)
-                    apkHandle.installApk(context, apkFile)
+                    apkHandle.downloadApk(context,apkUrl, allowInstall = false)
                     Result.success()
                 } else {
                     Result.success()

@@ -3,6 +3,7 @@ package com.mostaqem.core.database.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
+import androidx.room.Update
 import androidx.room.Upsert
 import com.mostaqem.screens.surahs.data.Surah
 import kotlinx.coroutines.flow.Flow
@@ -12,10 +13,13 @@ interface SurahDao {
     @Upsert
     suspend fun insertSurah(surah: Surah)
 
+    @Update
+    suspend fun updateSurah(surah: Surah)
+
     @Delete
     suspend fun deleteSurah(surah: Surah)
 
-    @Query("SELECT * FROM Surah")
+    @Query("SELECT * FROM Surah ORDER BY lastAccessed DESC")
     fun getSurahs() : Flow<List<Surah>>
 
     @Query("DELETE FROM Surah WHERE lastAccessed < :oneWeekAgo")

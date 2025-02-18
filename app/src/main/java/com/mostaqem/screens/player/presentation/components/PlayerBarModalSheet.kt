@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
@@ -24,15 +23,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mostaqem.core.navigation.models.PlayerDestination
-import com.mostaqem.dataStore
 import com.mostaqem.screens.player.presentation.PlayerViewModel
-import com.mostaqem.screens.settings.domain.AppSettings
-import com.mostaqem.screens.settings.domain.Language
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalSharedTransitionApi::class)

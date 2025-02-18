@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
 @Composable
-fun SurahCard(image: Any, name: String, onClick: () -> Unit) {
+fun SurahCard(image: Any, name: String, onClick: () -> Unit,onMoreOptionsClick: () -> Unit) {
     Column(
         verticalArrangement = Arrangement.Center,
 
@@ -44,7 +46,7 @@ fun SurahCard(image: Any, name: String, onClick: () -> Unit) {
                     .clickable {
                         onClick()
                     })
-            Box(modifier = Modifier.padding(10.0.dp)){
+            Box(modifier = Modifier.padding(6.0.dp)){
                 Icon(
                     Icons.Default.PlayArrow,
                     contentDescription = "play",
@@ -56,6 +58,23 @@ fun SurahCard(image: Any, name: String, onClick: () -> Unit) {
 
 
                 )
+            }
+            Box(modifier = Modifier.align(Alignment.TopStart)){
+               IconButton(onClick={
+                   onMoreOptionsClick()
+               }) {
+                   Icon(
+                       Icons.Default.MoreVert,
+                       contentDescription = "more",
+                       tint = MaterialTheme.colorScheme.onSurface,
+                       modifier = Modifier
+                           .clip(RoundedCornerShape(8.dp))
+                           .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
+                           .padding(4.dp)
+
+
+                   )
+               }
             }
 
 

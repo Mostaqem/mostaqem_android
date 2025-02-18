@@ -56,6 +56,7 @@ class SurahsViewModel @Inject constructor(
             is SurahEvents.AddSurah -> {
                 viewModelScope.launch {
                     dao.insertSurah(event.surah)
+                    dao.updateSurah(event.surah.copy(lastAccessed = System.currentTimeMillis()))
                 }
             }
 
@@ -76,7 +77,6 @@ class SurahsViewModel @Inject constructor(
 
         }
     }
-
 
 
 }

@@ -54,6 +54,7 @@ class PlayerViewModel @Inject constructor(
         exception.printStackTrace()
         Log.e("Player Error", "${exception.message}")
     }
+
     private var defaultReciter =
         Reciter(
             id = 1,
@@ -83,12 +84,15 @@ class PlayerViewModel @Inject constructor(
     private val _duration = MutableStateFlow(0L)
     val duration: StateFlow<Long> = _duration
 
+
     var isCached = false
 
     init {
-        if (!isCached) {
+
+        viewModelScope.launch {
             changeDefaultReciter()
         }
+
 
         viewModelScope.launch(errorHandler) {
             networkObserver.observe().collect {
@@ -258,7 +262,7 @@ class PlayerViewModel @Inject constructor(
     private fun getQueueUrls(currentSurahID: Int, reciterID: Int) {
         val previousChapters =
             (1..3).map { currentSurahID - it }.filter { it > 0 }
-        val nextChapters = (1..3).map { currentSurahID + it }
+        val nextChapters = (1..3).map { currentSurahID + it }.filter { it <=114 }
 
         val previousMediaItems = mutableSetOf<MediaItem>()
 
@@ -385,7 +389,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    fun pause(){
+    fun pause() {
         mediaController?.pause()
     }
 
@@ -423,8 +427,6 @@ class PlayerViewModel @Inject constructor(
             reciterRepository.getDefaultReciter()!!.collectLatest {
                 Log.d("Choosen Reciter", "changeDefaultReciter: ${it}")
                 defaultReciter = it
-                playerState.value =
-                    playerState.value.copy(reciter = defaultReciter)
             }
 
         }
@@ -453,12 +455,15 @@ class PlayerViewModel @Inject constructor(
     fun changeSurah(surah: Surah) {
         playerState.value =
             playerState.value.copy(surah = surah, reciter = defaultReciter, recitationID = null)
+        fetchMediaUrl()
+
     }
 
     fun changeReciter(reciter: Reciter) {
         playerState.value = playerState.value.copy(
             reciter = reciter, recitationID = null
         )
+        fetchMediaUrl(rId = reciter.id)
     }
 
     fun changeRecitation(id: Int) {
@@ -469,10 +474,11 @@ class PlayerViewModel @Inject constructor(
 
     fun changeShape(id: String, context: Context) {
         viewModelScope.launch {
-            context.dataStore.updateData {
-                it.copy(shapeID = id)
+            context.dataStore.updateData { settings ->
+                settings.copy(shapeID = id)
             }
         }
+
     }
 
     override fun onCleared() {

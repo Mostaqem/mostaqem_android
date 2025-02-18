@@ -1,21 +1,18 @@
 package com.mostaqem.screens.reading.presentation
 
-import android.graphics.Bitmap
 import android.os.Build
-import android.util.Log
-import android.widget.Space
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.rememberTransition
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,6 +25,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
@@ -44,39 +44,33 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.boundsInRoot
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.drawToBitmap
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mostaqem.R
 import com.mostaqem.core.navigation.models.ShareDestination
-import com.mostaqem.core.ui.theme.amiriFont
 import com.mostaqem.core.ui.theme.uthmaniFont
 import com.mostaqem.screens.reading.data.models.Verse
-import com.mostaqem.screens.settings.domain.toArabicNumbers
+import com.mostaqem.screens.settings.presentation.components.toArabicNumbers
 import com.mostaqem.screens.sharescreen.ShareViewModel
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,6 +92,8 @@ fun ReadingScreen(
     val totalPages = (verses.size + versesPerPage - 1) / versesPerPage
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { totalPages })
     var selectedVerses by remember { mutableStateOf<Set<Verse>>(emptySet()) }
+    var enableSelection by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     LaunchedEffect(pagerState.currentPage) {
         if (pagerState.currentPage == totalPages - 1) {
             readingViewModel.preloadVerses(chapterNumber + 1)
@@ -109,7 +105,7 @@ fun ReadingScreen(
     ) {
 
         Crossfade(
-            targetState = selectedVerses.isNotEmpty(),
+            targetState = selectedVerses.isNotEmpty() || enableSelection,
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
                 stiffness = Spring.StiffnessLow
@@ -120,17 +116,24 @@ fun ReadingScreen(
                 TopAppBar(
                     title = { Text("${selectedVerses.size.toArabicNumbers()} اخترت ") },
                     navigationIcon = {
-                        IconButton(onClick = { selectedVerses = emptySet() }) {
+                        IconButton(onClick = {
+                            if (enableSelection) enableSelection = false
+                            selectedVerses = emptySet()
+
+                        }) {
                             Icon(Icons.Default.Close, "close")
                         }
                     },
                     actions = {
-                        IconButton(onClick = {
-                            sharingViewModel.updateVerses(selectedVerses)
-                            navController.navigate(ShareDestination(chapterName = chapterName))
-                        }) {
-                            Icon(Icons.Default.Share, contentDescription = "share")
+                        if (selectedVerses.isNotEmpty()) {
+                            IconButton(onClick = {
+                                sharingViewModel.updateVerses(selectedVerses)
+                                navController.navigate(ShareDestination(chapterName = chapterName))
+                            }) {
+                                Icon(Icons.Default.Share, contentDescription = "share")
+                            }
                         }
+
                     }
                 )
             } else {
@@ -140,6 +143,13 @@ fun ReadingScreen(
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, "back")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {
+                            showBottomSheet.value = true
+                        }) {
+                            Icon(Icons.Default.MoreVert, contentDescription = "more")
                         }
                     }
                 )
@@ -153,18 +163,21 @@ fun ReadingScreen(
                 showBottomSheet.value = false
 
             }) {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    ListItem(
-                        headlineContent = {
-                            Text("انشر اية")
-                        },
-                        leadingContent = {
-                            Icon(Icons.Default.Share, contentDescription = "Share")
-                        },
-                        colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
 
-                        )
-                }
+                ListItem(
+                    headlineContent = {
+                        Text("انشر اية")
+                    },
+                    leadingContent = {
+                        Icon(Icons.Default.Share, contentDescription = "Share")
+                    },
+                    colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                    modifier = Modifier.clickable {
+                        enableSelection = true
+                        showBottomSheet.value = false
+                    }
+                )
+
             }
         }
         var layoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -292,7 +305,7 @@ fun ReadingScreen(
                                                                             .take(7 - selectedVerses.size)
                                                                         selectedVerses += versesToAdd
                                                                     }
-                                                                    // Clicking between existing selections
+
                                                                     else -> {
                                                                         selectedVerses += verse
                                                                     }
@@ -323,6 +336,64 @@ fun ReadingScreen(
                                 )
                             }
                     )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = if (pagerState.currentPage == 0) Arrangement.End else Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+
+                    ) {
+                        AnimatedVisibility(
+                            visible = pagerState.currentPage != 0,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+
+
+                        ) {
+                            IconButton(onClick = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(
+                                        pagerState.currentPage - 1,
+                                        animationSpec = tween(300)
+                                    )
+                                }
+
+                            }) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "back",
+                                )
+                            }
+
+                        }
+                        AnimatedVisibility(
+                            visible = pagerState.currentPage != pagerState.pageCount - 1,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+
+                        ) {
+                            IconButton(
+
+                                onClick = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(
+                                        pagerState.currentPage + 1,
+                                        animationSpec = tween(300)
+                                    )
+                                }
+
+                            }) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = "forward",
+
+                                )
+                            }
+
+
+                        }
+                    }
+
+
                 }
             }
         }
@@ -330,9 +401,9 @@ fun ReadingScreen(
 }
 
 
-fun displayVerseNumber(verse:Int):String{
+fun displayVerseNumber(verse: Int): String {
     val currentAPI = Build.VERSION.SDK_INT
-    if (currentAPI < 33){
+    if (currentAPI < 33) {
         return verse.toArabicNumbers().reversed()
     }
     return verse.toArabicNumbers()

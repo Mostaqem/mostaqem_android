@@ -75,7 +75,9 @@ class CustomNotificationProvider(context: Context) : DefaultMediaNotificationPro
                 add(previousButton)
                 add(defaultPlayPauseCommandButton)
                 add(nextButton)
-            }.build()
+            }.build().also {
+                setSmallIcon(R.drawable.logo)
+            }
         } else {
             mediaButtons
         }
@@ -85,7 +87,7 @@ class CustomNotificationProvider(context: Context) : DefaultMediaNotificationPro
         return super.addNotificationActions(
             mediaSession,
             notificationsButtons,
-            builder.setSmallIcon(R.drawable.logo),
+            builder,
             actionFactory,
         )
     }

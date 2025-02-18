@@ -1,10 +1,7 @@
 package com.mostaqem.core.di.modules
 
 import android.content.Context
-import androidx.compose.ui.platform.LocalContext
-import com.mostaqem.dataStore
 import com.mostaqem.screens.settings.domain.ApkHandle
-import com.mostaqem.screens.settings.domain.AppSettings
 import com.mostaqem.screens.settings.domain.GithubAPI
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,7 +11,6 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 import dagger.Provides
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.Flow
 import okhttp3.OkHttpClient
 
 @Module
@@ -34,8 +30,8 @@ object SettingsModule {
 
     @Provides
     @Singleton
-    fun provideApkHandle(@ApplicationContext context: Context): ApkHandle {
-        return ApkHandle(context)
+    fun provideApkHandle(): ApkHandle {
+        return ApkHandle()
     }
 
 }
