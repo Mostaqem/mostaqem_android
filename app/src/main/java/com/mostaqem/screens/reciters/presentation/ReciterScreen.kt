@@ -54,7 +54,7 @@ import com.mostaqem.R
 import com.mostaqem.screens.player.presentation.PlayerViewModel
 import com.mostaqem.screens.reciters.data.reciter.Reciter
 import com.mostaqem.screens.reciters.domain.ReciterEvents
-import com.mostaqem.screens.settings.domain.toArabicNumbers
+import com.mostaqem.screens.settings.presentation.components.toArabicNumbers
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

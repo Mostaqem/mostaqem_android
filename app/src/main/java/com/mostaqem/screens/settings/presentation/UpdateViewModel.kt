@@ -26,7 +26,7 @@ class UpdateViewModel @Inject constructor(
 
     private val _newVersion = MutableStateFlow<String?>(null)
     val newVersion: StateFlow<String?> = _newVersion
-    var apkInstallURL: String? = null
+    private var apkInstallURL: String? = null
 
     fun checkForUpgrade(currentVersion: String) {
         viewModelScope.launch(errorHandler) {
@@ -43,9 +43,7 @@ class UpdateViewModel @Inject constructor(
     fun performUpgrade(context: Context) {
         viewModelScope.launch(errorHandler) {
             if (apkInstallURL != null) {
-                val apkFile = apkHandle.downloadApk(apkInstallURL!!, context)
-                apkHandle.installApk(context, apkFile)
-
+                apkHandle.downloadApk(context,apkInstallURL!!)
             }
 
         }
@@ -54,5 +52,6 @@ class UpdateViewModel @Inject constructor(
     private fun isNewVersionAvailable(latestVersion: String, currentVersion: String): Boolean {
         return latestVersion > currentVersion
     }
+
 
 }

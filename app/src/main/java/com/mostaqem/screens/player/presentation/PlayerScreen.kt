@@ -10,7 +10,6 @@ import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -77,7 +76,7 @@ import com.mostaqem.screens.player.presentation.components.QueuePlaylist
 import com.mostaqem.screens.reciters.presentation.ReciterScreen
 import com.mostaqem.screens.reciters.presentation.ReciterViewModel
 import com.mostaqem.screens.reciters.presentation.recitations.RecitationList
-import com.mostaqem.screens.settings.domain.AppSettings
+import com.mostaqem.screens.settings.data.AppSettings
 import kotlin.math.roundToInt
 
 @OptIn(

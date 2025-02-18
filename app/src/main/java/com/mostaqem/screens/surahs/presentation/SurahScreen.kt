@@ -30,11 +30,9 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -56,7 +54,7 @@ import coil.compose.AsyncImage
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
 import com.mostaqem.screens.player.presentation.PlayerViewModel
-import com.mostaqem.screens.settings.domain.toArabicNumbers
+import com.mostaqem.screens.settings.presentation.components.toArabicNumbers
 import com.mostaqem.screens.surahs.data.Surah
 import com.mostaqem.screens.surahs.presentation.components.SurahOptions
 

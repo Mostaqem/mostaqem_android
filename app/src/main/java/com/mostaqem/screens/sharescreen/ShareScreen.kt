@@ -27,9 +27,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,6 +63,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.toFontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,7 +74,7 @@ import com.mostaqem.R
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.screens.player.presentation.PlayerViewModel
 import com.mostaqem.screens.reading.presentation.displayVerseNumber
-import com.mostaqem.screens.settings.domain.toArabicNumbers
+import com.mostaqem.screens.settings.presentation.components.toArabicNumbers
 import com.mostaqem.screens.sharescreen.data.SelectedColor
 import com.mostaqem.screens.sharescreen.data.SelectedFont
 import kotlinx.coroutines.delay
@@ -263,33 +266,27 @@ fun ShareScreen(
                         Text("تغير الخط", fontSize = 20.sp)
 
                         LazyRow(
-                            horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceEvenly,
                             modifier = Modifier.fillMaxWidth()
-
                         ) {
                             items(availableFonts) {
-                                Box(
-                                    modifier = Modifier
-                                        .align(Alignment.CenterHorizontally)
-                                        .then(
-                                            if (selectedFont == it) {
-                                                Modifier
-                                                    .border(
-                                                        width = 2.dp,
-                                                        color = Color.White,
-                                                        shape = RoundedCornerShape(18.dp)
-                                                    )
-                                                    .padding(20.dp)
-                                            } else {
-                                                Modifier
-                                            }
-                                        )
-                                        .clickable {
-                                            selectedFont = it
-                                        }) {
-                                    Text(it.name, fontSize = 16.sp)
-                                }
+                                FilterChip(
+                                    selected = selectedFont == it,
+                                    onClick = {
+                                        selectedFont = it
+                                    },
+                                    trailingIcon = {
+                                        if (selectedFont == it){
+                                            Icon(
+                                                Icons.Default.Check,
+                                                contentDescription = "check",
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+
+                                    },
+                                    label = { Text(it.name, textAlign = TextAlign.Center) })
                             }
                         }
 

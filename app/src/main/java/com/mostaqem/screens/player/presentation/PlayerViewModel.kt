@@ -24,7 +24,6 @@ import com.mostaqem.screens.player.data.PlayerSurah
 import com.mostaqem.screens.player.domain.PlayerRepository
 import com.mostaqem.screens.reciters.data.reciter.Reciter
 import com.mostaqem.screens.reciters.domain.ReciterRepository
-import com.mostaqem.screens.settings.domain.AppSettings
 import com.mostaqem.screens.surahs.data.AudioData
 import com.mostaqem.screens.surahs.data.Surah
 import com.mostaqem.screens.surahs.domain.repository.SurahRepository
@@ -34,12 +33,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -266,7 +262,7 @@ class PlayerViewModel @Inject constructor(
     private fun getQueueUrls(currentSurahID: Int, reciterID: Int) {
         val previousChapters =
             (1..3).map { currentSurahID - it }.filter { it > 0 }
-        val nextChapters = (1..3).map { currentSurahID + it }
+        val nextChapters = (1..3).map { currentSurahID + it }.filter { it <=114 }
 
         val previousMediaItems = mutableSetOf<MediaItem>()
 

@@ -4,26 +4,22 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -31,47 +27,42 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
+import androidx.navigation.NavController
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
-import com.mostaqem.core.network.NetworkConnectivityObserver
 import com.mostaqem.core.network.models.NetworkResult
-import com.mostaqem.core.network.models.NetworkStatus
-
+import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.screens.home.presentation.components.ReciterCard
 import com.mostaqem.screens.home.presentation.components.SurahCard
 import com.mostaqem.screens.player.presentation.PlayerViewModel
-import com.mostaqem.core.ui.theme.kufamFontFamily
-import com.mostaqem.screens.player.domain.MaterialShapes
 import com.mostaqem.screens.reciters.domain.ReciterEvents
 import com.mostaqem.screens.reciters.presentation.ReciterViewModel
 import com.mostaqem.screens.surahs.data.AudioData
+import com.mostaqem.screens.surahs.data.Surah
 import com.mostaqem.screens.surahs.presentation.SurahsViewModel
+import com.mostaqem.screens.surahs.presentation.components.SurahOptions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnrememberedMutableState")
@@ -80,13 +71,16 @@ fun HomeScreen(
     playerViewModel: PlayerViewModel,
     viewModel: HomeViewModel = hiltViewModel(),
     surahViewModel: SurahsViewModel = hiltViewModel(),
-    reciterViewModel: ReciterViewModel = hiltViewModel()
+    reciterViewModel: ReciterViewModel = hiltViewModel(),
+    navController: NavController
 ) {
     val scrollState = rememberScrollState()
     val surahs by viewModel.savedSurahs.collectAsState()
     val reciters by viewModel.savedReciters.collectAsState()
     val loading by viewModel.loading
     val randomSurahs by viewModel.randomSurah.collectAsState()
+    var selectedSurah by remember { mutableStateOf<Surah?>(null) }
+    var openOptionsSheet by remember { mutableStateOf(false) }
 
     Column(Modifier.verticalScroll(scrollState)) {
         LargeTopAppBar(title = {
@@ -98,6 +92,22 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Column {
+            if (openOptionsSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        openOptionsSheet = false
+                    }
+                ) {
+                    SurahOptions(
+                        selectedSurah = selectedSurah,
+                        playerViewModel = playerViewModel,
+                        navController = navController
+                    ) {
+                        openOptionsSheet = false
+                    }
+                }
+            }
+
             if (!loading) {
                 Text(
                     "مرشح لك",
@@ -149,21 +159,31 @@ fun HomeScreen(
                         is NetworkResult.Success -> {
                             val data =
                                 (randomSurahs as NetworkResult.Success<List<AudioData>>).data
-                            items(data) {
+                            items(data) { audio ->
                                 Box(contentAlignment = Alignment.Center,
                                     modifier = Modifier
                                         .height(100.dp)
                                         .width(200.dp)
                                         .clip(RoundedCornerShape(16.dp))
                                         .background(MaterialTheme.colorScheme.primaryContainer)
-                                        .clickable {
-                                            playerViewModel.playAudioData(it)
-                                            surahViewModel.onSurahEvents(SurahEvents.AddSurah(it.surah))
-                                            reciterViewModel.onReciterEvents(
-                                                ReciterEvents.AddReciter(
-                                                    it.recitation.reciter
+                                        .pointerInput(Unit) {
+                                            detectTapGestures(onLongPress = {
+                                                selectedSurah = audio.surah
+                                                openOptionsSheet = true
+                                            }, onTap = {
+                                                playerViewModel.playAudioData(audio)
+                                                surahViewModel.onSurahEvents(
+                                                    SurahEvents.AddSurah(
+                                                        audio.surah
+                                                    )
                                                 )
-                                            )
+                                                reciterViewModel.onReciterEvents(
+                                                    ReciterEvents.AddReciter(
+                                                        audio.recitation.reciter
+                                                    )
+                                                )
+                                            })
+
                                         }
 
                                 ) {
@@ -174,11 +194,11 @@ fun HomeScreen(
                                     ) {
                                         Column {
                                             Text(
-                                                it.surah.arabicName,
+                                                audio.surah.arabicName,
                                                 style = MaterialTheme.typography.titleLarge
                                             )
                                             Text(
-                                                it.recitation.reciter.arabicName,
+                                                audio.recitation.reciter.arabicName,
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                                             )
                                         }
@@ -250,16 +270,20 @@ fun HomeScreen(
                     )
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-
+                val lastAccessed: Long = System.currentTimeMillis()
+                println("Current time: $lastAccessed")
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(14.dp),
                     contentPadding = PaddingValues(horizontal = 30.dp, vertical = 20.dp)
                 ) {
                     items(surahs) { surah ->
-                        SurahCard(image = surah.image, name = surah.arabicName) {
+                        println("Last Accessed: ${surah.lastAccessed}")
+                        SurahCard(image = surah.image, name = surah.arabicName, onClick = {
                             playerViewModel.changeSurah(surah)
                             playerViewModel.fetchMediaUrl()
-
+                        }) {
+                            selectedSurah = surah
+                            openOptionsSheet = true
                         }
                     }
 

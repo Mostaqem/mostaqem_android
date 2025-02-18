@@ -1,6 +1,7 @@
 package com.mostaqem.screens.settings.domain
 
 import androidx.datastore.core.Serializer
+import com.mostaqem.screens.settings.data.AppSettings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException

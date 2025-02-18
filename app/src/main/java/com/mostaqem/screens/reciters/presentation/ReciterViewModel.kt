@@ -59,6 +59,8 @@ class ReciterViewModel @Inject constructor(
             is ReciterEvents.AddReciter -> {
                 viewModelScope.launch {
                     dao.insertReciter(event.reciter)
+                    dao.updateReciter(event.reciter.copy(lastAccessed = System.currentTimeMillis()))
+
                 }
             }
 

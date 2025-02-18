@@ -9,7 +9,7 @@ import com.mostaqem.core.network.NetworkConnectivityObserver
 import com.mostaqem.core.network.ignoreAllSSLErrors
 import com.mostaqem.dataStore
 import com.mostaqem.screens.home.domain.HomeRepository
-import com.mostaqem.screens.settings.domain.AppSettings
+import com.mostaqem.screens.settings.data.AppSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
