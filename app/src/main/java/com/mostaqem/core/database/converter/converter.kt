@@ -2,8 +2,8 @@ package com.mostaqem.core.database.converter
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
-import com.mostaqem.screens.reciters.data.reciter.Reciter
-import com.mostaqem.screens.surahs.data.Surah
+import com.mostaqem.features.reciters.data.reciter.Reciter
+import com.mostaqem.features.surahs.data.Surah
 
 class Converters {
     private val gson = Gson()

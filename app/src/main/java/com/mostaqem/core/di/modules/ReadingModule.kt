@@ -2,9 +2,9 @@ package com.mostaqem.core.di.modules
 
 import android.content.Context
 import com.google.gson.Gson
-import com.mostaqem.screens.reading.data.utils.AssetLoader
-import com.mostaqem.screens.reading.data.utils.AssetReader
-import com.mostaqem.screens.reading.domain.ReadingRepository
+import com.mostaqem.features.reading.data.utils.AssetLoader
+import com.mostaqem.features.reading.data.utils.AssetReader
+import com.mostaqem.features.reading.domain.ReadingRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

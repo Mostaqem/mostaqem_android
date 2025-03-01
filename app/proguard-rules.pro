@@ -21,5 +21,10 @@
 #-renamesourcefileattribute SourceFile
 -printmapping
 -printusage
-
+-dontwarn java.awt.image.BufferedImage
+-dontwarn javax.imageio.ImageIO
+-dontwarn javax.imageio.stream.ImageInputStream
+-dontwarn javax.swing.filechooser.FileFilter
 -keep class com.mostaqem.** { *; }
+-keep class org.jaudiotagger.**
+-keep class java.**

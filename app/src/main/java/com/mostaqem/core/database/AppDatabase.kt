@@ -7,12 +7,12 @@ import com.mostaqem.core.database.converter.Converters
 import com.mostaqem.core.database.dao.PlayerDao
 import com.mostaqem.core.database.dao.ReciterDao
 import com.mostaqem.core.database.dao.SurahDao
-import com.mostaqem.screens.player.data.PlayerSurah
-import com.mostaqem.screens.reciters.data.reciter.Reciter
-import com.mostaqem.screens.surahs.data.Surah
+import com.mostaqem.features.player.data.PlayerSurah
+import com.mostaqem.features.reciters.data.reciter.Reciter
+import com.mostaqem.features.surahs.data.Surah
 
 @Database(
-    entities = [Surah::class, Reciter::class,PlayerSurah::class],
+    entities = [Surah::class, Reciter::class, PlayerSurah::class],
     version = 2,
     )
 @TypeConverters(Converters::class)

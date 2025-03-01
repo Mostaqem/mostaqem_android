@@ -2,9 +2,9 @@ package com.mostaqem.core.di.modules
 
 import com.mostaqem.core.database.AppDatabase
 import com.mostaqem.core.database.dao.SurahDao
-import com.mostaqem.screens.surahs.data.SurahRepositoryImpl
-import com.mostaqem.screens.surahs.domain.repository.SurahRepository
-import com.mostaqem.screens.surahs.domain.repository.SurahService
+import com.mostaqem.features.surahs.data.SurahRepositoryImpl
+import com.mostaqem.features.surahs.domain.repository.SurahRepository
+import com.mostaqem.features.surahs.domain.repository.SurahService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

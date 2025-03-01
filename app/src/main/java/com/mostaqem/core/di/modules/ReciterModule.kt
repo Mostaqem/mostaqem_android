@@ -3,9 +3,9 @@ package com.mostaqem.core.di.modules
 import android.content.Context
 import com.mostaqem.core.database.AppDatabase
 import com.mostaqem.core.database.dao.ReciterDao
-import com.mostaqem.screens.reciters.data.ReciterRepositoryImp
-import com.mostaqem.screens.reciters.domain.ReciterRepository
-import com.mostaqem.screens.reciters.domain.ReciterService
+import com.mostaqem.features.reciters.data.ReciterRepositoryImp
+import com.mostaqem.features.reciters.domain.ReciterRepository
+import com.mostaqem.features.reciters.domain.ReciterService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -29,9 +29,8 @@ object ReciterModule {
     @Singleton
     fun provideReciterRepository(
         api: ReciterService,
-        @ApplicationContext context: Context
     ): ReciterRepository {
-        return ReciterRepositoryImp(api, context)
+        return ReciterRepositoryImp(api)
     }
 
     @Provides
