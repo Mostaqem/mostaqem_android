@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -38,12 +39,22 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.Mostaqem"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <data
+                    android:scheme="mostaqem"
+                    android:host="player" />
             </intent-filter>
         </activity>
 
@@ -76,7 +87,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".widget.AppWidgetReceiver"
+            android:name=".features.widget.AppWidgetReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

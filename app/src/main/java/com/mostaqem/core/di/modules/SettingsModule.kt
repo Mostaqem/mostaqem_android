@@ -1,8 +1,10 @@
 package com.mostaqem.core.di.modules
 
 import android.content.Context
-import com.mostaqem.screens.settings.domain.ApkHandle
-import com.mostaqem.screens.settings.domain.GithubAPI
+import com.mostaqem.features.personalization.domain.PersonalizationRepository
+import com.mostaqem.features.reciters.domain.ReciterRepository
+import com.mostaqem.features.update.domain.ApkHandle
+import com.mostaqem.features.update.domain.GithubAPI
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -32,6 +34,15 @@ object SettingsModule {
     @Singleton
     fun provideApkHandle(): ApkHandle {
         return ApkHandle()
+    }
+
+    @Provides
+    @Singleton
+    fun providePersonalizationRepository(
+        @ApplicationContext context: Context,
+        repository: ReciterRepository
+    ): PersonalizationRepository {
+        return PersonalizationRepository(context, repository)
     }
 
 }

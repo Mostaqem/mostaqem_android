@@ -8,8 +8,8 @@ import com.mostaqem.core.database.dao.SurahDao
 import com.mostaqem.core.network.NetworkConnectivityObserver
 import com.mostaqem.core.network.ignoreAllSSLErrors
 import com.mostaqem.dataStore
-import com.mostaqem.screens.home.domain.HomeRepository
-import com.mostaqem.screens.settings.data.AppSettings
+import com.mostaqem.features.history.domain.HomeRepository
+import com.mostaqem.features.settings.data.AppSettings
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,8 +22,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
-import java.io.IOException
-import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
 
 @Module
@@ -55,15 +53,6 @@ object BaseModule {
             .baseUrl("https://209.38.241.76/api/v1/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient.newBuilder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .readTimeout(30, TimeUnit.SECONDS)
-                .addInterceptor { chain ->
-                    try {
-                        chain.proceed(chain.request())
-                    } catch (e: Exception) {
-                        throw IOException("Please check your internet connection")
-                    }
-                }
                 .build())
             .build()
     }

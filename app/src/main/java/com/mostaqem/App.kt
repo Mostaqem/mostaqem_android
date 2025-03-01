@@ -9,8 +9,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.mostaqem.screens.home.domain.worker.DeleteWorker
-import com.mostaqem.screens.settings.domain.UpdateWorker
+import com.mostaqem.features.history.domain.worker.DeleteWorker
+import com.mostaqem.features.update.domain.UpdateWorker
 
 import dagger.hilt.android.HiltAndroidApp
 import java.util.concurrent.TimeUnit

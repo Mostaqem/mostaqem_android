@@ -18,6 +18,12 @@ object UpdateDestination
 object SurahsDestination
 
 @Serializable
+object OfflineDestination
+
+@Serializable
+object OfflineSettingsDestination
+
+@Serializable
 data class ReadingDestination(
     val surahID: Int,
     val surahName: String,

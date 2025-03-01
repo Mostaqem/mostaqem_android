@@ -39,7 +39,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,10 +56,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mostaqem.core.navigation.models.AppearanceDestination
 import com.mostaqem.core.navigation.models.BottomScreens
 import com.mostaqem.core.navigation.models.HomeDestination
+import com.mostaqem.core.navigation.models.OfflineDestination
+import com.mostaqem.core.navigation.models.OfflineSettingsDestination
 import com.mostaqem.core.navigation.models.PlayerDestination
 import com.mostaqem.core.navigation.models.ReadingDestination
 import com.mostaqem.core.navigation.models.SettingsDestination
@@ -71,24 +73,28 @@ import com.mostaqem.core.network.NetworkConnectivityObserver
 import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.core.ui.controller.ObserveAsEvents
 import com.mostaqem.core.ui.controller.SnackbarController
-import com.mostaqem.screens.home.presentation.HomeScreen
-import com.mostaqem.screens.player.presentation.PlayerScreen
-import com.mostaqem.screens.player.presentation.PlayerViewModel
-import com.mostaqem.screens.player.presentation.components.PlayerBarModalSheet
-import com.mostaqem.screens.reading.domain.ReadingRepository
-import com.mostaqem.screens.reading.presentation.ReadingScreen
-import com.mostaqem.screens.settings.presentation.SettingsScreen
-import com.mostaqem.screens.settings.presentation.components.AppearanceScreen
-import com.mostaqem.screens.settings.presentation.components.UpdateScreen
-import com.mostaqem.screens.sharescreen.ShareScreen
-import com.mostaqem.screens.sharescreen.ShareViewModel
-import com.mostaqem.screens.surahs.presentation.SurahsScreen
+import com.mostaqem.features.history.presentation.HistoryScreen
+import com.mostaqem.features.player.presentation.PlayerScreen
+import com.mostaqem.features.player.presentation.PlayerViewModel
+import com.mostaqem.features.player.presentation.components.PlayerBarModalSheet
+import com.mostaqem.features.reading.presentation.ReadingScreen
+import com.mostaqem.features.settings.presentation.SettingsScreen
+import com.mostaqem.features.personalization.presentation.AppearanceScreen
+import com.mostaqem.features.offline.presentation.OfflineSettingsScreen
+import com.mostaqem.features.update.presentation.UpdateScreen
+import com.mostaqem.features.share.ShareScreen
+import com.mostaqem.features.share.ShareViewModel
+import com.mostaqem.features.surahs.presentation.SurahsScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun MostaqemApp() {
-    val items = listOf(BottomScreens.Home, BottomScreens.Surah, BottomScreens.Settings)
+    val items = listOf(
+        BottomScreens.Home,
+        BottomScreens.Surah,
+        BottomScreens.Settings
+    )
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: HomeDestination::class.qualifiedName
@@ -108,6 +114,8 @@ fun MostaqemApp() {
             durationMillis = 300, easing = FastOutSlowInEasing
         ), label = "bottomBarOffset"
     )
+
+
 
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         ObserveAsEvents(flow = SnackbarController.events, snackbarHostState) { event ->
@@ -145,7 +153,6 @@ fun MostaqemApp() {
                                     0, (bottomBarHeight.toPx() * bottomBarOffset).toInt()
                                 )
                             },
-
 
                             selected = isSelected,
                             onClick = {
@@ -219,7 +226,7 @@ fun MostaqemApp() {
                                     )
                                 }) {
                                 composable<HomeDestination> {
-                                    HomeScreen(
+                                    HistoryScreen(
                                         playerViewModel = playerViewModel,
                                         navController = navController
                                     )
@@ -238,14 +245,21 @@ fun MostaqemApp() {
                                     )
                                 }
                                 composable<UpdateDestination> { UpdateScreen(navController = navController) }
-                                composable<PlayerDestination> {
+                                composable<PlayerDestination>(
+                                    deepLinks = listOf(
+                                        navDeepLink<PlayerDestination>(basePath = "mostaqem://player")
+                                    )
+
+                                ) {
+
                                     PlayerScreen(
                                         playerViewModel = playerViewModel,
                                         sharedTransitionScope = this@SharedTransitionLayout,
                                         animatedVisibilityScope = this,
                                         navController = navController,
-                                        onBackPlayer = { hidePlayer.value = false }
-                                    )
+                                        hidePlayerBar = hidePlayer,
+
+                                        )
                                 }
                                 composable<ReadingDestination> {
                                     val args = it.toRoute<ReadingDestination>()
@@ -265,6 +279,10 @@ fun MostaqemApp() {
                                         hidePlayerState = hidePlayer,
                                         playerViewModel = playerViewModel
                                     )
+                                }
+
+                                composable<OfflineSettingsDestination> {
+                                    OfflineSettingsScreen(navController = navController)
                                 }
                             }
                         }

@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
-import com.mostaqem.screens.reciters.data.reciter.Reciter
+import com.mostaqem.features.reciters.data.reciter.Reciter
 import kotlinx.coroutines.flow.Flow
 
 @Dao

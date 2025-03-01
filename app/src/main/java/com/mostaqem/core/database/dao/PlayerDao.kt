@@ -3,7 +3,7 @@ package com.mostaqem.core.database.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.mostaqem.screens.player.data.PlayerSurah
+import com.mostaqem.features.player.data.PlayerSurah
 
 @Dao
 interface PlayerDao {

@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
-import com.mostaqem.screens.surahs.data.Surah
+import com.mostaqem.features.surahs.data.Surah
 import kotlinx.coroutines.flow.Flow
 
 @Dao
