@@ -60,8 +60,8 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mostaqem.core.navigation.models.AppearanceDestination
 import com.mostaqem.core.navigation.models.BottomScreens
+import com.mostaqem.core.navigation.models.DonationDestination
 import com.mostaqem.core.navigation.models.HomeDestination
-import com.mostaqem.core.navigation.models.OfflineDestination
 import com.mostaqem.core.navigation.models.OfflineSettingsDestination
 import com.mostaqem.core.navigation.models.PlayerDestination
 import com.mostaqem.core.navigation.models.ReadingDestination
@@ -73,18 +73,19 @@ import com.mostaqem.core.network.NetworkConnectivityObserver
 import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.core.ui.controller.ObserveAsEvents
 import com.mostaqem.core.ui.controller.SnackbarController
+import com.mostaqem.features.donate.presentation.DonateScreen
 import com.mostaqem.features.history.presentation.HistoryScreen
+import com.mostaqem.features.offline.presentation.OfflineSettingsScreen
+import com.mostaqem.features.personalization.presentation.AppearanceScreen
 import com.mostaqem.features.player.presentation.PlayerScreen
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.player.presentation.components.PlayerBarModalSheet
 import com.mostaqem.features.reading.presentation.ReadingScreen
 import com.mostaqem.features.settings.presentation.SettingsScreen
-import com.mostaqem.features.personalization.presentation.AppearanceScreen
-import com.mostaqem.features.offline.presentation.OfflineSettingsScreen
-import com.mostaqem.features.update.presentation.UpdateScreen
 import com.mostaqem.features.share.ShareScreen
 import com.mostaqem.features.share.ShareViewModel
 import com.mostaqem.features.surahs.presentation.SurahsScreen
+import com.mostaqem.features.update.presentation.UpdateScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -283,6 +284,9 @@ fun MostaqemApp() {
 
                                 composable<OfflineSettingsDestination> {
                                     OfflineSettingsScreen(navController = navController)
+                                }
+                                composable<DonationDestination> {
+                                    DonateScreen(navController = navController)
                                 }
                             }
                         }

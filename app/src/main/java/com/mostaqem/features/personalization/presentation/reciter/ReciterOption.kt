@@ -90,7 +90,6 @@ fun ReciterOption(
 
     ) {
         Column {
-
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,

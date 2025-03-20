@@ -99,5 +99,7 @@
         </receiver>
 
     </application>
-
+    <queries>
+        <package android:name="com.egyptianbanks.instapay" />
+    </queries>
 </manifest>

@@ -328,13 +328,11 @@ fun PlayerScreen(
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(modifier = Modifier.padding(vertical = 10.dp)) {
-
                             AsyncImage(
                                 model = playerSurah.surah?.image,
                                 contentDescription = "",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
-
                                     .clip(
                                         MaterialShapes.entries.find { it.id == customShapeData.shapeID }?.shape
                                             ?: MaterialShapes.RECT.shape
@@ -342,10 +340,7 @@ fun PlayerScreen(
                                     .sizeIn(maxHeight = 300.dp, maxWidth = 300.dp)
                                     .aspectRatio(1f)
                                     .align(Alignment.CenterHorizontally)
-
-
                             )
-
 
 
                         Column(modifier = Modifier.padding(20.dp)) {

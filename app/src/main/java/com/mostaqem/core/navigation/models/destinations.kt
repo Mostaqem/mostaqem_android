@@ -18,9 +18,6 @@ object UpdateDestination
 object SurahsDestination
 
 @Serializable
-object OfflineDestination
-
-@Serializable
 object OfflineSettingsDestination
 
 @Serializable
@@ -32,6 +29,9 @@ data class ReadingDestination(
 
 @Serializable
 object PlayerDestination
+
+@Serializable
+object DonationDestination
 
 @Serializable
 data class ShareDestination(

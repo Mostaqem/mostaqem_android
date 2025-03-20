@@ -55,6 +55,7 @@ import com.mostaqem.core.navigation.models.UpdateDestination
 import com.mostaqem.core.ui.controller.SnackbarController
 import com.mostaqem.core.ui.controller.SnackbarEvents
 import com.mostaqem.core.ui.theme.kufamFontFamily
+import com.mostaqem.features.about.presentation.AboutScreen
 import com.mostaqem.features.player.domain.CustomShape
 import com.mostaqem.features.player.domain.Octagon
 import com.mostaqem.features.settings.data.Options
@@ -64,8 +65,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SettingsScreen(modifier: Modifier = Modifier, navController: NavController) {
     var showSheet by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+
     val options = listOf(
         Options(name = "المشغل",
             description = "تغير شكل المشغل و الخ",
@@ -99,162 +99,9 @@ fun SettingsScreen(modifier: Modifier = Modifier, navController: NavController) 
             onDismissRequest = {
                 showSheet = false
             }) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .clip(CustomShape(Octagon()))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
-                        .size(100.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.logo),
-                        contentDescription = "logo",
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.size(50.dp)
-                    )
-
-                }
-                Spacer(Modifier.height(16.dp))
-                Text(text = "مستقيم", style = MaterialTheme.typography.titleLarge)
-                Spacer(Modifier.height(18.dp))
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.tertiaryContainer)
-                            .size(80.dp)
-                            .clickable {
-                                val url = "https://github.com/mostaqem/mostaqem_android"
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                                try {
-                                    context.startActivity(intent)
-                                } catch (e: ActivityNotFoundException) {
-                                    scope.launch {
-                                        SnackbarController.sendEvent(
-                                            events = SnackbarEvents(message = "لا يوجد حاجة لفتح اللينك")
-                                        )
-
-                                    }
-
-                                }
-
-
-                            }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.github),
-                            contentDescription = "github",
-                            modifier = Modifier.size(45.dp),
-                            tint = MaterialTheme.colorScheme.onTertiaryContainer
-                        )
-                    }
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(18))
-                            .background(MaterialTheme.colorScheme.secondaryContainer)
-                            .size(80.dp)
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text("النسخة")
-                            Text(
-                                BuildConfig.VERSION_NAME,
-                                fontSize = 25.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-
-                        }
-
-                    }
-                }
-                Spacer(Modifier.height(16.dp))
-                Column(
-                    modifier = Modifier
-                        .padding(20.dp)
-                        .clip(RoundedCornerShape(28.dp))
-                ) {
-                    ListItem(
-                        modifier = Modifier.clickable {
-                            val url = "https://github.com/Mostaqem/mostaqem_android/issues/new"
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                            try {
-                                context.startActivity(intent)
-                            } catch (e: ActivityNotFoundException) {
-                                scope.launch {
-                                    SnackbarController.sendEvent(
-                                        events = SnackbarEvents(message = "لا يوجد حاجة لفتح اللينك")
-                                    )
-
-                                }
-
-                            }
-                        },
-                        headlineContent = {
-                            Text(
-                                "إبلاغ عن مشكلة",
-                                fontSize = 23.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(horizontal = 10.dp),
-                                color = MaterialTheme.colorScheme.primary
-
-                            )
-                        },
-                        trailingContent = {
-                            Icon(
-                                painter = painterResource(R.drawable.github),
-                                contentDescription = "person",
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        supportingContent = {
-                            Text(
-                                "اذاننا صاغية",
-                                fontSize = 18.sp,
-                                modifier = Modifier.padding(horizontal = 10.dp)
-                            )
-                        },
-
-                        )
-                    HorizontalDivider()
-                    ListItem(
-                        headlineContent = {
-                            Text(
-                                "المطورون",
-                                fontSize = 23.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(horizontal = 10.dp),
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        },
-                        supportingContent = {
-                            Text(
-                                "مازن عمر - عمر صبرة",
-                                fontSize = 18.sp,
-                                modifier = Modifier.padding(horizontal = 10.dp),
-                            )
-                        },
-                        trailingContent = {
-                            Icon(Icons.Default.Person, contentDescription = "person")
-                        },
-                        )
-                }
-
-
+            AboutScreen(navController=navController){
+                showSheet = false
             }
-
         }
     }
 
