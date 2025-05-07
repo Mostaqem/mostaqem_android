@@ -2,6 +2,8 @@ package com.mostaqem.features.personalization.domain
 
 import android.content.Context
 import com.mostaqem.dataStore
+import com.mostaqem.features.language.data.Language
+import com.mostaqem.features.language.domain.AppLanguages
 import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.reciters.domain.ReciterRepository
 import kotlinx.coroutines.flow.Flow
@@ -48,6 +50,10 @@ class PersonalizationRepository @Inject constructor(
 
     fun getDefaultRecitationID(): Flow<Int> = context.dataStore.data.map {
         it.recitationID
+    }
+
+    suspend fun changeLanguageDatastore(language: AppLanguages) {
+        context.dataStore.updateData { it.copy(language = language) }
     }
 
 

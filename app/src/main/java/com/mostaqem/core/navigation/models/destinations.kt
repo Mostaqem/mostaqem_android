@@ -31,6 +31,9 @@ data class ReadingDestination(
 object PlayerDestination
 
 @Serializable
+object LanguagesDestination
+
+@Serializable
 object DonationDestination
 
 @Serializable

@@ -57,6 +57,10 @@ class SurahsViewModel @Inject constructor(
                     _surahState.value = it
                 }
         }
+        viewModelScope.launch {
+            val localFiles = offlineRepository.getAudioDataFiles()
+            _downloaded.value = localFiles
+        }
     }
 
 

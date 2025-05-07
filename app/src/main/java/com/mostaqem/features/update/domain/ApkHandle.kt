@@ -8,13 +8,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 
 class ApkHandle {
 
     fun downloadApk(context: Context, url: String,allowInstall: Boolean = true) {
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
 
-        val request = DownloadManager.Request(Uri.parse(url)).apply {
+        val request = DownloadManager.Request(url.toUri()).apply {
             setTitle("Mostaqem Update!")
             setDescription("Downloading...")
             setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
@@ -56,7 +57,8 @@ class ApkHandle {
                 when (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))) {
                     DownloadManager.STATUS_SUCCESSFUL -> {
                         val uri =
-                            Uri.parse(cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI)))
+                            cursor.getString(cursor.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI))
+                                .toUri()
                         startInstall(context, uri)
                     }
                 }

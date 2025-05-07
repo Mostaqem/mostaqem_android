@@ -27,13 +27,19 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
 @Composable
-fun SurahCard(image: Any, name: String, onClick: () -> Unit,onMoreOptionsClick: () -> Unit) {
+fun SurahCard(
+    image: Any,
+    name: String,
+    onClick: () -> Unit,
+    onMoreOptionsClick: () -> Unit
+) {
     Column(
         verticalArrangement = Arrangement.Center,
 
         ) {
-        Box(contentAlignment = Alignment.BottomEnd,) {
-            AsyncImage(model = image,
+        Box(contentAlignment = Alignment.BottomEnd) {
+            AsyncImage(
+                model = image,
                 contentDescription = "surah",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -43,7 +49,7 @@ fun SurahCard(image: Any, name: String, onClick: () -> Unit,onMoreOptionsClick: 
                     .clickable {
                         onClick()
                     })
-            Box(modifier = Modifier.padding(6.0.dp)){
+            Box(modifier = Modifier.padding(6.0.dp)) {
                 Icon(
                     Icons.Default.PlayArrow,
                     contentDescription = "play",
@@ -56,22 +62,22 @@ fun SurahCard(image: Any, name: String, onClick: () -> Unit,onMoreOptionsClick: 
 
                 )
             }
-            Box(modifier = Modifier.align(Alignment.TopStart)){
-               IconButton(onClick={
-                   onMoreOptionsClick()
-               }) {
-                   Icon(
-                       Icons.Default.MoreVert,
-                       contentDescription = "more",
-                       tint = MaterialTheme.colorScheme.onSurface,
-                       modifier = Modifier
-                           .clip(RoundedCornerShape(8.dp))
-                           .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
-                           .padding(4.dp)
+            Box(modifier = Modifier.align(Alignment.TopStart)) {
+                IconButton(onClick = {
+                    onMoreOptionsClick()
+                }) {
+                    Icon(
+                        Icons.Default.MoreVert,
+                        contentDescription = "more",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
+                            .padding(4.dp)
 
 
-                   )
-               }
+                    )
+                }
             }
 
 

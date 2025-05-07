@@ -17,7 +17,7 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 1
-        versionName = "0.4.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -26,6 +26,9 @@ android {
 
 
 
+    }
+    androidResources {
+        generateLocaleConfig = true
     }
 
     buildTypes {
@@ -92,6 +95,7 @@ dependencies {
     implementation(libs.coil.svg)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
+    implementation(libs.androidx.appcompat)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.kotlinx.serialization.json)
@@ -115,6 +119,7 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    debugImplementation(libs.ui.test.manifest)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)

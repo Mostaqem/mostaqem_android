@@ -2,10 +2,8 @@ package com.mostaqem.features.surahs.presentation
 
 import android.util.Log
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,10 +17,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.MoreVert
-import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,7 +26,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SearchBar
@@ -47,13 +42,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -62,10 +57,13 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
+import com.mostaqem.dataStore
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.offline.domain.toArabicNumbers
 import com.mostaqem.features.reciters.data.reciter.Reciter
+import com.mostaqem.features.settings.data.AppSettings
 import com.mostaqem.features.surahs.data.Surah
+import com.mostaqem.features.surahs.presentation.components.SurahListItem
 import com.mostaqem.features.surahs.presentation.components.SurahOptions
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,60 +91,66 @@ fun SurahsScreen(
     val downloadedSurahs by viewModel.downloaded.collectAsState()
     var showDownloads by remember { mutableStateOf(false) }
     val player = playerViewModel.playerState.value
+    val languageCode =
+        LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
+
+    val isArabic = languageCode == "ar"
 
 
     Column {
-        SearchBar(inputField = {
-            SearchBarDefaults.InputField(query = query,
-                onQueryChange = {
-                    query = it
-                    viewModel.searchSurahs(it)
-                },
-                onSearch = {
-                    expanded = false
-                    querySurahsList.value = emptyList()
-                },
-                placeholder = { Text("ابحث عن السورة") },
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
+        SearchBar(
+            inputField = {
+                SearchBarDefaults.InputField(
+                    query = query,
+                    onQueryChange = {
+                        query = it
+                        viewModel.searchSurahs(it)
+                    },
+                    onSearch = {
+                        expanded = false
+                        querySurahsList.value = emptyList()
+                    },
+                    placeholder = { Text(stringResource(R.string.search_chapter)) },
+                    expanded = expanded,
+                    onExpandedChange = { expanded = it },
 
-                leadingIcon = {
-                    if (expanded) {
-                        IconButton(onClick = {
-                            query = ""
-                            viewModel.searchSurahs(null)
-                            expanded = false
+                    leadingIcon = {
+                        if (expanded) {
+                            IconButton(onClick = {
+                                query = ""
+                                viewModel.searchSurahs(null)
+                                expanded = false
 
-                        }) {
+                            }) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                    contentDescription = "back"
+                                )
+                            }
+                        }
+
+                    },
+                    trailingIcon = {
+                        if (query.isNotEmpty()) {
+                            IconButton(onClick = {
+                                query = ""
+                                viewModel.searchSurahs(null)
+
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Close,
+                                    contentDescription = "delete",
+                                )
+                            }
+                        } else {
                             Icon(
-                                imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                                contentDescription = "back"
+                                imageVector = Icons.Outlined.Search, contentDescription = "search"
                             )
                         }
-                    }
-
-                },
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = {
-                            query = ""
-                            viewModel.searchSurahs(null)
-
-                        }) {
-                            Icon(
-                                imageVector = Icons.Outlined.Close,
-                                contentDescription = "delete",
-                            )
-                        }
-                    } else {
-                        Icon(
-                            imageVector = Icons.Outlined.Search, contentDescription = "search"
-                        )
-                    }
 
 
-                })
-        },
+                    })
+            },
             expanded = expanded,
             onExpandedChange = { expanded = it },
             modifier = Modifier
@@ -177,14 +181,17 @@ fun SurahsScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    Text(text = "لا يوجد سورة بهذا الاسم")
+                    Text(text = stringResource(R.string.no_chapter))
 
                 }
             }
             if (query.isNotEmpty() && !queryLoading && querySurahsList.value.isNotEmpty()) {
                 val surahs = querySurahsList.value
-                val surahsCount: String = surahs.size.toArabicNumbers()
-                val surahArabic: String = if (surahs.size > 1) "سور" else "سورة"
+
+                val surahsCount: String =
+                    if (isArabic) surahs.size.toArabicNumbers() else surahs.size.toString()
+                val surahArabic: String =
+                    if (surahs.size > 1) stringResource(R.string.surahs) else stringResource(R.string.surah)
                 Text(
                     text = "$surahsCount $surahArabic ",
                     modifier = Modifier.padding(16.dp),
@@ -196,61 +203,18 @@ fun SurahsScreen(
                         val currentPlayedSurah: Surah? = player.surah
                         val isCurrentSurahPlayed: Boolean =
                             currentPlayedSurah != null && currentPlayedSurah.arabicName == surahs[index].arabicName
-                        ListItem(headlineContent = { Text(text = surahs[index].arabicName) },
-                            supportingContent = { Text(text = surahs[index].complexName) },
-                            leadingContent = {
-                                Box(contentAlignment = Alignment.Center) {
-                                    AsyncImage(
-                                        model = surahs[index].image,
-                                        contentDescription = "surah",
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .size(55.dp)
-                                            .clip(RoundedCornerShape(12.dp))
-                                    )
-                                    if (isCurrentSurahPlayed) {
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(RoundedCornerShape(12.dp))
-                                                .background(
-                                                    Color.Black.copy(alpha = 0.8f)
-                                                )
-                                                .size(55.5.dp)
-                                        )
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.outline_graphic_eq_24),
-                                            contentDescription = "Playing",
-                                            tint = MaterialTheme.colorScheme.tertiary
-                                        )
-                                    }
-                                }
-
-                            },
-                            trailingContent = {
-                                IconButton(onClick = {
-                                    selectedSurah = surahs[index]
-                                    isOptionsShown = true
-
-                                }) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.baseline_more_vert_24),
-                                        contentDescription = "play"
-                                    )
-                                }
-
-                            },
-                            colors = if (isCurrentSurahPlayed) ListItemDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                headlineColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                supportingColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                trailingIconColor = MaterialTheme.colorScheme.onTertiaryContainer,
-
-                                ) else ListItemDefaults.colors(containerColor = Color.Transparent),
-                            modifier = Modifier.clickable {
-                                playerViewModel.changeSurah(surahs[index])
-                                playerViewModel.fetchMediaUrl()
-                                viewModel.onSurahEvents(SurahEvents.AddSurah(surahs[index]))
-                            })
+                        SurahListItem(
+                            surah = surahs[index],
+                            isCurrentSurahPlayed = isCurrentSurahPlayed,
+                            isArabic = isArabic,
+                            onMenu = {
+                                selectedSurah = surahs[index]
+                                isOptionsShown = true
+                            }) {
+                            playerViewModel.changeSurah(surahs[index])
+                            playerViewModel.fetchMediaUrl()
+                            viewModel.onSurahEvents(SurahEvents.AddSurah(surahs[index]))
+                        }
                     }
                     item {
                         Spacer(modifier = Modifier.height(100.dp))
@@ -267,7 +231,7 @@ fun SurahsScreen(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(if (showDownloads) "السور المتحملة" else "السور")
+            Text(if (showDownloads) stringResource(R.string.downloaded) else stringResource(R.string.surahs))
             IconButton(onClick = {
                 showDownloads = !showDownloads
                 if (showDownloads) viewModel.displayDownloaded()
@@ -289,7 +253,8 @@ fun SurahsScreen(
                     playerViewModel = playerViewModel,
                     navController = navController,
                     selectedReciter = selectedReciter,
-                    selectedRecitationID = selectedRecitation
+                    selectedRecitationID = selectedRecitation,
+                    isArabic = isArabic
 
                 ) {
                     isOptionsShown = false
@@ -301,6 +266,7 @@ fun SurahsScreen(
             when (value) {
                 true -> {
                     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Log.d("Downloaded", "SurahsScreen: ${downloadedSurahs}")
                         items(downloadedSurahs) {
                             ListItem(
                                 headlineContent = {
@@ -311,7 +277,7 @@ fun SurahsScreen(
                                 },
                                 leadingContent = {
                                     AsyncImage(
-                                        model = it.surah.image,
+                                        model = "https://img.freepik.com/premium-photo/illustration-mosque-with-crescent-moon-stars-simple-shapes-minimalist-flat-design_217051-15556.jpg",
                                         contentDescription = "surah",
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
@@ -340,67 +306,25 @@ fun SurahsScreen(
                 }
 
                 false -> {
+
                     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                         items(surahs.itemCount) { index ->
                             val currentPlayedSurah: Surah? = player.surah
                             val isCurrentSurahPlayed: Boolean =
                                 currentPlayedSurah != null && currentPlayedSurah.arabicName == surahs[index]?.arabicName
                             if (surahs[index] != null) {
-                                ListItem(headlineContent = { Text(text = surahs[index]!!.arabicName) },
-                                    supportingContent = { Text(text = surahs[index]!!.complexName) },
-                                    leadingContent = {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            AsyncImage(
-                                                model = surahs[index]?.image,
-                                                contentDescription = "surah",
-                                                contentScale = ContentScale.Crop,
-                                                modifier = Modifier
-                                                    .size(55.dp)
-                                                    .clip(RoundedCornerShape(12.dp))
-                                            )
-                                            if (isCurrentSurahPlayed) {
-                                                Box(
-                                                    modifier = Modifier
-                                                        .clip(RoundedCornerShape(12.dp))
-                                                        .background(
-                                                            Color.Black.copy(alpha = 0.8f)
-                                                        )
-                                                        .size(55.5.dp)
-                                                )
-                                                Icon(
-                                                    painter = painterResource(id = R.drawable.outline_graphic_eq_24),
-                                                    contentDescription = "Playing",
-                                                    tint = MaterialTheme.colorScheme.tertiary
-                                                )
-                                            }
-                                        }
-
-                                    },
-                                    trailingContent = {
-                                        IconButton(onClick = {
-                                            selectedSurah = surahs[index]
-                                            isOptionsShown = true
-
-                                        }) {
-                                            Icon(
-                                                painter = painterResource(id = R.drawable.baseline_more_vert_24),
-                                                contentDescription = "play"
-                                            )
-                                        }
-
-                                    },
-                                    colors = if (isCurrentSurahPlayed) ListItemDefaults.colors(
-                                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                                        headlineColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                        supportingColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                        trailingIconColor = MaterialTheme.colorScheme.onTertiaryContainer,
-
-                                        ) else ListItemDefaults.colors(),
-                                    modifier = Modifier.clickable {
-                                        playerViewModel.changeSurah(surahs[index]!!)
-                                        playerViewModel.fetchMediaUrl()
-                                        viewModel.onSurahEvents(SurahEvents.AddSurah(surahs[index]!!))
-                                    })
+                                SurahListItem(
+                                    surah = surahs[index]!!,
+                                    isCurrentSurahPlayed = isCurrentSurahPlayed,
+                                    isArabic = isArabic,
+                                    onMenu = {
+                                        selectedSurah = surahs[index]
+                                        isOptionsShown = true
+                                    }) {
+                                    playerViewModel.changeSurah(surahs[index]!!)
+                                    playerViewModel.fetchMediaUrl()
+                                    viewModel.onSurahEvents(SurahEvents.AddSurah(surahs[index]!!))
+                                }
                             }
                         }
                         val surahLoadState = surahs.loadState.refresh
@@ -420,21 +344,13 @@ fun SurahsScreen(
                             }
 
                             surahLoadState is LoadState.Error -> {
-                                val error = surahLoadState.error
-                                var errorMessage = "السيرفر معفن"
-                                if (error.message!!.contains("connect")) {
-                                    errorMessage = "لا يوجد انترنت"
-                                }
                                 item {
                                     Column(
                                         modifier = Modifier.fillParentMaxSize(),
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        Text(
-                                            text = errorMessage,
-                                            textAlign = TextAlign.Center,
-                                        )
+
                                         IconButton(onClick = { surahs.retry() }) {
                                             Icon(
                                                 Icons.Outlined.Refresh,
@@ -450,6 +366,7 @@ fun SurahsScreen(
                             Spacer(modifier = Modifier.height(100.dp))
                         }
                     }
+
 
                 }
             }

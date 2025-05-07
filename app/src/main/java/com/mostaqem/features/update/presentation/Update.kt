@@ -42,13 +42,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mostaqem.R
 import com.mostaqem.core.ui.theme.kufamFontFamily
+import com.mostaqem.core.ui.theme.productFontFamily
+import com.mostaqem.dataStore
 import com.mostaqem.features.player.domain.CustomShape
 import com.mostaqem.features.player.domain.Octagon
+import com.mostaqem.features.settings.data.AppSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +65,12 @@ fun UpdateScreen(
 ) {
     val context = LocalContext.current
     val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+    val languageCode =
+        context.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
 
+    val fontFamily = remember(languageCode) {
+        if (languageCode == "en") productFontFamily else kufamFontFamily
+    }
     viewModel.checkForUpgrade(pInfo.versionName.toString())
 
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -77,10 +88,12 @@ fun UpdateScreen(
         val showUpgrade by viewModel.showUpgradePrompt.collectAsState()
 
         if (!showUpgrade) {
-            Text("لا يوجد تحديث", modifier = Modifier.align(Alignment.CenterHorizontally))
+            Text(
+                stringResource(R.string.no_update),
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            )
         } else {
-
-            UpdateButton(viewModel, context)
+            UpdateButton(viewModel, context, fontFamily)
         }
 
 
@@ -90,7 +103,7 @@ fun UpdateScreen(
 
 @Composable
 private fun UpdateButton(
-    viewModel: UpdateViewModel, context: Context
+    viewModel: UpdateViewModel, context: Context, fontFamily: FontFamily
 ) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -105,7 +118,8 @@ private fun UpdateButton(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(15.dp)
+                horizontalArrangement = Arrangement.spacedBy(15.dp),
+                modifier = Modifier.padding(16.dp)
             ) {
                 Icon(
                     Icons.Default.Info,
@@ -113,7 +127,7 @@ private fun UpdateButton(
                     tint = MaterialTheme.colorScheme.onSecondaryContainer
                 )
                 Text(
-                    "التحديث يحدث فقط عندما تتصل بال Wifi",
+                    stringResource(R.string.need_wifi),
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
@@ -123,8 +137,8 @@ private fun UpdateButton(
         Spacer(Modifier.height(30.dp))
 
         Text(
-            "النسخة الجديدة",
-            fontFamily = kufamFontFamily,
+            stringResource(R.string.new_version),
+            fontFamily = fontFamily,
             style = MaterialTheme.typography.headlineMedium
         )
         Spacer(Modifier.height(30.dp))
@@ -172,8 +186,9 @@ private fun UpdateButton(
 
             ) {}
             Text(
-                if (isDownloading) "ثوان.." else "تحديث",
+                if (isDownloading) stringResource(R.string.seconds) else stringResource(R.string.update),
                 style = MaterialTheme.typography.titleLarge,
+                fontFamily = fontFamily,
                 color = if (isDownloading) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.primary
             )
 

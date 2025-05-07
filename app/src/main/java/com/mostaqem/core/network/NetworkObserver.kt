@@ -5,18 +5,20 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
-import com.mostaqem.core.network.models.NetworkResult
+import com.mostaqem.core.network.models.DataError
+import com.mostaqem.core.network.models.Result
 import com.mostaqem.core.network.models.NetworkStatus
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
-class NetworkConnectivityObserver(private val context: Context) {
+class NetworkConnectivityObserver(context: Context) {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -58,27 +60,27 @@ class NetworkConnectivityObserver(private val context: Context) {
 suspend fun <T : Any, R : Any> safeApiCall(
     apiCall: suspend () -> Response<T>,
     mapper: (T) -> R
-): NetworkResult<R> {
+): Result<R, DataError.Network> {
     return try {
         val response = apiCall()
-        if (response.isSuccessful) {
-            val body = response.body()
-            if (body != null) {
-                NetworkResult.Success(mapper(body))
-            } else {
-                NetworkResult.Error("Empty response body")
-            }
+
+        val body = response.body()
+        if (body != null) {
+            Result.Success(mapper(body))
         } else {
-            NetworkResult.Error("API Error: ${response.errorBody()}")
-        }
-    } catch (e: Exception) {
-        when (e) {
-            is UnknownHostException -> NetworkResult.Error("No Internet Connection")
-            is SocketTimeoutException -> NetworkResult.Error("Connection Timeout")
-            is IOException -> NetworkResult.Error("No Internet Connection")
-            else -> NetworkResult.Error("Network Error: ${e.message}")
+            Result.Error(DataError.Network.SERIALIZATION)
         }
 
+    } catch (e: HttpException) {
+        when (e.code()) {
+            408 -> Result.Error(DataError.Network.REQUEST_TIMEOUT)
+            500 -> Result.Error(DataError.Network.SERVER_ERROR)
+            401 -> Result.Error(DataError.Network.UNAUTHORIZED)
+            else -> Result.Error(DataError.Network.UNKNOWN)
+        }
+
+    } catch (e: IOException) {
+        Result.Error(DataError.Network.NO_INTERNET)
     }
 }
 

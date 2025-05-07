@@ -1,7 +1,6 @@
 package com.mostaqem.features.about.presentation
 
 import android.content.ActivityNotFoundException
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
@@ -17,21 +16,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,6 +43,11 @@ import com.mostaqem.core.ui.controller.SnackbarEvents
 import com.mostaqem.features.player.domain.CustomShape
 import com.mostaqem.features.player.domain.Octagon
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
+import com.mostaqem.core.ui.theme.kufamFontFamily
+import com.mostaqem.core.ui.theme.productFontFamily
+import com.mostaqem.dataStore
+import com.mostaqem.features.settings.data.AppSettings
 
 @Composable
 fun AboutScreen(
@@ -53,6 +57,12 @@ fun AboutScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val languageCode =
+        context.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
+
+    val fontFamily = remember(languageCode) {
+        if (languageCode == "en") productFontFamily else kufamFontFamily
+    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -74,7 +84,11 @@ fun AboutScreen(
 
         }
         Spacer(Modifier.height(16.dp))
-        Text(text = "مستقيم", style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.titleLarge,
+            fontFamily = fontFamily
+        )
         Spacer(Modifier.height(18.dp))
 
         Row(
@@ -89,7 +103,7 @@ fun AboutScreen(
                     .size(80.dp)
                     .clickable {
                         val url = "https://github.com/mostaqem/mostaqem_android"
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
                         try {
                             context.startActivity(intent)
                         } catch (e: ActivityNotFoundException) {
@@ -122,7 +136,7 @@ fun AboutScreen(
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("النسخة")
+                    Text(stringResource(R.string.version))
                     Text(
                         BuildConfig.VERSION_NAME,
                         fontSize = 25.sp,
@@ -158,11 +172,12 @@ fun AboutScreen(
                 },
                 headlineContent = {
                     Text(
-                        "إبلاغ عن مشكلة",
+                        stringResource(R.string.bug_report),
                         fontSize = 23.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(horizontal = 10.dp),
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        fontFamily = fontFamily
 
                     )
                 },
@@ -175,7 +190,7 @@ fun AboutScreen(
                 },
                 supportingContent = {
                     Text(
-                        "اذاننا صاغية",
+                        stringResource(R.string.bug_report_details),
                         fontSize = 18.sp,
                         modifier = Modifier.padding(horizontal = 10.dp)
                     )
@@ -186,19 +201,21 @@ fun AboutScreen(
             ListItem(
                 modifier = Modifier.clickable {
                     onBack()
-                    navController.navigate(DonationDestination) },
+                    navController.navigate(DonationDestination)
+                },
                 headlineContent = {
                     Text(
-                        "تبرع",
+                        stringResource(R.string.donate),
                         fontSize = 23.sp,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(horizontal = 10.dp),
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        fontFamily = fontFamily
                     )
                 },
                 supportingContent = {
                     Text(
-                        "تبرع لمستقيم ليكون مستمر",
+                        stringResource(R.string.donate_details),
                         fontSize = 18.sp,
                         modifier = Modifier.padding(horizontal = 10.dp),
                     )
@@ -208,28 +225,6 @@ fun AboutScreen(
                         painter = painterResource(R.drawable.donate),
                         contentDescription = "donate"
                     )
-                },
-            )
-            HorizontalDivider()
-            ListItem(
-                headlineContent = {
-                    Text(
-                        "المطورون",
-                        fontSize = 23.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(horizontal = 10.dp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                },
-                supportingContent = {
-                    Text(
-                        "مازن عمر - عمر صبرة",
-                        fontSize = 18.sp,
-                        modifier = Modifier.padding(horizontal = 10.dp),
-                    )
-                },
-                trailingContent = {
-                    Icon(Icons.Default.Person, contentDescription = "person")
                 },
             )
         }

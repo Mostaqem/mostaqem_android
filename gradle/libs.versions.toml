@@ -10,13 +10,13 @@ hiltAndroid = "2.51.1"
 hiltNavigationCompose = "1.2.0"
 jaudiotagger = "3.0.1"
 kotlin = "2.0.21"
-coreKtx = "1.10.1"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.10.0"
-composeBom = "2025.01.01"
+composeBom = "2025.04.01"
 lifecycleViewmodelCompose = "2.8.4"
 media3Ui = "1.5.1"
 pagingCompose = "3.3.2"
@@ -24,7 +24,7 @@ retrofit = "2.11.0"
 roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
 roomRuntime = "2.6.1"
-uiTextGoogleFonts = "1.7.1"
+uiTextGoogleFonts = "1.7.8"
 composeNavigation = "2.8.0"
 serialization = "1.6.3"
 uiautomator = "2.2.0"
@@ -37,7 +37,8 @@ media3Session = "1.5.1"
 loggingInterceptor = "5.0.0-alpha.14"
 hiltCommon = "1.2.0"
 workRuntimeKtx = "2.10.0"
-composeAnimation = "1.7.6"
+composeAnimation = "1.7.8"
+appcompat = "1.7.0"
 
 [libraries]
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
@@ -91,6 +92,9 @@ androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profi
 androidx-material3-adaptive-navigation-suite-android = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite-android", version.ref = "material3AdaptiveNavigationSuiteAndroid" }
 androidx-media3-session = { group = "androidx.media3", name = "media3-session", version.ref = "media3Session" }
 androidx-hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hiltCommon" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "uiTextGoogleFonts" }
+ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "uiTextGoogleFonts" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

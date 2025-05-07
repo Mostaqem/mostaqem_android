@@ -40,7 +40,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,12 +53,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -64,8 +70,10 @@ import androidx.navigation.NavController
 import com.mostaqem.R
 import com.mostaqem.core.navigation.models.ShareDestination
 import com.mostaqem.core.ui.theme.uthmaniFont
+import com.mostaqem.dataStore
 import com.mostaqem.features.reading.data.models.Verse
 import com.mostaqem.features.offline.domain.toArabicNumbers
+import com.mostaqem.features.settings.data.AppSettings
 import com.mostaqem.features.share.ShareViewModel
 import kotlinx.coroutines.launch
 
@@ -91,6 +99,10 @@ fun ReadingScreen(
     var selectedVerses by remember { mutableStateOf<Set<Verse>>(emptySet()) }
     var enableSelection by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+    val languageCode =
+        LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
+
+
     LaunchedEffect(pagerState.currentPage) {
         if (pagerState.currentPage == totalPages - 1) {
             readingViewModel.preloadVerses(chapterNumber + 1)
@@ -110,8 +122,10 @@ fun ReadingScreen(
             )
         ) { isSelectionMode ->
             if (isSelectionMode) {
+                val count: String =
+                    if (languageCode == "ar") selectedVerses.size.toArabicNumbers() else selectedVerses.size.toString()
                 TopAppBar(
-                    title = { Text("${selectedVerses.size.toArabicNumbers()} اخترت ") },
+                    title = { Text("$count ${stringResource(R.string.selectedd)} ") },
                     navigationIcon = {
                         IconButton(onClick = {
                             if (enableSelection) enableSelection = false
@@ -135,7 +149,7 @@ fun ReadingScreen(
                 )
             } else {
                 CenterAlignedTopAppBar(
-                    title = { Text("سورة $chapterName", fontFamily = uthmaniFont) },
+                    title = { Text(chapterName, fontFamily = uthmaniFont) },
 
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
@@ -163,7 +177,7 @@ fun ReadingScreen(
 
                 ListItem(
                     headlineContent = {
-                        Text("انشر اية")
+                        Text(stringResource(R.string.share_verse))
                     },
                     leadingContent = {
                         Icon(Icons.Default.Share, contentDescription = "Share")
@@ -181,6 +195,7 @@ fun ReadingScreen(
         HorizontalPager(
             state = pagerState,
             pageSpacing = 10.dp,
+            reverseLayout = languageCode == "en",
             verticalAlignment = Alignment.Top,
             modifier = Modifier.fillMaxSize(),
         ) { page ->
@@ -234,77 +249,82 @@ fun ReadingScreen(
                             )
                         }
                     }
-                    Text(
-                        text = annotatedString,
-                        textAlign = TextAlign.Justify,
-                        lineHeight = 45.sp,
-                        fontFamily = uthmaniFont,
-                        onTextLayout = { layoutResult = it },
-                        fontSize = 30.sp,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .pointerInput(Unit) {
-                                detectTapGestures(
-                                    onTap = { offset ->
-                                        layoutResult?.let { layout ->
-                                            val position = layout.getOffsetForPosition(offset)
-                                            val clickedAnnotation = annotatedString
-                                                .getStringAnnotations(position, position)
-                                                .firstOrNull()
+                    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
 
-                                            clickedAnnotation?.let { annotation ->
-                                                // Find the corresponding verse from pageVerses
-                                                val clickedVerse = pageVerses.find {
-                                                    it.verse.toArabicNumbers() == annotation.tag
-                                                }
+                        Text(
+                            text = annotatedString,
+                            textAlign = TextAlign.Justify,
+                            lineHeight = 45.sp,
+                            fontFamily = uthmaniFont,
+                            onTextLayout = { layoutResult = it },
+                            fontSize = 30.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = { offset ->
+                                            layoutResult?.let { layout ->
+                                                val position = layout.getOffsetForPosition(offset)
+                                                val clickedAnnotation = annotatedString
+                                                    .getStringAnnotations(position, position)
+                                                    .firstOrNull()
 
-                                                clickedVerse?.let { verse ->
-                                                    when {
-                                                        // If verse is already selected, deselect it
-                                                        selectedVerses.contains(verse) -> {
-                                                            selectedVerses -= verse
-                                                        }
-                                                        // If we haven't reached max selection limit
-                                                        selectedVerses.size < 7 -> {
-                                                            if (selectedVerses.isEmpty()) {
-                                                                // First selection
-                                                                selectedVerses += verse
-                                                            } else {
-                                                                // Find the range
-                                                                val minSelectedVerse =
-                                                                    selectedVerses.minOf { it.verse }
-                                                                val maxSelectedVerse =
-                                                                    selectedVerses.maxOf { it.verse }
+                                                clickedAnnotation?.let { annotation ->
+                                                    // Find the corresponding verse from pageVerses
+                                                    val clickedVerse = pageVerses.find {
+                                                        it.verse.toArabicNumbers() == annotation.tag
+                                                    }
 
-                                                                when {
-                                                                    // Clicking before the current selection
-                                                                    verse.verse < minSelectedVerse -> {
-                                                                        val versesToAdd = pageVerses
-                                                                            .filter {
-                                                                                it.verse in verse.verse..minSelectedVerse &&
-                                                                                        !selectedVerses.contains(
-                                                                                            it
-                                                                                        )
-                                                                            }
-                                                                            .take(7 - selectedVerses.size)
-                                                                        selectedVerses += versesToAdd
-                                                                    }
-                                                                    // Clicking after the current selection
-                                                                    verse.verse > maxSelectedVerse -> {
-                                                                        val versesToAdd = pageVerses
-                                                                            .filter {
-                                                                                it.verse in maxSelectedVerse..verse.verse &&
-                                                                                        !selectedVerses.contains(
-                                                                                            it
-                                                                                        )
-                                                                            }
-                                                                            .take(7 - selectedVerses.size)
-                                                                        selectedVerses += versesToAdd
-                                                                    }
+                                                    clickedVerse?.let { verse ->
+                                                        when {
+                                                            // If verse is already selected, deselect it
+                                                            selectedVerses.contains(verse) -> {
+                                                                selectedVerses -= verse
+                                                            }
+                                                            // If we haven't reached max selection limit
+                                                            selectedVerses.size < 7 -> {
+                                                                if (selectedVerses.isEmpty()) {
+                                                                    // First selection
+                                                                    selectedVerses += verse
+                                                                } else {
+                                                                    // Find the range
+                                                                    val minSelectedVerse =
+                                                                        selectedVerses.minOf { it.verse }
+                                                                    val maxSelectedVerse =
+                                                                        selectedVerses.maxOf { it.verse }
 
-                                                                    else -> {
-                                                                        selectedVerses += verse
+                                                                    when {
+                                                                        // Clicking before the current selection
+                                                                        verse.verse < minSelectedVerse -> {
+                                                                            val versesToAdd =
+                                                                                pageVerses
+                                                                                    .filter {
+                                                                                        it.verse in verse.verse..minSelectedVerse &&
+                                                                                                !selectedVerses.contains(
+                                                                                                    it
+                                                                                                )
+                                                                                    }
+                                                                                    .take(7 - selectedVerses.size)
+                                                                            selectedVerses += versesToAdd
+                                                                        }
+                                                                        // Clicking after the current selection
+                                                                        verse.verse > maxSelectedVerse -> {
+                                                                            val versesToAdd =
+                                                                                pageVerses
+                                                                                    .filter {
+                                                                                        it.verse in maxSelectedVerse..verse.verse &&
+                                                                                                !selectedVerses.contains(
+                                                                                                    it
+                                                                                                )
+                                                                                    }
+                                                                                    .take(7 - selectedVerses.size)
+                                                                            selectedVerses += versesToAdd
+                                                                        }
+
+                                                                        else -> {
+                                                                            selectedVerses += verse
+                                                                        }
                                                                     }
                                                                 }
                                                             }
@@ -312,84 +332,89 @@ fun ReadingScreen(
                                                     }
                                                 }
                                             }
+                                        }, onLongPress = { offset ->
+                                            layoutResult?.let { layout ->
+                                                val position = layout.getOffsetForPosition(offset)
+                                                annotatedString
+                                                    .getStringAnnotations(position, position)
+                                                    .firstOrNull()
+                                                    ?.let { annotation ->
+                                                        selectedVerses += Verse(
+                                                            text = annotation.item,
+                                                            verse = annotation.tag.toInt(),
+                                                            chapter = chapterNumber
+                                                        )
+
+                                                    }
+                                            }
                                         }
-                                    }, onLongPress = { offset ->
-                                        layoutResult?.let { layout ->
-                                            val position = layout.getOffsetForPosition(offset)
-                                            annotatedString
-                                                .getStringAnnotations(position, position)
-                                                .firstOrNull()
-                                                ?.let { annotation ->
-                                                    selectedVerses += Verse(
-                                                        text = annotation.item,
-                                                        verse = annotation.tag.toInt(),
-                                                        chapter = chapterNumber
-                                                    )
-
-                                                }
-                                        }
-                                    }
-                                )
-                            }
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = if (pagerState.currentPage == 0) Arrangement.End else Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()
-
-                    ) {
-                        AnimatedVisibility(
-                            visible = pagerState.currentPage != 0,
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
-
-
-                        ) {
-                            IconButton(onClick = {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(
-                                        pagerState.currentPage - 1,
-                                        animationSpec = tween(300)
                                     )
                                 }
+                        )
 
-                            }) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "back",
-                                )
-                            }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = if (pagerState.currentPage == 0) Arrangement.End  else Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth(),
 
-                        }
-                        AnimatedVisibility(
-                            visible = pagerState.currentPage != pagerState.pageCount - 1,
-                            modifier = Modifier
-                                .padding(horizontal = 16.dp)
 
-                        ) {
-                            IconButton(
+                            ) {
+                            AnimatedVisibility(
+                                visible = pagerState.currentPage != 0,
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
 
-                                onClick = {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(
-                                        pagerState.currentPage + 1,
-                                        animationSpec = tween(300)
-                                    )
+
+                            ) {
+                                IconButton(
+
+                                    onClick = {
+                                        scope.launch {
+                                            pagerState.animateScrollToPage(
+                                                pagerState.currentPage - 1,
+                                                animationSpec = tween(300)
+                                            )
+                                        }
+
+                                    }) {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "back",
+
+                                        )
                                 }
 
-                            }) {
-                                Icon(
-                                    Icons.AutoMirrored.Filled.ArrowForward,
-                                    contentDescription = "forward",
-
-                                )
                             }
+                            AnimatedVisibility(
+                                visible = pagerState.currentPage != pagerState.pageCount - 1,
+                                modifier = Modifier
+                                    .padding(horizontal = 16.dp)
+
+                            ) {
+                                IconButton(
+
+                                    onClick = {
+                                        scope.launch {
+                                            pagerState.animateScrollToPage(
+                                                pagerState.currentPage + 1,
+                                                animationSpec = tween(300)
+                                            )
+                                        }
+
+                                    }) {
+                                    Icon(
+                                        Icons.AutoMirrored.Filled.ArrowForward,
+                                        contentDescription = "forward",
+
+                                        )
+                                }
 
 
+                            }
                         }
+
+
                     }
-
-
                 }
             }
         }

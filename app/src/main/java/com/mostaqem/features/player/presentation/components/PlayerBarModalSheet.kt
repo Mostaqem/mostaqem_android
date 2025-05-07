@@ -47,45 +47,45 @@ fun PlayerBarModalSheet(
     var offset by remember { mutableFloatStateOf(0f) }
 
     val dismissThreshold = 100
-    Box(modifier = modifier
+    Box(
+        modifier = modifier
             .offset { IntOffset(0, offset.roundToInt()) }
-        .pointerInput(Unit) {
-            detectTapGestures(
-                onTap = {
-                    hidePlayer.value = true
-                    navController.navigate(PlayerDestination)
-
-                }
-            )
-        }
-        .pointerInput(Unit) {
-            // Handle drag gestures
-            detectVerticalDragGestures(
-                onVerticalDrag = { _, dragAmount ->
-                    offset += dragAmount
-                },
-                onDragEnd = {
-                    if (offset > dismissThreshold) {
-                        playerViewModel.clear()
-                    } else {
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
                         hidePlayer.value = true
                         navController.navigate(PlayerDestination)
-                        offset = 0f
+
                     }
-                }
-            )
-        }
-        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-        .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
-        .height(80.dp)
-        .fillMaxWidth()
+                )
+            }
+            .pointerInput(Unit) {
+                detectVerticalDragGestures(
+                    onVerticalDrag = { _, dragAmount ->
+                        offset += dragAmount
+                    },
+                    onDragEnd = {
+                        if (offset > dismissThreshold) {
+                            playerViewModel.clear()
+                        } else {
+                            hidePlayer.value = true
+                            navController.navigate(PlayerDestination)
+                            offset = 0f
+                        }
+                    }
+                )
+            }
+            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+            .height(80.dp)
+            .fillMaxWidth()
 
     ) {
         PlayerBar(
             image = surah!!.image,
             playerIcon = playerIcon,
             onPlayPause = { playerViewModel.handlePlayPause() },
-            surahName = surah.arabicName ,
+            surahName = surah.arabicName,
             reciterName = reciter.arabicName,
             progress = progress,
             sharedTransitionScope = sharedTransitionScope,

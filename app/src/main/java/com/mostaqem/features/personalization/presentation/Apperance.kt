@@ -1,6 +1,5 @@
 package com.mostaqem.features.personalization.presentation
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -21,26 +20,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.mostaqem.R
+import com.mostaqem.core.ui.theme.kufamFontFamily
+import com.mostaqem.core.ui.theme.productFontFamily
 import com.mostaqem.dataStore
 import com.mostaqem.features.personalization.presentation.reciter.ReciterOption
 import com.mostaqem.features.player.domain.MaterialShapes
 import com.mostaqem.features.player.presentation.PlayerViewModel
-import com.mostaqem.features.reciters.presentation.ReciterScreen
-import com.mostaqem.features.reciters.presentation.ReciterViewModel
 import com.mostaqem.features.settings.data.AppSettings
 import com.mostaqem.features.personalization.presentation.shapes.OptionShape
 
@@ -52,23 +48,33 @@ fun AppearanceScreen(
     val context = LocalContext.current
     val userSettings = context.dataStore.data.collectAsState(initial = AppSettings()).value
 
+    val languageCode =
+        LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
 
+    val fontFamily = remember(languageCode) {
+        if (languageCode == "en") productFontFamily else kufamFontFamily
+    }
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         LargeTopAppBar(
-            title = { Text(text = "السمات") },
+            title = { Text(text = stringResource(R.string.apperanace), fontFamily = fontFamily) },
             navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back ")
                 }
             },
         )
-        ListItem(headlineContent = {
-            Text("الشيخ المفضل", Modifier.padding(horizontal = 18.dp))
-        },
+        ListItem(
+            headlineContent = {
+                Text(
+                    stringResource(R.string.default_reciter),
+                    fontFamily = fontFamily,
+                    modifier = Modifier.padding(horizontal = 18.dp)
+                )
+            },
             supportingContent = {
                 Text(
-                    "تغير الشيخ المفضل لديك و يمكنك الضغط طويلا لتغير التلاوة المفضلة لديك",
+                    stringResource(R.string.change_default_reciter),
                     Modifier.padding(horizontal = 18.dp)
                 )
             }
@@ -79,7 +85,11 @@ fun AppearanceScreen(
 
         Spacer(Modifier.height(15.dp))
 
-        Text("تغيير شكل عرض الصورة في المشغل", Modifier.padding(horizontal = 18.dp))
+        Text(
+            stringResource(R.string.change_shape),
+            fontFamily = fontFamily,
+            modifier = Modifier.padding(horizontal = 18.dp)
+        )
         Spacer(Modifier.height(15.dp))
         LazyRow(
             horizontalArrangement = Arrangement.SpaceBetween,

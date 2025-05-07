@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
 import coil.compose.AsyncImage
@@ -38,13 +39,14 @@ fun QueuePlaylist(
 ) {
     val player = playerViewModel.playerState.value
     val lazyListState = rememberLazyListState()
+    Log.d("Playlist", "QueuePlaylist: ${playlists}")
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .statusBarsPadding(), state = lazyListState
     ) {
-        item { CenterAlignedTopAppBar(title = { Text(text = "تسمع التالي") }) }
+        item { CenterAlignedTopAppBar(title = { Text(text = stringResource(R.string.play_next)) }) }
         item {
 
             ListItem(

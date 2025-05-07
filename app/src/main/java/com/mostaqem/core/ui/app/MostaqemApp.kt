@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
@@ -62,6 +63,7 @@ import com.mostaqem.core.navigation.models.AppearanceDestination
 import com.mostaqem.core.navigation.models.BottomScreens
 import com.mostaqem.core.navigation.models.DonationDestination
 import com.mostaqem.core.navigation.models.HomeDestination
+import com.mostaqem.core.navigation.models.LanguagesDestination
 import com.mostaqem.core.navigation.models.OfflineSettingsDestination
 import com.mostaqem.core.navigation.models.PlayerDestination
 import com.mostaqem.core.navigation.models.ReadingDestination
@@ -75,6 +77,7 @@ import com.mostaqem.core.ui.controller.ObserveAsEvents
 import com.mostaqem.core.ui.controller.SnackbarController
 import com.mostaqem.features.donate.presentation.DonateScreen
 import com.mostaqem.features.history.presentation.HistoryScreen
+import com.mostaqem.features.language.presentation.LanguageScreen
 import com.mostaqem.features.offline.presentation.OfflineSettingsScreen
 import com.mostaqem.features.personalization.presentation.AppearanceScreen
 import com.mostaqem.features.player.presentation.PlayerScreen
@@ -118,216 +121,227 @@ fun MostaqemApp() {
 
 
 
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        ObserveAsEvents(flow = SnackbarController.events, snackbarHostState) { event ->
-            scope.launch {
-                snackbarHostState.currentSnackbarData?.dismiss()
-                val result = snackbarHostState.showSnackbar(
-                    message = event.message, actionLabel = event.action?.name
-                )
 
-                if (result == SnackbarResult.ActionPerformed) {
-                    event.action?.action?.invoke()
-                }
-            }
-        }
-        Scaffold(snackbarHost = {
-            SnackbarHost(snackbarHostState) { data ->
-                Snackbar(snackbarData = data, modifier = Modifier.padding(bottom = 160.dp))
-            }
-        }) { padding ->
-            NavigationSuiteScaffold(layoutType = if (showBottomBar) NavigationSuiteType.NavigationBar else NavigationSuiteType.None,
-                navigationSuiteColors = NavigationSuiteDefaults.colors(
-                    navigationBarContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
-                        3.dp
-                    )
-                ),
-                modifier = Modifier.fillMaxSize(),
+    ObserveAsEvents(flow = SnackbarController.events, snackbarHostState) { event ->
+        scope.launch {
+            snackbarHostState.currentSnackbarData?.dismiss()
+            val result = snackbarHostState.showSnackbar(
+                message = event.message, actionLabel = event.action?.name
+            )
 
-                navigationSuiteItems = {
-
-                    items.forEach { screen ->
-                        val isSelected: Boolean = screen.route::class.qualifiedName == currentRoute
-                        item(
-                            modifier = Modifier.offset {
-                                IntOffset(
-                                    0, (bottomBarHeight.toPx() * bottomBarOffset).toInt()
-                                )
-                            },
-
-                            selected = isSelected,
-                            onClick = {
-                                navController.navigate(screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-
-                            },
-                            icon = {
-                                if (isSelected) {
-                                    Icon(
-                                        imageVector = ImageVector.vectorResource(id = screen.selectedIcon),
-                                        modifier = Modifier.size(22.dp),
-                                        contentDescription = "selected"
-                                    )
-                                } else {
-                                    Icon(
-                                        imageVector = ImageVector.vectorResource(id = screen.icon),
-                                        modifier = Modifier.size(22.dp),
-                                        contentDescription = screen.name
-                                    )
-                                }
-
-                            },
-                            label = { Text(text = screen.name) },
-                            alwaysShowLabel = false,
-                        )
-                    }
-
-
-                }) {
-                val playerViewModel: PlayerViewModel = hiltViewModel()
-                val shareViewModel: ShareViewModel = viewModel()
-
-                SharedTransitionLayout {
-                    Box(
-                        contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()
-                    ) {
-
-                        Box(modifier = Modifier.align(Alignment.TopStart)) {
-
-                            NavHost(navController = navController,
-                                startDestination = HomeDestination,
-
-                                enterTransition = {
-                                    fadeIn(animationSpec = tween(durationMillis = 300)) + scaleIn(
-                                        initialScale = 0.9f,
-                                        animationSpec = tween(durationMillis = 300)
-                                    )
-                                },
-                                exitTransition = {
-                                    fadeOut(animationSpec = tween(durationMillis = 300)) + scaleOut(
-                                        targetScale = 0.9f,
-                                        animationSpec = tween(durationMillis = 300)
-                                    )
-                                },
-                                popEnterTransition = {
-                                    fadeIn(animationSpec = tween(durationMillis = 300)) + scaleIn(
-                                        initialScale = 0.9f,
-                                        animationSpec = tween(durationMillis = 300)
-                                    )
-                                },
-                                popExitTransition = {
-                                    fadeOut(animationSpec = tween(durationMillis = 300)) + scaleOut(
-                                        targetScale = 0.9f,
-                                        animationSpec = tween(durationMillis = 300)
-                                    )
-                                }) {
-                                composable<HomeDestination> {
-                                    HistoryScreen(
-                                        playerViewModel = playerViewModel,
-                                        navController = navController
-                                    )
-                                }
-                                composable<SurahsDestination> {
-                                    SurahsScreen(
-                                        playerViewModel = playerViewModel,
-                                        navController = navController
-                                    )
-                                }
-                                composable<SettingsDestination> { SettingsScreen(navController = navController) }
-                                composable<AppearanceDestination> {
-                                    AppearanceScreen(
-                                        navController = navController,
-                                        playerViewModel = playerViewModel
-                                    )
-                                }
-                                composable<UpdateDestination> { UpdateScreen(navController = navController) }
-                                composable<PlayerDestination>(
-                                    deepLinks = listOf(
-                                        navDeepLink<PlayerDestination>(basePath = "mostaqem://player")
-                                    )
-
-                                ) {
-
-                                    PlayerScreen(
-                                        playerViewModel = playerViewModel,
-                                        sharedTransitionScope = this@SharedTransitionLayout,
-                                        animatedVisibilityScope = this,
-                                        navController = navController,
-                                        hidePlayerBar = hidePlayer,
-
-                                        )
-                                }
-                                composable<ReadingDestination> {
-                                    val args = it.toRoute<ReadingDestination>()
-                                    ReadingScreen(
-                                        chapterName = args.surahName,
-                                        chapterNumber = args.surahID,
-                                        navController = navController,
-                                        sharingViewModel = shareViewModel
-                                    )
-                                }
-                                composable<ShareDestination> {
-                                    val args = it.toRoute<ShareDestination>()
-                                    ShareScreen(
-                                        shareViewModel = shareViewModel,
-                                        navController = navController,
-                                        chapterName = args.chapterName,
-                                        hidePlayerState = hidePlayer,
-                                        playerViewModel = playerViewModel
-                                    )
-                                }
-
-                                composable<OfflineSettingsDestination> {
-                                    OfflineSettingsScreen(navController = navController)
-                                }
-                                composable<DonationDestination> {
-                                    DonateScreen(navController = navController)
-                                }
-                            }
-                        }
-
-                        val surah = playerViewModel.playerState.value.surah
-                        val context = LocalContext.current
-                        val isConnected by NetworkConnectivityObserver(context).observe()
-                            .collectAsState(initial = NetworkStatus.Unavailable)
-                        if (isConnected == NetworkStatus.Lost) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .clip(
-                                        RoundedCornerShape(
-                                            topStart = 16.dp,
-                                            topEnd = 16.dp
-                                        )
-                                    )
-                                    .background(MaterialTheme.colorScheme.errorContainer)
-                                    .height(80.dp)
-                                    .fillMaxWidth()
-                            ) {
-                                Text("غير متصل بأنترنت, حاول مرة اخري")
-                            }
-                        }
-                        if (surah != null) {
-                            AnimatedVisibility(visible = !hidePlayer.value) {
-                                PlayerBarModalSheet(
-                                    playerViewModel = playerViewModel,
-                                    navController = navController,
-                                    hidePlayer = hidePlayer,
-                                    sharedTransitionScope = this@SharedTransitionLayout,
-                                    animatedVisibilityScope = this
-                                )
-                            }
-
-                        }
-                    }
-                }
-
+            if (result == SnackbarResult.ActionPerformed) {
+                event.action?.action?.invoke()
             }
         }
     }
+    Scaffold(snackbarHost = {
+        SnackbarHost(snackbarHostState) { data ->
+            Snackbar(
+                snackbarData = data,
+                modifier = Modifier.padding(bottom = if (showBottomBar) 160.dp else 0.dp)
+            )
+        }
+    }) { padding ->
+        NavigationSuiteScaffold(
+            layoutType = if (showBottomBar) NavigationSuiteType.NavigationBar else NavigationSuiteType.None,
+            navigationSuiteColors = NavigationSuiteDefaults.colors(
+                navigationBarContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                    3.dp
+                )
+            ),
+            modifier = Modifier.fillMaxSize(),
+
+            navigationSuiteItems = {
+
+                items.forEach { screen ->
+                    val isSelected: Boolean = screen.route::class.qualifiedName == currentRoute
+                    item(
+                        modifier = Modifier.offset {
+                            IntOffset(
+                                0, (bottomBarHeight.toPx() * bottomBarOffset).toInt()
+                            )
+                        },
+
+                        selected = isSelected,
+                        onClick = {
+                            navController.navigate(screen.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+
+                        },
+                        icon = {
+                            if (isSelected) {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = screen.selectedIcon),
+                                    modifier = Modifier.size(22.dp),
+                                    contentDescription = "selected"
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = ImageVector.vectorResource(id = screen.icon),
+                                    modifier = Modifier.size(22.dp),
+                                    contentDescription = "nonselected"
+                                )
+                            }
+
+                        },
+                        label = { Text(text = stringResource(screen.id)) },
+                        alwaysShowLabel = false,
+                    )
+                }
+
+
+            }) {
+            val playerViewModel: PlayerViewModel = hiltViewModel()
+            val shareViewModel: ShareViewModel = viewModel()
+
+            SharedTransitionLayout {
+                Box(
+                    contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()
+                ) {
+
+                    Box(modifier = Modifier.align(Alignment.TopStart)) {
+
+                        NavHost(
+                            navController = navController,
+                            startDestination = HomeDestination,
+
+                            enterTransition = {
+                                fadeIn(animationSpec = tween(durationMillis = 300)) + scaleIn(
+                                    initialScale = 0.9f,
+                                    animationSpec = tween(durationMillis = 300)
+                                )
+                            },
+                            exitTransition = {
+                                fadeOut(animationSpec = tween(durationMillis = 300)) + scaleOut(
+                                    targetScale = 0.9f,
+                                    animationSpec = tween(durationMillis = 300)
+                                )
+                            },
+                            popEnterTransition = {
+                                fadeIn(animationSpec = tween(durationMillis = 300)) + scaleIn(
+                                    initialScale = 0.9f,
+                                    animationSpec = tween(durationMillis = 300)
+                                )
+                            },
+                            popExitTransition = {
+                                fadeOut(animationSpec = tween(durationMillis = 300)) + scaleOut(
+                                    targetScale = 0.9f,
+                                    animationSpec = tween(durationMillis = 300)
+                                )
+                            }) {
+                            composable<HomeDestination> {
+                                HistoryScreen(
+                                    playerViewModel = playerViewModel,
+                                    navController = navController
+                                )
+                            }
+                            composable<SurahsDestination> {
+                                SurahsScreen(
+                                    playerViewModel = playerViewModel,
+                                    navController = navController
+                                )
+                            }
+                            composable<SettingsDestination> { SettingsScreen(navController = navController) }
+                            composable<AppearanceDestination> {
+                                AppearanceScreen(
+                                    navController = navController,
+                                    playerViewModel = playerViewModel
+                                )
+                            }
+                            composable<UpdateDestination> { UpdateScreen(navController = navController) }
+                            composable<PlayerDestination>(
+                                deepLinks = listOf(
+                                    navDeepLink<PlayerDestination>(basePath = "mostaqem://player")
+                                )
+
+                            ) {
+
+                                PlayerScreen(
+                                    playerViewModel = playerViewModel,
+                                    sharedTransitionScope = this@SharedTransitionLayout,
+                                    animatedVisibilityScope = this,
+                                    navController = navController,
+                                    hidePlayerBar = hidePlayer,
+
+                                    )
+                            }
+                            composable<ReadingDestination> {
+                                val args = it.toRoute<ReadingDestination>()
+                                ReadingScreen(
+                                    chapterName = args.surahName,
+                                    chapterNumber = args.surahID,
+                                    navController = navController,
+                                    sharingViewModel = shareViewModel
+                                )
+                            }
+                            composable<ShareDestination> {
+                                val args = it.toRoute<ShareDestination>()
+                                ShareScreen(
+                                    shareViewModel = shareViewModel,
+                                    navController = navController,
+                                    chapterName = args.chapterName,
+                                    hidePlayerState = hidePlayer,
+                                    playerViewModel = playerViewModel
+                                )
+                            }
+
+                            composable<OfflineSettingsDestination> {
+                                OfflineSettingsScreen(navController = navController)
+                            }
+                            composable<DonationDestination> {
+                                DonateScreen(navController = navController)
+                            }
+                            composable<LanguagesDestination> {
+                                LanguageScreen(
+                                    navController = navController,
+                                    playerViewModel = playerViewModel
+                                )
+                            }
+                        }
+                    }
+
+                    val surah = playerViewModel.playerState.value.surah
+                    val context = LocalContext.current
+                    val isConnected by NetworkConnectivityObserver(context).observe()
+                        .collectAsState(initial = NetworkStatus.Unavailable)
+                    if (isConnected == NetworkStatus.Lost) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .clip(
+                                    RoundedCornerShape(
+                                        topStart = 16.dp,
+                                        topEnd = 16.dp
+                                    )
+                                )
+                                .background(MaterialTheme.colorScheme.errorContainer)
+                                .height(80.dp)
+                                .fillMaxWidth()
+                        ) {
+                            Text("غير متصل بأنترنت, حاول مرة اخري")
+                        }
+                    }
+                    if (surah != null) {
+                        AnimatedVisibility(visible = !hidePlayer.value) {
+                            PlayerBarModalSheet(
+                                playerViewModel = playerViewModel,
+                                navController = navController,
+                                hidePlayer = hidePlayer,
+                                sharedTransitionScope = this@SharedTransitionLayout,
+                                animatedVisibilityScope = this
+                            )
+                        }
+
+                    }
+                }
+            }
+
+        }
+    }
+
 }
