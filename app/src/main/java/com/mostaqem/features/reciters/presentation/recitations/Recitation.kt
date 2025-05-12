@@ -63,7 +63,9 @@ fun RecitationList(
                 trailingContent = {
                     RadioButton(
                         selected = it.id == currentRecitationID,
-                        onClick = {})
+                        onClick = {
+                            playerViewModel.changeRecitation(it.id)
+                        })
                 }
             )
         }

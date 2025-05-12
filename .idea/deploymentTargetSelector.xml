@@ -7,10 +7,10 @@
       </SelectionState>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-05-07T16:03:03.890119368Z">
+        <DropdownSelection timestamp="2025-05-08T14:35:15.224422341Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=U4YYD22419507802" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/mazen/.config/.android/avd/Medium_Phone.avd" />
             </handle>
           </Target>
         </DropdownSelection>

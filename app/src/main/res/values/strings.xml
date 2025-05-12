@@ -70,9 +70,15 @@
     <string name="recitations">Recitations</string>
     <string name="change_shape">Change surah shape</string>
 
+    <string name="sleep_timer">Sleep timer</string>
+    <string name="stop">Stop</string>
+    <string name="done">Done</string>
+    <string name="min">min</string>
+    <string name="end_of_chapter">End of the chapter</string>
+    <string name="start">Start</string>
 
-
-
+    <string name="download">download</string>
+    <string name="share">Share</string>
 
 
 

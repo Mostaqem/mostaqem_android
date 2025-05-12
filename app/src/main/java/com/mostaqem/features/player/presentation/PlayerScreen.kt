@@ -1,14 +1,12 @@
 package com.mostaqem.features.player.presentation
 
+import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -26,10 +24,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
@@ -38,16 +34,14 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -64,14 +58,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -87,14 +78,18 @@ import com.mostaqem.features.player.domain.Octagon
 import com.mostaqem.features.player.presentation.components.PlayButtons
 import com.mostaqem.features.player.presentation.components.PlayOptions
 import com.mostaqem.features.player.presentation.components.QueuePlaylist
+import com.mostaqem.features.player.presentation.components.sleep.SleepDialog
 import com.mostaqem.features.reciters.presentation.ReciterScreen
 import com.mostaqem.features.reciters.presentation.ReciterViewModel
 import com.mostaqem.features.reciters.presentation.recitations.RecitationList
 import com.mostaqem.features.settings.data.AppSettings
 import kotlin.math.roundToInt
+import kotlin.text.toInt
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(
     ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class,
+    ExperimentalMaterial3WindowSizeClassApi::class,
 )
 @Composable
 fun PlayerScreen(
@@ -102,14 +97,16 @@ fun PlayerScreen(
     navController: NavController,
     hidePlayerBar: MutableState<Boolean>,
     sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    surahId: Int? = null,
+    recitationID: Int? = null
 ) {
-
     BackHandler {
-        hidePlayerBar.value = false
         navController.popBackStack()
+        hidePlayerBar.value = false
     }
     LaunchedEffect(key1 = hidePlayerBar) {
+        if (surahId != null && recitationID != null) playerViewModel.fetchMediaUrl(surahId = surahId.toInt(), recID = recitationID.toInt())
         hidePlayerBar.value = true
         val isCached = playerViewModel.isCached
         val player = playerViewModel.playerState.value
@@ -135,6 +132,7 @@ fun PlayerScreen(
         LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value
     var offset by remember { mutableFloatStateOf(0f) }
     val dismissThreshold = 300f
+
 
     Box(
         modifier = Modifier
@@ -247,6 +245,7 @@ fun PlayerScreen(
                                 }
                                 PlayOptions(
                                     playerViewModel = playerViewModel,
+
                                 )
                             }
                         }
@@ -264,22 +263,21 @@ fun PlayerScreen(
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(modifier = Modifier.padding(vertical = 10.dp)) {
-                        AsyncImage(
-                            model = playerSurah.surah?.image,
-                            contentDescription = "",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .clip(
-                                    MaterialShapes.entries.find { it.id == customShapeData.shapeID }?.shape
-                                        ?: MaterialShapes.RECT.shape
-                                )
-                                .fillMaxWidth()
-                                .aspectRatio(1f)
-                                .align(Alignment.CenterHorizontally)
-                        )
-
-
+                        BoxWithConstraints(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                            val size = if (maxHeight <= 640.dp) 200.dp else 330.dp
+                            AsyncImage(
+                                model = playerSurah.surah?.image,
+                                contentDescription = "",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .clip(
+                                        MaterialShapes.entries.find { it.id == customShapeData.shapeID }?.shape
+                                            ?: MaterialShapes.RECT.shape
+                                    )
+                                    .size(size)
+                            )
+                        }
                         Column(modifier = Modifier.padding(20.dp)) {
                             playerSurah.surah?.let {
                                 Text(
@@ -367,7 +365,13 @@ fun PlayerScreen(
     }
 }
 
-@Preview(showBackground = true, locale = "ar", device = "spec:width=360dp,height=640dp")
+@Preview(
+    showBackground = true,
+    locale = "ar",
+    device = "spec:width=360dp,height=640dp",
+    widthDp = 340,
+    heightDp = 640
+)
 @Composable
 private fun Shape() {
 
@@ -385,8 +389,12 @@ private fun Shape() {
                             shapeType = Octagon()
                         )
                     )
-                    .background(Color.LightGray)
+                    .background(Color.Green)
+                    .size(200.dp)
+                    .aspectRatio(1f)
             )
+
+
 
 
             Column(modifier = Modifier.padding(vertical = 45.dp, horizontal = 25.dp)) {

@@ -52,7 +52,6 @@ fun HistoryScreen(
     val scrollState = rememberScrollState()
 
     val uiState by viewModel.uiState.collectAsState()
-
     Column(Modifier.verticalScroll(scrollState)) {
 
         LargeTopAppBar(title = {

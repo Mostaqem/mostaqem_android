@@ -16,7 +16,7 @@ android {
         applicationId = "com.mostaqem"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
+        versionCode = 3
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -96,6 +96,7 @@ dependencies {
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.material3.window.size.class1)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.kotlinx.serialization.json)

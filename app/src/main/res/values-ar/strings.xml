@@ -68,4 +68,15 @@
 
     <string name="recitations">تلاوات</string>
     <string name="change_shape">تغير شكل عرض السورة في المشغل</string>
+
+    <string name="sleep_timer">توقيت النوم</string>
+    <string name="stop">إيقاف</string>
+    <string name="done">تمّ</string>
+    <string name="min">دقيقة</string>
+    <string name="end_of_chapter">نهاية السورة</string>
+    <string name="start">إبدا</string>
+
+    <string name="download">تحميل</string>
+    <string name="share">انشر السورة</string>
+
 </resources>

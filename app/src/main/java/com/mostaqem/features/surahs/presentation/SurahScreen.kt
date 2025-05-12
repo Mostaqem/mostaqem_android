@@ -17,7 +17,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
@@ -31,6 +33,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -232,12 +235,17 @@ fun SurahsScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(if (showDownloads) stringResource(R.string.downloaded) else stringResource(R.string.surahs))
-            IconButton(onClick = {
+            TextButton(onClick = {
                 showDownloads = !showDownloads
                 if (showDownloads) viewModel.displayDownloaded()
-
             }) {
-                Icon(painter = painterResource(R.drawable.filter), contentDescription = "filter")
+               Row(
+                   horizontalArrangement = Arrangement.Center,
+                   verticalAlignment = Alignment.CenterVertically
+               ) {
+                   Text(stringResource(R.string.downloaded))
+                   Icon(Icons.Outlined.ArrowDropDown, contentDescription = "")
+               }
             }
         }
 
@@ -254,7 +262,8 @@ fun SurahsScreen(
                     navController = navController,
                     selectedReciter = selectedReciter,
                     selectedRecitationID = selectedRecitation,
-                    isArabic = isArabic
+                    isArabic = isArabic,
+                    isDownloaded = showDownloads
 
                 ) {
                     isOptionsShown = false
@@ -266,7 +275,6 @@ fun SurahsScreen(
             when (value) {
                 true -> {
                     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Log.d("Downloaded", "SurahsScreen: ${downloadedSurahs}")
                         items(downloadedSurahs) {
                             ListItem(
                                 headlineContent = {
@@ -311,7 +319,7 @@ fun SurahsScreen(
                         items(surahs.itemCount) { index ->
                             val currentPlayedSurah: Surah? = player.surah
                             val isCurrentSurahPlayed: Boolean =
-                                currentPlayedSurah != null && currentPlayedSurah.arabicName == surahs[index]?.arabicName
+                                currentPlayedSurah != null && (currentPlayedSurah.arabicName == surahs[index]?.complexName || currentPlayedSurah.arabicName == surahs[index]?.arabicName)
                             if (surahs[index] != null) {
                                 SurahListItem(
                                     surah = surahs[index]!!,

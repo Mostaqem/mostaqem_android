@@ -39,7 +39,6 @@ fun QueuePlaylist(
 ) {
     val player = playerViewModel.playerState.value
     val lazyListState = rememberLazyListState()
-    Log.d("Playlist", "QueuePlaylist: ${playlists}")
 
     LazyColumn(
         modifier = modifier
@@ -87,7 +86,6 @@ fun QueuePlaylist(
             val metadata = item.mediaMetadata
             val playingQueue: Boolean =
                 metadata.title.toString() == player.surah?.arabicName && metadata.albumArtist == player.recitationID.toString()
-            Log.d("Playlist", "Item: ${metadata.title} | Index: ${index} ")
 
             ListItem(
                 headlineContent = { Text(text = metadata.title.toString()) },
@@ -107,7 +105,7 @@ fun QueuePlaylist(
 
                 },
                 modifier = Modifier.clickable {
-                    playerViewModel.playQueueItem(index + 1)
+                    playerViewModel.playQueueItem(index)
                 },
 
                 colors = if (playingQueue) ListItemDefaults.colors(

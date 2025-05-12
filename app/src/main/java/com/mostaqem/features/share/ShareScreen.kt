@@ -240,7 +240,6 @@ fun ShareScreen(
                         Modifier.padding(bottom = 16.dp, start = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(20.dp)
                     ) {
-                        Text("تغير اللون", fontSize = 20.sp)
                         LazyRow(
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically,
@@ -271,8 +270,6 @@ fun ShareScreen(
                                         })
                             }
                         }
-                        Text("تغير الخط", fontSize = 20.sp)
-
                         LazyRow(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceEvenly,

@@ -24,15 +24,17 @@ import org.jaudiotagger.tag.FieldKey
 import org.jaudiotagger.tag.images.ArtworkFactory
 import java.io.File
 import androidx.core.net.toUri
+import androidx.media3.common.MediaItem
+import androidx.media3.common.MediaMetadata
 
 class OfflineRepository(private val context: Context) {
-    fun downloadAudio(data: PlayerSurah) {
+    fun downloadAudio(data: MediaItem) {
 
         val downloadManager = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-        val surahID = data.surah!!.id
-        val recitationID = data.recitationID
-        val request = DownloadManager.Request(data.url?.toUri()).apply {
-            setTitle(data.surah.arabicName)
+        val surahID = data.mediaId
+        val recitationID = data.mediaMetadata.albumArtist
+        val request = DownloadManager.Request(data.localConfiguration?.uri).apply {
+            setTitle(data.mediaMetadata.title)
             setDescription("Downloading...")
             setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             setDestinationInExternalFilesDir(
@@ -81,19 +83,17 @@ class OfflineRepository(private val context: Context) {
         )
     }
 
-    private fun updateMetadata(filePath: String, data: PlayerSurah) {
+    private fun updateMetadata(filePath: String, data: MediaItem) {
         try {
+            Log.d("PlayerSurah", "PlayerSurah: ${data}")
             val file = File(filePath)
             val audioFile = AudioFileIO.read(file)
             val tag = audioFile.tagOrCreateAndSetDefault
-            tag.setField(FieldKey.ARTIST, data.reciter.arabicName)
-            tag.setField(FieldKey.MUSICIP_ID, data.surah?.id.toString())
-            tag.setField(FieldKey.SUBTITLE, data.surah?.complexName)
-            tag.setField(FieldKey.GENRE, data.reciter.englishName)
-            tag.setField(FieldKey.ALBUM, data.reciter.id.toString())
-            tag.setField(FieldKey.TITLE, data.surah?.arabicName ?: "no title")
-            tag.setField(FieldKey.ALBUM_ARTIST, data.recitationID.toString())
-            tag.setField(ArtworkFactory.createLinkedArtworkFromURL(data.surah?.image ?: "no image"))
+            tag.setField(FieldKey.ARTIST, data.mediaMetadata.artist.toString())
+            tag.setField(FieldKey.MUSICIP_ID, data.mediaId)
+            tag.setField(FieldKey.ALBUM, data.mediaMetadata.albumTitle.toString())
+            tag.setField(FieldKey.TITLE, data.mediaMetadata.title.toString())
+            tag.setField(FieldKey.ALBUM_ARTIST, data.mediaMetadata.albumArtist.toString())
             audioFile.commit()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -104,6 +104,7 @@ class OfflineRepository(private val context: Context) {
         val folder = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
         if (folder == null) {
             Log.e("OfflineRepository", "External files directory is null")
+            logToFile("FolderPath: External files directory is null")
             return emptyList()
         }
         if (!folder.exists() || !folder.isDirectory) {
@@ -116,15 +117,20 @@ class OfflineRepository(private val context: Context) {
         val file = folder.listFiles()
         if (file == null) {
             Log.e("OfflineRepository", "listFiles() returned null for folder: ${folder.path}")
+            logToFile("FolderPath: ${folder.path}")
+
             return emptyList()
         }
         val audios = mutableListOf<AudioData>()
         file.forEach { fileItem ->
+            val ext = fileItem.extension.lowercase()
+            if (ext != "mp3") return@forEach
             try {
                 val player = getAudioDataFromFile(fileItem)
                 audios.add(player)
             } catch (e: Exception) {
                 Log.e("OfflineRepository", "Error processing file ${fileItem.path}: ${e.message}")
+                logToFile("Error Message: ${e.message.toString()}")
             }
         }
         return audios
@@ -159,6 +165,7 @@ class OfflineRepository(private val context: Context) {
         val title: String = tag.getFirst(FieldKey.TITLE)
         val complexName: String = tag.getFirst(FieldKey.SUBTITLE)
         val artist: String = tag.getFirst(FieldKey.ARTIST)
+        Log.d("SurahID", "Offline SurahID: ${tag.getFirst(FieldKey.MUSICIP_ID)}")
         val surahID = tag.getFirst(FieldKey.MUSICIP_ID).toInt()
         val recitationID = tag.getFirst(FieldKey.ALBUM_ARTIST).toInt()
         val englishName: String = tag.getFirst(FieldKey.GENRE)
@@ -245,6 +252,11 @@ class OfflineRepository(private val context: Context) {
 
     fun deleteFile(path: String) {
         File(path).delete()
+    }
+
+    fun logToFile(message: String) {
+        val logFile = File(context.getExternalFilesDir(null), "log.txt")
+        logFile.appendText("$message\n")
     }
 
 

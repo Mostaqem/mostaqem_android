@@ -1,32 +1,61 @@
 package com.mostaqem.features.player.presentation.components
 
+import android.content.Intent
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.mostaqem.R
 import com.mostaqem.features.player.data.BottomSheetType
 import com.mostaqem.features.player.presentation.PlayerViewModel
+import com.mostaqem.features.player.presentation.components.sleep.SleepDialog
+import com.mostaqem.features.player.presentation.components.sleep.SleepViewModel
+import com.mostaqem.features.player.presentation.components.sleep.toMinSec
 
 @Composable
-fun PlayOptions(modifier: Modifier = Modifier, playerViewModel: PlayerViewModel) {
+fun PlayOptions(
+    modifier: Modifier = Modifier,
+    playerViewModel: PlayerViewModel,
+) {
     var isDownloading by remember { mutableStateOf(false) }
-
+    val showSleepDialog = remember { mutableStateOf(false) }
+    val viewModel: SleepViewModel = hiltViewModel<SleepViewModel>()
+    val remainingTime by viewModel.remainingTime.collectAsState()
+    val context = LocalContext.current
+    if (showSleepDialog.value) {
+        SleepDialog(
+            showSleepDialog = showSleepDialog,
+            playerViewModel = playerViewModel,
+            viewModel = viewModel,
+            remainingTime = remainingTime,
+        )
+    }
     Row(
         modifier = modifier
             .padding(10.dp)
@@ -63,21 +92,90 @@ fun PlayOptions(modifier: Modifier = Modifier, playerViewModel: PlayerViewModel)
                 )
         }
         Spacer(modifier = Modifier.width(15.dp))
-        AnimatedVisibility(
-            visible = !playerViewModel.isCurrentSurahDownloaded()
-        ) {
+        if (remainingTime == 0L) {
             IconButton(onClick = {
-                if (!isDownloading) playerViewModel.download()
-                isDownloading = true
-
+                showSleepDialog.value = true
             }) {
                 Icon(
-                    painter = painterResource(if (isDownloading) R.drawable.download_off else R.drawable.download),
-                    contentDescription = "download",
+                    painter = painterResource(R.drawable.bedtime),
+                    contentDescription = "sleep_timer",
 
                     )
             }
+        } else {
+            TextButton(onClick = {
+                showSleepDialog.value = true
+            }) {
+                Text(remainingTime.toMinSec())
+            }
         }
+
+        Spacer(modifier = Modifier.width(15.dp))
+        Box {
+            var expanded by remember { mutableStateOf(false) }
+            IconButton(onClick = { expanded = !expanded }) {
+                Icon(
+                    painter = painterResource(R.drawable.baseline_more_horiz_24),
+                    contentDescription = "menu"
+                )
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                DropdownMenuItem(
+
+                    text = { Text(stringResource(R.string.share)) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Share,
+                            contentDescription = "share"
+                        )
+                    },
+                    onClick = {
+                        val deepLinkUrl = "https://mostaqemapp.online/quran/1/166"
+                        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                            type = "text/plain"
+                            putExtra(Intent.EXTRA_TEXT, deepLinkUrl)
+                        }
+                        context.startActivity(Intent.createChooser(shareIntent, "Share via"))
+
+                    }
+                )
+                if (!playerViewModel.isCurrentSurahDownloaded()) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.download)) },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(R.drawable.download),
+                                contentDescription = "download"
+                            )
+                        },
+                        onClick = {
+                            if (!isDownloading) playerViewModel.download()
+                            isDownloading = true
+                        }
+                    )
+                }
+
+            }
+        }
+//        AnimatedVisibility(
+//            visible = !playerViewModel.isCurrentSurahDownloaded()
+//        ) {
+//            IconButton(onClick = {
+//                if (!isDownloading) playerViewModel.download()
+//                isDownloading = true
+//
+//            }) {
+//                Icon(
+//                    painter = painterResource(if (isDownloading) R.drawable.download_off else R.drawable.download),
+//                    contentDescription = "download",
+//
+//                    )
+//            }
+//        }
 
     }
 }
+

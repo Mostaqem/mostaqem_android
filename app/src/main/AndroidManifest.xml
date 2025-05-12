@@ -9,7 +9,6 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
 
-
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -19,8 +18,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Mostaqem"
-        >
+        android:theme="@style/Theme.Mostaqem">
         <profileable
             android:shell="true"
             tools:targetApi="29" />
@@ -61,10 +59,25 @@
                 <action android:name="android.intent.action.VIEW" />
 
                 <data
-                    android:scheme="mostaqem"
-                    android:host="player" />
+                    android:host="player"
+                    android:scheme="mostaqem" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="mostaqemapp.online"
+                    android:scheme="https"
+                    android:pathPrefix="/quran/" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".CrashReportActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Mostaqem" />
 
 
         <provider
@@ -107,7 +120,4 @@
         </receiver>
 
     </application>
-    <queries>
-        <package android:name="com.egyptianbanks.instapay" />
-    </queries>
 </manifest>

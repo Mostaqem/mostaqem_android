@@ -1,5 +1,7 @@
 package com.mostaqem.core.ui.app
 
+import android.content.Intent
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -57,6 +59,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mostaqem.core.navigation.models.AppearanceDestination
@@ -256,19 +259,23 @@ fun MostaqemApp() {
                             composable<UpdateDestination> { UpdateScreen(navController = navController) }
                             composable<PlayerDestination>(
                                 deepLinks = listOf(
-                                    navDeepLink<PlayerDestination>(basePath = "mostaqem://player")
-                                )
+                                    navDeepLink<PlayerDestination>(basePath = "mostaqem://player"),
+                                    navDeepLink<PlayerDestination>(basePath = "https://mostaqemapp.online/quran/{surahID}/{recitationID}"),
 
-                            ) {
+                                    ),
 
+                                ) {
+                                val surahID = it.arguments?.getString("surahID")?.toInt()
+                                val recitationID = it.arguments?.getString("recitationID")?.toInt()
                                 PlayerScreen(
                                     playerViewModel = playerViewModel,
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     animatedVisibilityScope = this,
                                     navController = navController,
                                     hidePlayerBar = hidePlayer,
-
-                                    )
+                                    surahId = surahID,
+                                    recitationID = recitationID
+                                )
                             }
                             composable<ReadingDestination> {
                                 val args = it.toRoute<ReadingDestination>()

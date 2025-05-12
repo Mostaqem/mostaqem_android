@@ -15,7 +15,6 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.google.common.util.concurrent.MoreExecutors
 import com.mostaqem.R
 import com.mostaqem.core.network.NetworkConnectivityObserver
-import com.mostaqem.core.network.models.DataError
 import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.core.network.models.Result
 import com.mostaqem.core.ui.controller.SnackbarController
@@ -25,17 +24,13 @@ import com.mostaqem.features.offline.domain.OfflineRepository
 import com.mostaqem.features.personalization.domain.PersonalizationRepository
 import com.mostaqem.features.player.data.BottomSheetType
 import com.mostaqem.features.player.data.PlayerSurah
-import com.mostaqem.features.player.data.toAudioData
 import com.mostaqem.features.player.domain.repository.PlayerRepository
 import com.mostaqem.features.reciters.data.RecitationData
 import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.surahs.data.AudioData
 import com.mostaqem.features.surahs.data.Surah
-import com.mostaqem.features.surahs.data.SurahAudio
-import com.mostaqem.features.surahs.domain.repository.SurahRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
@@ -46,7 +41,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -92,6 +86,7 @@ class PlayerViewModel @Inject constructor(
     val duration: StateFlow<Long> = _duration
 
 
+
     var isCached = false
 
     init {
@@ -133,7 +128,8 @@ class PlayerViewModel @Inject constructor(
                         }
 
                         override fun onPlayerError(error: PlaybackException) {
-                            Log.e("PlayerError", "Playback error: ${error.message}", error)
+                            Log.e("PlayerError", "Playback error: ${error.errorCode}", error)
+
                         }
 
                         override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
@@ -217,6 +213,7 @@ class PlayerViewModel @Inject constructor(
                         val metadata = setMetadata(metadataData.data.response)
                         mediaController?.setMediaItem(metadata, player.position)
                         mediaController?.prepare()
+                        getQueueUrls(currentSurahID = player.surah.id, reciterID = player.reciter.id)
                     }
 
 
@@ -253,7 +250,6 @@ class PlayerViewModel @Inject constructor(
 
     private fun setMetadata(data: AudioData): MediaItem {
         val isDefaultEnglish = languageManager.getLanguageCode() == "en"
-        Log.d("isDefaultEnglish", "setMetadata: ${isDefaultEnglish}")
         val surahName = if (isDefaultEnglish) data.surah.complexName else data.surah.arabicName
         val reciterName =
             if (isDefaultEnglish) data.recitation.reciter.englishName else data.recitation.reciter.arabicName
@@ -270,8 +266,6 @@ class PlayerViewModel @Inject constructor(
         val data: AudioData? = offlineRepository.getFileURL(surahID, recitationID)
 
         if (data != null) {
-
-            Log.d("Player", "setLocalMetadata: ${data}")
             val metadata: MediaMetadata =
                 MediaMetadata.Builder()
                     .setTitle(data.surah.arabicName)
@@ -295,8 +289,7 @@ class PlayerViewModel @Inject constructor(
         val previousChapters = (1..3).map { currentSurahID - it }.filter { it > 0 }
         val nextChapters = (1..3).map { currentSurahID + it }.filter { it <= 114 }
         val previousMediaItems = mutableSetOf<MediaItem>()
-        val currentAudioData: AudioData = playerState.value.toAudioData()
-        val currentMediaItem: MediaItem = setMetadata(currentAudioData)
+        val currentMediaItem: MediaItem = mediaController?.currentMediaItem!!
 
         val nextMediaItems = mutableSetOf<MediaItem>()
 
@@ -317,8 +310,6 @@ class PlayerViewModel @Inject constructor(
                         val mediaItem = setMetadata(data.data.response)
                         previousMediaItems.add(mediaItem)
                     }
-
-
                 }
 
             }
@@ -349,23 +340,25 @@ class PlayerViewModel @Inject constructor(
         viewModelScope.launch {
             previousJobs.awaitAll()
             nextJobs.awaitAll()
-            queuePlaylist =
-                (previousMediaItems + currentMediaItem + nextMediaItems).toMutableList()
-            mediaController?.addMediaItems(queuePlaylist)
-
+            queuePlaylist = (previousMediaItems.reversed() + currentMediaItem + nextMediaItems).toMutableList()
+            mediaController?.run {
+                clearMediaItems()
+                addMediaItems(queuePlaylist)
+                val currentIndex = previousMediaItems.size
+                seekTo(currentIndex,0L)
+            }
         }
     }
 
     fun fetchMediaUrl(reciterId: Int? = null, surahId: Int? = null, recID: Int? = null) {
+
         val surahID: Int = surahId ?: playerState.value.surah!!.id
         val reciterID: Int = reciterId ?: defaultReciter.id
-        Log.d("Player", "surahID: ${surahID}")
-
         viewModelScope.launch {
             val recitationID = recID ?: personalizationRepository.getDefaultRecitationID()
-                    .first()
+                .first()
 
-            val isSurahDownloaded = offlineRepository.isSurahDownloaded(surahID, recitationID ?: 0)
+            val isSurahDownloaded = offlineRepository.isSurahDownloaded(surahID, recitationID)
             val playDownloaded = offlineRepository.getPlayDownloadedOption().first()
             isCached = false
 
@@ -379,7 +372,6 @@ class PlayerViewModel @Inject constructor(
 
             } else {
                 val networkStatus = networkObserver.observe().first()
-
                 if (networkStatus == NetworkStatus.Available) {
                     val mediaData = playerRepository.getMediaURL(surahID, reciterID, recID)
                     if (mediaData is Result.Success) {
@@ -410,11 +402,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun playQueueItem(mediaItemIndex: Int) {
-        Log.d(
-            "Queue",
-            "MediaItem: ${mediaController?.getMediaItemAt(mediaItemIndex)?.mediaMetadata?.title}"
-        )
-        mediaController?.seekTo(mediaItemIndex, 0L)
+        mediaController?.seekTo(mediaItemIndex , 0L)
     }
 
     fun handlePlayPause() {
@@ -565,7 +553,6 @@ class PlayerViewModel @Inject constructor(
     fun changeDefaultReciter() {
         viewModelScope.launch(errorHandler) {
             personalizationRepository.getDefaultReciter().collectLatest {
-                Log.d("Choosen Reciter", "changeDefaultReciter: ${it}")
                 defaultReciter = it
             }
 
@@ -592,7 +579,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun changeSurah(surah: Surah) {
-        Log.d("ChangeSurah", "changeSurah: ${surah}")
+
         playerState.value =
             playerState.value.copy(surah = surah, reciter = defaultReciter, recitationID = null)
 
@@ -602,10 +589,13 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun changeReciter(reciter: Reciter) {
-        playerState.value = playerState.value.copy(
-            reciter = reciter, isLocal = false
-        )
-        fetchMediaUrl(reciterId = reciter.id)
+        if (playerState.value.surah != null) {
+            playerState.value = playerState.value.copy(
+                reciter = reciter, isLocal = false
+            )
+            fetchMediaUrl(reciterId = reciter.id)
+        }
+
     }
 
     fun changeRecitation(id: Int) {
@@ -613,14 +603,18 @@ class PlayerViewModel @Inject constructor(
             recitationID = id,
             isLocal = false
         )
-        Log.d("Recitation", "changeRecitation: ${id}")
         fetchMediaUrl(recID = id)
 
     }
 
     fun download() {
-        val player = playerState.value
-        offlineRepository.downloadAudio(data = player)
+        val currentMediaItem = mediaController?.currentMediaItem
+        if (currentMediaItem == null || currentMediaItem.localConfiguration == null) return
+        viewModelScope.launch {
+            delay(1000)
+            offlineRepository.downloadAudio(data = currentMediaItem)
+
+        }
     }
 
     fun localPlay(data: AudioData) {

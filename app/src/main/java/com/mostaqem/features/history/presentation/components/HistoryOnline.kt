@@ -19,10 +19,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -97,7 +99,8 @@ fun HistoryOnline(
                     navController = navController,
                     selectedReciter = selectedReciter,
                     isArabic = languageCode == "ar",
-                    selectedRecitationID = selectedRecitation
+                    selectedRecitationID = selectedRecitation,
+
                 ) {
                     openOptionsSheet = false
                 }
@@ -186,7 +189,8 @@ fun HistoryOnline(
                                         Text(
                                             if (languageCode == "en") audio.surah.complexName else audio.surah.arabicName,
                                             style = MaterialTheme.typography.titleLarge,
-                                            fontFamily = fontFamily
+                                            fontFamily = fontFamily,
+                                            modifier = Modifier.fillMaxWidth()
                                         )
                                         Text(
                                             if (languageCode == "en") audio.recitation.reciter.englishName else audio.recitation.reciter.arabicName,
@@ -196,11 +200,22 @@ fun HistoryOnline(
                                             color = MaterialTheme.colorScheme.onPrimaryContainer
                                         )
                                     }
-                                    Icon(
-                                        Icons.Default.PlayArrow,
-                                        modifier = Modifier.size(20.dp),
-                                        contentDescription = "sd"
-                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(CircleShape)
+                                            .background(
+                                                MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f)
+                                            )
+                                            .size(30.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            Icons.Default.PlayArrow,
+                                            modifier = Modifier.size(20.dp),
+                                            contentDescription = "sd"
+                                        )
+                                    }
 
 
                                 }

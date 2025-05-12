@@ -34,6 +34,7 @@ fun SurahOptions(
     selectedRecitationID: Int? = null,
     playerViewModel: PlayerViewModel,
     navController: NavController,
+    isDownloaded: Boolean = false,
     isArabic: Boolean,
     onDismiss: () -> Unit,
 
@@ -41,7 +42,7 @@ fun SurahOptions(
     LazyColumn {
         item {
             ListItem(
-                headlineContent = { Text(text = if (isArabic) selectedSurah!!.arabicName else selectedSurah!!.complexName) },
+                headlineContent = { Text(text = if (isArabic || isDownloaded) selectedSurah!!.arabicName else selectedSurah!!.complexName) },
                 supportingContent = { selectedReciter?.arabicName?.let { Text(text = it) } },
                 leadingContent = {
                     Box(contentAlignment = Alignment.Center) {

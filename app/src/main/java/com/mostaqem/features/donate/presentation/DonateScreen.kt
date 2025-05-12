@@ -166,7 +166,6 @@ fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
             }
             if (isUserFromEgypt(context)) {
                 item {
-
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(16.dp))
@@ -188,24 +187,70 @@ fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
                                         )
                                     }
                                 }
-                            }
+                            },
+                        contentAlignment = Alignment.Center
 
                     ) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(R.drawable.instapay),
-                                contentDescription = "instapay",
-                                modifier = Modifier.size(100.dp),
-                                tint = MaterialTheme.colorScheme.onTertiaryContainer
-                            )
-                            Text("the-sabra@instapay", textAlign = TextAlign.Center)
-                        }
+                        Icon(
+                            painter = painterResource(R.drawable.instapay),
+                            contentDescription = "instapay",
+                            modifier = Modifier.size(100.dp),
+                            tint = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+
+                    }
+                }
+            }
+            item {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                        .size(130.dp)
+                        .clickable {
+                            val packageName = "com.mostaqem"
+                            val playStoreUri = "market://details?id=$packageName".toUri()
+                            val playStoreIntent = Intent(Intent.ACTION_VIEW, playStoreUri)
+                            val webUri =
+                                "https://play.google.com/store/apps/details?id=$packageName".toUri()
+                            val webIntent = Intent(Intent.ACTION_VIEW, webUri)
+
+                            try {
+                                context.startActivity(playStoreIntent)
+                            } catch (e: ActivityNotFoundException) {
+                                try {
+                                    context.startActivity(webIntent)
+                                } catch (webEx: ActivityNotFoundException) {
+                                    scope.launch {
+                                        SnackbarController.sendEvent(
+                                            events = SnackbarEvents(message = "لا يوجد حاجة لفتح اللينك")
+                                        )
+
+                                    }
+                                }
 
 
+                            }
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.padding(10.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.googleplay),
+                            contentDescription = "github",
+                            modifier = Modifier.size(40.dp),
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                        Text(
+                            stringResource(R.string.star_us),
+                            modifier = Modifier.padding(10.dp),
+                            textAlign = TextAlign.Center,
+                            fontFamily = fontFamily,
+                        )
                     }
                 }
             }
