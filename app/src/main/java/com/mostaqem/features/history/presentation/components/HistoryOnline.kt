@@ -1,6 +1,5 @@
 package com.mostaqem.features.history.presentation.components
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,9 +23,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -51,17 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mostaqem.R
-import com.mostaqem.core.database.events.SurahEvents
-import com.mostaqem.core.network.models.DataError
 import com.mostaqem.core.network.models.Result
 import com.mostaqem.features.history.data.HistoryState
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.reciters.data.reciter.Reciter
-import com.mostaqem.features.reciters.domain.ReciterEvents
-import com.mostaqem.features.reciters.presentation.ReciterViewModel
 import com.mostaqem.features.surahs.data.AudioData
 import com.mostaqem.features.surahs.data.Surah
-import com.mostaqem.features.surahs.presentation.SurahsViewModel
 import com.mostaqem.features.surahs.presentation.components.SurahOptions
 
 @Composable
@@ -86,7 +80,6 @@ fun HistoryOnline(
     var selectedRecitation: Int? by remember { mutableStateOf(null) }
     var openOptionsSheet by remember { mutableStateOf(false) }
     Column {
-
         if (openOptionsSheet) {
             ModalBottomSheet(
                 onDismissRequest = {
@@ -108,6 +101,7 @@ fun HistoryOnline(
         }
 
         if (!loading) {
+//            LoadingIndicator()
             Text(
                 stringResource(R.string.recommended),
                 fontSize = 20.sp,
