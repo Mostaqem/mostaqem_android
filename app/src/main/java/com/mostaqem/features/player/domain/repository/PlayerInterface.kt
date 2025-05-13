@@ -18,4 +18,6 @@ interface PlayerInterface {
     ): Result<SurahAudio, DataError.Network>
 
     suspend fun buildQueue(currentSurahID: Int, reciterID: Int): List<MediaItem>
+
+
 }

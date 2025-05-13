@@ -79,6 +79,7 @@ import com.mostaqem.features.player.presentation.components.PlayButtons
 import com.mostaqem.features.player.presentation.components.PlayOptions
 import com.mostaqem.features.player.presentation.components.QueuePlaylist
 import com.mostaqem.features.player.presentation.components.sleep.SleepDialog
+import com.mostaqem.features.player.presentation.components.sleep.SleepViewModel
 import com.mostaqem.features.reciters.presentation.ReciterScreen
 import com.mostaqem.features.reciters.presentation.ReciterViewModel
 import com.mostaqem.features.reciters.presentation.recitations.RecitationList
@@ -94,6 +95,7 @@ import kotlin.text.toInt
 @Composable
 fun PlayerScreen(
     playerViewModel: PlayerViewModel,
+    sleepViewModel: SleepViewModel,
     navController: NavController,
     hidePlayerBar: MutableState<Boolean>,
     sharedTransitionScope: SharedTransitionScope,
@@ -245,7 +247,8 @@ fun PlayerScreen(
                                 }
                                 PlayOptions(
                                     playerViewModel = playerViewModel,
-
+                                    viewModel = sleepViewModel,
+                                    playerSurah = playerSurah
                                 )
                             }
                         }
@@ -342,23 +345,9 @@ fun PlayerScreen(
                     }
                     PlayOptions(
                         playerViewModel = playerViewModel,
+                        viewModel = sleepViewModel,
+                        playerSurah = playerSurah
                     )
-                    if (isConnected == NetworkStatus.Unavailable || isConnected == NetworkStatus.Lost) {
-                        Box(
-                            contentAlignment = Alignment.Center, modifier = Modifier
-                                .clip(
-                                    RoundedCornerShape(
-                                        topStart = 16.dp, topEnd = 16.dp
-                                    )
-                                )
-                                .background(MaterialTheme.colorScheme.errorContainer)
-                                .fillMaxWidth()
-                                .height(80.dp)
-
-                        ) {
-                            Text("غير متصل بأنترنت, حاول مرة اخري")
-                        }
-                    }
                 }
             }
         }

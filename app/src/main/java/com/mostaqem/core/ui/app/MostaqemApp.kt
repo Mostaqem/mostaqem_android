@@ -86,6 +86,7 @@ import com.mostaqem.features.personalization.presentation.AppearanceScreen
 import com.mostaqem.features.player.presentation.PlayerScreen
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.player.presentation.components.PlayerBarModalSheet
+import com.mostaqem.features.player.presentation.components.sleep.SleepViewModel
 import com.mostaqem.features.reading.presentation.ReadingScreen
 import com.mostaqem.features.settings.presentation.SettingsScreen
 import com.mostaqem.features.share.ShareScreen
@@ -201,6 +202,7 @@ fun MostaqemApp() {
             }) {
             val playerViewModel: PlayerViewModel = hiltViewModel()
             val shareViewModel: ShareViewModel = viewModel()
+            val sleepViewModel: SleepViewModel = hiltViewModel<SleepViewModel>()
 
             SharedTransitionLayout {
                 Box(
@@ -269,6 +271,7 @@ fun MostaqemApp() {
                                 val recitationID = it.arguments?.getString("recitationID")?.toInt()
                                 PlayerScreen(
                                     playerViewModel = playerViewModel,
+                                    sleepViewModel = sleepViewModel,
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     animatedVisibilityScope = this,
                                     navController = navController,

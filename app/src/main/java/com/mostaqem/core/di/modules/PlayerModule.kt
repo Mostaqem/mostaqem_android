@@ -59,14 +59,6 @@ object PlayerModule {
         return database.playerDao
     }
 
-    @Provides
-    @ViewModelScoped
-    fun providePlayerRepository(
-        dao: PlayerDao,
-        surahRepository: SurahRepository
-    ): PlayerRepository {
-        return PlayerRepository(dao, surahRepository)
-    }
 
 
 }

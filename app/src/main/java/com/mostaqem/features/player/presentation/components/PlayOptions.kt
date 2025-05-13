@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mostaqem.R
 import com.mostaqem.features.player.data.BottomSheetType
+import com.mostaqem.features.player.data.PlayerSurah
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.player.presentation.components.sleep.SleepDialog
 import com.mostaqem.features.player.presentation.components.sleep.SleepViewModel
@@ -42,10 +43,11 @@ import com.mostaqem.features.player.presentation.components.sleep.toMinSec
 fun PlayOptions(
     modifier: Modifier = Modifier,
     playerViewModel: PlayerViewModel,
+    playerSurah: PlayerSurah,
+    viewModel: SleepViewModel
 ) {
     var isDownloading by remember { mutableStateOf(false) }
     val showSleepDialog = remember { mutableStateOf(false) }
-    val viewModel: SleepViewModel = hiltViewModel<SleepViewModel>()
     val remainingTime by viewModel.remainingTime.collectAsState()
     val context = LocalContext.current
     if (showSleepDialog.value) {
@@ -133,7 +135,10 @@ fun PlayOptions(
                         )
                     },
                     onClick = {
-                        val deepLinkUrl = "https://mostaqemapp.online/quran/1/166"
+                        val surahID = playerSurah.surah?.id
+                        val reciterID = playerSurah.reciter.id
+                        val deepLinkUrl =
+                            "https://mostaqemapp.online/quran/${surahID}/${reciterID}"
                         val shareIntent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
                             putExtra(Intent.EXTRA_TEXT, deepLinkUrl)
