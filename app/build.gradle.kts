@@ -16,7 +16,7 @@ android {
         applicationId = "com.mostaqem"
         minSdk = 26
         targetSdk = 35
-        versionCode = 5
+        versionCode = 6
         versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -103,17 +103,18 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.hilt.android)
     implementation(libs.logging.interceptor)
+    implementation(libs.material3)
     implementation(libs.androidx.material3.adaptive.navigation.suite)
     implementation(libs.androidx.compose.material3.adaptive.navigation)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.dash)
     implementation(libs.androidx.media3.ui)
     implementation(libs.gson)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.converter.gson)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.profileinstaller)
-    implementation(libs.androidx.material3.adaptive.navigation.suite.android)
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.logging.interceptor)
