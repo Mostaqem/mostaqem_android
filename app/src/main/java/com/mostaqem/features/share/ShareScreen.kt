@@ -91,10 +91,12 @@ import java.io.FileOutputStream
 fun ShareScreen(
     modifier: Modifier = Modifier,
     shareViewModel: ShareViewModel,
-    hidePlayerState: MutableState<Boolean>,
     navController: NavController,
     playerViewModel: PlayerViewModel,
-    chapterName: String
+    chapterName: String,
+    onShowPlayer:()->Unit,
+    onHidePlayer:()->Unit,
+
 ) {
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var composableBounds by remember { mutableStateOf<Rect?>(null) }
@@ -160,7 +162,7 @@ fun ShareScreen(
     }
 
     LaunchedEffect(isButtonVisible) {
-        hidePlayerState.value = true
+        onHidePlayer()
         playerViewModel.pause()
         if (!isButtonVisible) {
             delay(100)
@@ -202,7 +204,7 @@ fun ShareScreen(
                 title = {},
                 navigationIcon = {
                     IconButton(onClick = {
-                        hidePlayerState.value = false
+                        onShowPlayer()
                         navController.popBackStack()
                     }) {
                         Icon(

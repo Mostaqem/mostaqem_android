@@ -1,6 +1,5 @@
 package com.mostaqem.features.history.presentation.components
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,10 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -51,27 +50,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.mostaqem.R
-import com.mostaqem.core.database.events.SurahEvents
-import com.mostaqem.core.network.models.DataError
 import com.mostaqem.core.network.models.Result
 import com.mostaqem.features.history.data.HistoryState
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.reciters.data.reciter.Reciter
-import com.mostaqem.features.reciters.domain.ReciterEvents
-import com.mostaqem.features.reciters.presentation.ReciterViewModel
 import com.mostaqem.features.surahs.data.AudioData
 import com.mostaqem.features.surahs.data.Surah
-import com.mostaqem.features.surahs.presentation.SurahsViewModel
 import com.mostaqem.features.surahs.presentation.components.SurahOptions
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 fun HistoryOnline(
     playerViewModel: PlayerViewModel,
     navController: NavController,
     languageCode: String,
     fontFamily: FontFamily,
     state: HistoryState,
+
     onAddSurah: (AudioData) -> Unit,
     onFetchData: () -> Unit
 ) {
@@ -101,7 +96,7 @@ fun HistoryOnline(
                     isArabic = languageCode == "ar",
                     selectedRecitationID = selectedRecitation,
 
-                ) {
+                    ) {
                     openOptionsSheet = false
                 }
             }
@@ -153,7 +148,7 @@ fun HistoryOnline(
                                 contentAlignment = Alignment.Center,
                                 modifier = Modifier.fillParentMaxWidth()
                             ) {
-                                CircularProgressIndicator()
+                                LoadingIndicator()
                             }
                         }
                     }
@@ -205,7 +200,9 @@ fun HistoryOnline(
                                         modifier = Modifier
                                             .clip(CircleShape)
                                             .background(
-                                                MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.3f)
+                                                MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                                    alpha = 0.3f
+                                                )
                                             )
                                             .size(30.dp),
                                         contentAlignment = Alignment.Center
@@ -264,7 +261,7 @@ fun HistoryOnline(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                CircularProgressIndicator()
+                LoadingIndicator()
             }
         }
         if (surahs.isNotEmpty()) {

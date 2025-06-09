@@ -2,7 +2,6 @@ package com.mostaqem.features.player.presentation
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -21,16 +20,17 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,11 +43,9 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -68,8 +66,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.mostaqem.R
-import com.mostaqem.core.network.NetworkConnectivityObserver
-import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.dataStore
 import com.mostaqem.features.player.data.BottomSheetType
 import com.mostaqem.features.player.domain.CustomShape
@@ -78,38 +74,40 @@ import com.mostaqem.features.player.domain.Octagon
 import com.mostaqem.features.player.presentation.components.PlayButtons
 import com.mostaqem.features.player.presentation.components.PlayOptions
 import com.mostaqem.features.player.presentation.components.QueuePlaylist
-import com.mostaqem.features.player.presentation.components.sleep.SleepDialog
 import com.mostaqem.features.player.presentation.components.sleep.SleepViewModel
 import com.mostaqem.features.reciters.presentation.ReciterScreen
 import com.mostaqem.features.reciters.presentation.ReciterViewModel
 import com.mostaqem.features.reciters.presentation.recitations.RecitationList
 import com.mostaqem.features.settings.data.AppSettings
 import kotlin.math.roundToInt
-import kotlin.text.toInt
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(
     ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class,
-    ExperimentalMaterial3WindowSizeClassApi::class,
+    ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3ExpressiveApi::class,
 )
 @Composable
 fun PlayerScreen(
     playerViewModel: PlayerViewModel,
     sleepViewModel: SleepViewModel,
     navController: NavController,
-    hidePlayerBar: MutableState<Boolean>,
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     surahId: Int? = null,
-    recitationID: Int? = null
+    recitationID: Int? = null,
+    onBack: () -> Unit,
+    onShowBar: () -> Unit,
 ) {
     BackHandler {
         navController.popBackStack()
-        hidePlayerBar.value = false
+        onBack()
     }
-    LaunchedEffect(key1 = hidePlayerBar) {
-        if (surahId != null && recitationID != null) playerViewModel.fetchMediaUrl(surahId = surahId.toInt(), recID = recitationID.toInt())
-        hidePlayerBar.value = true
+    LaunchedEffect(Unit) {
+        if (surahId != null && recitationID != null) playerViewModel.fetchMediaUrl(
+            surahId = surahId.toInt(),
+            recID = recitationID.toInt()
+        )
+        onShowBar()
         val isCached = playerViewModel.isCached
         val player = playerViewModel.playerState.value
         if (isCached && player.isLocal) {
@@ -126,26 +124,21 @@ fun PlayerScreen(
     val percentage by playerViewModel.positionPercentage.collectAsState()
     val progress by playerViewModel.currentPosition.collectAsState()
     val duration by playerViewModel.duration.collectAsState()
-
-    val context = LocalContext.current
-    val isConnected by NetworkConnectivityObserver(context).observe()
-        .collectAsState(initial = NetworkStatus.Unavailable)
     val customShapeData =
         LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value
     var offset by remember { mutableFloatStateOf(0f) }
     val dismissThreshold = 300f
 
-
     Box(
         modifier = Modifier
+            .navigationBarsPadding()
             .offset { IntOffset(0, offset.roundToInt()) }
             .pointerInput(Unit) {
-
                 detectVerticalDragGestures(onVerticalDrag = { _, dragAmount ->
                     offset += dragAmount
                 }, onDragEnd = {
                     if (offset > dismissThreshold) {
-                        hidePlayerBar.value = false
+                        onBack()
                         navController.popBackStack()
                     } else {
                         offset = 0f
@@ -248,7 +241,8 @@ fun PlayerScreen(
                                 PlayOptions(
                                     playerViewModel = playerViewModel,
                                     viewModel = sleepViewModel,
-                                    playerSurah = playerSurah
+                                    playerSurah = playerSurah,
+                                    navController = navController
                                 )
                             }
                         }
@@ -256,7 +250,6 @@ fun PlayerScreen(
 
                 }
             }
-
             else -> {
                 Column(
                     modifier = Modifier
@@ -267,7 +260,7 @@ fun PlayerScreen(
                 ) {
                     Column(modifier = Modifier.padding(vertical = 10.dp)) {
                         BoxWithConstraints(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                            val size = if (maxHeight <= 640.dp) 200.dp else 330.dp
+                            val size = if (maxHeight <= 640.dp) 200.dp else 300.dp
                             AsyncImage(
                                 model = playerSurah.surah?.image,
                                 contentDescription = "",
@@ -295,6 +288,7 @@ fun PlayerScreen(
                                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                             )
                         }
+
                         Slider(
                             value = percentage,
                             onValueChange = { playerViewModel.seekToPosition(it) },
@@ -321,7 +315,7 @@ fun PlayerScreen(
                     if (bottomSheetType != BottomSheetType.None) {
                         ModalBottomSheet(
                             sheetState = bottomSheetState,
-                            dragHandle = {},
+
                             containerColor = MaterialTheme.colorScheme.surface,
                             onDismissRequest = {
                                 playerViewModel.hideBottomSheet()
@@ -346,7 +340,8 @@ fun PlayerScreen(
                     PlayOptions(
                         playerViewModel = playerViewModel,
                         viewModel = sleepViewModel,
-                        playerSurah = playerSurah
+                        playerSurah = playerSurah,
+                        navController = navController
                     )
                 }
             }
@@ -395,6 +390,7 @@ private fun Shape() {
                 )
                 Text(text = "عبدالباسط عبدالصمد")
             }
+
             Slider(
                 value = 0.5f, onValueChange = { },
 

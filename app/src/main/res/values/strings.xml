@@ -80,6 +80,12 @@
     <string name="download">download</string>
     <string name="share">Share</string>
 
+    <string name="sort_by">Sort by</string>
+    <string name="quran">Quran</string>
+    <string name="name">Name</string>
+    <string name="revelation_place">Revelation place</string>
+
+
 
 
 </resources>

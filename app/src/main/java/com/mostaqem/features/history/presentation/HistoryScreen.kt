@@ -2,9 +2,11 @@ package com.mostaqem.features.history.presentation
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,7 +43,8 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel(),
     surahViewModel: SurahsViewModel = hiltViewModel(),
     reciterViewModel: ReciterViewModel = hiltViewModel(),
-    navController: NavController
+    navController: NavController,
+    paddingValues: PaddingValues
 ) {
     val languageCode =
         LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
@@ -49,45 +52,43 @@ fun HistoryScreen(
     val fontFamily = remember(languageCode) {
         if (languageCode == "en") productFontFamily else kufamFontFamily
     }
-    val scrollState = rememberScrollState()
-
     val uiState by viewModel.uiState.collectAsState()
-    Column(Modifier.verticalScroll(scrollState)) {
-
-        LargeTopAppBar(title = {
-            Text(
-                text = stringResource(R.string.hello),
-                style = MaterialTheme.typography.headlineMedium,
-                fontFamily = fontFamily,
-                modifier = Modifier.padding(start = 12.dp)
-            )
-        })
-        Spacer(modifier = Modifier.height(24.dp))
-
-        HistoryOnline(
-            playerViewModel,
-            navController,
-            languageCode,
-            fontFamily,
-            uiState,
-            onAddSurah = {
-                playerViewModel.playAudioData(it)
-                surahViewModel.onSurahEvents(
-                    SurahEvents.AddSurah(
-                        it.surah
-                    )
+    LazyColumn(contentPadding = paddingValues) {
+        item {
+            LargeTopAppBar(title = {
+                Text(
+                    text = stringResource(R.string.hello),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontFamily = fontFamily,
+                    modifier = Modifier.padding(start = 12.dp)
                 )
-                reciterViewModel.onReciterEvents(
-                    ReciterEvents.AddReciter(
-                        it.recitation.reciter
-                    )
-                )
-            }
-        ){
-            viewModel.fetchData()
+            })
+            Spacer(modifier = Modifier.height(24.dp))
         }
-
-
+        item {
+            HistoryOnline(
+                playerViewModel,
+                navController,
+                languageCode,
+                fontFamily,
+                uiState,
+                onAddSurah = {
+                    playerViewModel.playAudioData(it)
+                    surahViewModel.onSurahEvents(
+                        SurahEvents.AddSurah(
+                            it.surah
+                        )
+                    )
+                    reciterViewModel.onReciterEvents(
+                        ReciterEvents.AddReciter(
+                            it.recitation.reciter
+                        )
+                    )
+                }
+            ) {
+                viewModel.fetchData()
+            }
+        }
     }
 }
 

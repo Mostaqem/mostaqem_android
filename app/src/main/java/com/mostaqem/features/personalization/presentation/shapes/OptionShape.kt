@@ -23,7 +23,6 @@ fun OptionShape(
     materialShape: MaterialShapes,
     isSelected: Boolean,
     personalizationViewModel: PersonalizationViewModel = hiltViewModel(),
-    context: Context
 ) {
     Box(contentAlignment = Alignment.Center) {
         Box(modifier = Modifier

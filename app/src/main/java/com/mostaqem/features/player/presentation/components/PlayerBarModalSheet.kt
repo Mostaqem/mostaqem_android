@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -34,11 +35,11 @@ import kotlin.math.roundToInt
 @Composable
 fun PlayerBarModalSheet(
     modifier: Modifier = Modifier,
-    hidePlayer: MutableState<Boolean>,
     navController: NavController,
     playerViewModel: PlayerViewModel,
     sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    onTap: () -> Unit
 ) {
     val playerIcon by playerViewModel.playPauseIcon.collectAsState()
     val surah = playerViewModel.playerState.value.surah
@@ -49,11 +50,12 @@ fun PlayerBarModalSheet(
     val dismissThreshold = 100
     Box(
         modifier = modifier
+            .navigationBarsPadding()
             .offset { IntOffset(0, offset.roundToInt()) }
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
-                        hidePlayer.value = true
+                        onTap()
                         navController.navigate(PlayerDestination)
 
                     }
@@ -68,7 +70,7 @@ fun PlayerBarModalSheet(
                         if (offset > dismissThreshold) {
                             playerViewModel.clear()
                         } else {
-                            hidePlayer.value = true
+                            onTap()
                             navController.navigate(PlayerDestination)
                             offset = 0f
                         }

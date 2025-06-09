@@ -79,4 +79,9 @@
     <string name="download">تحميل</string>
     <string name="share">انشر السورة</string>
 
+    <string name="sort_by">ترتيب حسب</string>
+    <string name="quran">القران</string>
+    <string name="name">الإسم</string>
+    <string name="revelation_place">مكان الوحي</string>
+
 </resources>

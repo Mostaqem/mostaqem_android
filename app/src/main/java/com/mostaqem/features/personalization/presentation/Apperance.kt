@@ -92,7 +92,7 @@ fun AppearanceScreen(
         )
         Spacer(Modifier.height(15.dp))
         LazyRow(
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.SpaceEvenly,
             contentPadding = WindowInsets.safeContent.asPaddingValues(),
             modifier = Modifier
                 .fillMaxWidth()
@@ -103,7 +103,6 @@ fun AppearanceScreen(
                 OptionShape(
                     isSelected = userSettings.shapeID == it.id,
                     materialShape = it,
-                    context = context
                 )
             }
         }

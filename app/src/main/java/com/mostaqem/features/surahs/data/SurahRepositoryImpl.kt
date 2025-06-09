@@ -16,14 +16,14 @@ import javax.inject.Singleton
 class SurahRepositoryImpl(
     private val api: SurahService,
 ) : SurahRepository {
-    override suspend fun getRemoteSurahs(): Flow<PagingData<Surah>> {
+    override suspend fun getRemoteSurahs(sortBy: SurahSortBy): Flow<PagingData<Surah>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 10,
                 prefetchDistance = 5,
                 initialLoadSize = 5
             ),
-            pagingSourceFactory = { SurahPagingSource(api = api) }).flow
+            pagingSourceFactory = { SurahPagingSource(api = api, defaultSortBy = sortBy) }).flow
     }
 
 

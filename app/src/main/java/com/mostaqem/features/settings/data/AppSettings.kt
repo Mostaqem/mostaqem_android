@@ -2,12 +2,14 @@ package com.mostaqem.features.settings.data
 
 import com.mostaqem.features.language.domain.AppLanguages
 import com.mostaqem.features.reciters.data.reciter.Reciter
+import com.mostaqem.features.surahs.data.SurahSortBy
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class AppSettings(
     val shapeID: String = "rect",
     val language: AppLanguages = AppLanguages.ENGLISH,
+    val sortBy: SurahSortBy = SurahSortBy.ID,
     val reciterSaved: Reciter = Reciter(
         id = 1,
         arabicName = "عبدالباسط عبدالصمد",

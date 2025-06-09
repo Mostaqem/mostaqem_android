@@ -14,11 +14,14 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -41,6 +44,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +53,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -110,11 +115,11 @@ fun MostaqemApp() {
         SnackbarHostState()
     }
     val scope = rememberCoroutineScope()
-    val showBottomBar = remember(currentRoute) {
-        items.any { it.route::class.qualifiedName == currentRoute }
-    }
+    var isSearchExpanded by remember { mutableStateOf(false) }
+    val showBottomBar =
+        !isSearchExpanded && items.any { it.route::class.qualifiedName == currentRoute }
     val bottomBarHeight = 56.dp
-    val hidePlayer = rememberSaveable {
+    var hidePlayer by rememberSaveable {
         mutableStateOf(false)
     }
     val bottomBarOffset by animateFloatAsState(
@@ -122,8 +127,6 @@ fun MostaqemApp() {
             durationMillis = 300, easing = FastOutSlowInEasing
         ), label = "bottomBarOffset"
     )
-
-
 
 
     ObserveAsEvents(flow = SnackbarController.events, snackbarHostState) { event ->
@@ -138,7 +141,9 @@ fun MostaqemApp() {
             }
         }
     }
-    Scaffold(snackbarHost = {
+    Scaffold(
+        contentWindowInsets = WindowInsets.safeDrawing,
+        snackbarHost = {
         SnackbarHost(snackbarHostState) { data ->
             Snackbar(
                 snackbarData = data,
@@ -154,9 +159,7 @@ fun MostaqemApp() {
                 )
             ),
             modifier = Modifier.fillMaxSize(),
-
             navigationSuiteItems = {
-
                 items.forEach { screen ->
                     val isSelected: Boolean = screen.route::class.qualifiedName == currentRoute
                     item(
@@ -165,7 +168,6 @@ fun MostaqemApp() {
                                 0, (bottomBarHeight.toPx() * bottomBarOffset).toInt()
                             )
                         },
-
                         selected = isSelected,
                         onClick = {
                             navController.navigate(screen.route) {
@@ -175,7 +177,6 @@ fun MostaqemApp() {
                                 launchSingleTop = true
                                 restoreState = true
                             }
-
                         },
                         icon = {
                             if (isSelected) {
@@ -191,14 +192,16 @@ fun MostaqemApp() {
                                     contentDescription = "nonselected"
                                 )
                             }
-
                         },
-                        label = { Text(text = stringResource(screen.id)) },
+                        label = {
+                            Text(
+                                text = stringResource(screen.id),
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
                         alwaysShowLabel = false,
                     )
                 }
-
-
             }) {
             val playerViewModel: PlayerViewModel = hiltViewModel()
             val shareViewModel: ShareViewModel = viewModel()
@@ -206,15 +209,16 @@ fun MostaqemApp() {
 
             SharedTransitionLayout {
                 Box(
-                    contentAlignment = Alignment.BottomCenter, modifier = Modifier.fillMaxSize()
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier = Modifier.fillMaxSize(),
                 ) {
-
-                    Box(modifier = Modifier.align(Alignment.TopStart)) {
-
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                    ) {
                         NavHost(
                             navController = navController,
                             startDestination = HomeDestination,
-
                             enterTransition = {
                                 fadeIn(animationSpec = tween(durationMillis = 300)) + scaleIn(
                                     initialScale = 0.9f,
@@ -242,13 +246,15 @@ fun MostaqemApp() {
                             composable<HomeDestination> {
                                 HistoryScreen(
                                     playerViewModel = playerViewModel,
-                                    navController = navController
+                                    navController = navController,
+                                    paddingValues = padding
                                 )
                             }
                             composable<SurahsDestination> {
                                 SurahsScreen(
                                     playerViewModel = playerViewModel,
-                                    navController = navController
+                                    navController = navController,
+                                    onHideBottom = { isSearchExpanded = it }
                                 )
                             }
                             composable<SettingsDestination> { SettingsScreen(navController = navController) }
@@ -275,9 +281,10 @@ fun MostaqemApp() {
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     animatedVisibilityScope = this,
                                     navController = navController,
-                                    hidePlayerBar = hidePlayer,
                                     surahId = surahID,
-                                    recitationID = recitationID
+                                    recitationID = recitationID,
+                                    onBack = { hidePlayer = false },
+                                    onShowBar = { hidePlayer = true }
                                 )
                             }
                             composable<ReadingDestination> {
@@ -295,8 +302,9 @@ fun MostaqemApp() {
                                     shareViewModel = shareViewModel,
                                     navController = navController,
                                     chapterName = args.chapterName,
-                                    hidePlayerState = hidePlayer,
-                                    playerViewModel = playerViewModel
+                                    playerViewModel = playerViewModel,
+                                    onShowPlayer = { hidePlayer = false },
+                                    onHidePlayer = { hidePlayer = true }
                                 )
                             }
 
@@ -316,35 +324,16 @@ fun MostaqemApp() {
                     }
 
                     val surah = playerViewModel.playerState.value.surah
-                    val context = LocalContext.current
-                    val isConnected by NetworkConnectivityObserver(context).observe()
-                        .collectAsState(initial = NetworkStatus.Unavailable)
-                    if (isConnected == NetworkStatus.Lost) {
-                        Box(
-                            contentAlignment = Alignment.Center,
-                            modifier = Modifier
-                                .clip(
-                                    RoundedCornerShape(
-                                        topStart = 16.dp,
-                                        topEnd = 16.dp
-                                    )
-                                )
-                                .background(MaterialTheme.colorScheme.errorContainer)
-                                .height(80.dp)
-                                .fillMaxWidth()
-                        ) {
-                            Text("غير متصل بأنترنت, حاول مرة اخري")
-                        }
-                    }
                     if (surah != null) {
-                        AnimatedVisibility(visible = !hidePlayer.value) {
+                        AnimatedVisibility(visible = !hidePlayer) {
                             PlayerBarModalSheet(
                                 playerViewModel = playerViewModel,
                                 navController = navController,
-                                hidePlayer = hidePlayer,
                                 sharedTransitionScope = this@SharedTransitionLayout,
                                 animatedVisibilityScope = this
-                            )
+                            ) {
+                                hidePlayer = true
+                            }
                         }
 
                     }

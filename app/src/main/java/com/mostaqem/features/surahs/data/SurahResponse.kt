@@ -28,3 +28,11 @@ data class Surah(
 
     val lastAccessed: Long = System.currentTimeMillis()
 )
+
+enum class SurahSortBy {
+    ID,
+    NAME,
+    REVELATION_PLACE
+}
+
+data class SortItems(val name:String, val value: SurahSortBy)

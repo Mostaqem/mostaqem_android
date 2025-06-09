@@ -1,27 +1,20 @@
 package com.mostaqem
 
-import android.app.ComponentCaller
 import android.content.Context
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.LocaleList
-import android.preference.PreferenceManager
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.core.content.ContextCompat
 import androidx.datastore.dataStore
-import androidx.navigation.Navigation.findNavController
-import com.google.common.io.Resources
 import com.mostaqem.core.ui.app.MostaqemApp
 import com.mostaqem.core.ui.theme.MostaqemTheme
 import com.mostaqem.features.language.domain.LanguageManager
 import com.mostaqem.features.settings.domain.AppSettingsSerializer
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import java.util.Locale
 import kotlin.system.exitProcess

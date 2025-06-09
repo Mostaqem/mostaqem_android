@@ -6,6 +6,8 @@ import com.mostaqem.features.language.data.Language
 import com.mostaqem.features.language.domain.AppLanguages
 import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.reciters.domain.ReciterRepository
+import com.mostaqem.features.settings.data.AppSettings
+import com.mostaqem.features.surahs.data.SurahSortBy
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -17,6 +19,8 @@ class PersonalizationRepository @Inject constructor(
     private val context: Context,
     private val reciterRepository: ReciterRepository
 ) {
+
+    val appSettings: Flow<AppSettings> = context.dataStore.data
 
     fun getDefaultReciter(): Flow<Reciter> = context.dataStore.data
         .map {
@@ -54,6 +58,10 @@ class PersonalizationRepository @Inject constructor(
 
     suspend fun changeLanguageDatastore(language: AppLanguages) {
         context.dataStore.updateData { it.copy(language = language) }
+    }
+
+    suspend fun changeSortBy(sortBy: SurahSortBy) {
+        context.dataStore.updateData { settings -> settings.copy(sortBy = sortBy) }
     }
 
 

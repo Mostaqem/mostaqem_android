@@ -86,7 +86,6 @@ class PlayerViewModel @Inject constructor(
     val duration: StateFlow<Long> = _duration
 
 
-
     var isCached = false
 
     init {
@@ -213,7 +212,10 @@ class PlayerViewModel @Inject constructor(
                         val metadata = setMetadata(metadataData.data.response)
                         mediaController?.setMediaItem(metadata, player.position)
                         mediaController?.prepare()
-                        getQueueUrls(currentSurahID = player.surah.id, reciterID = player.reciter.id)
+                        getQueueUrls(
+                            currentSurahID = player.surah.id,
+                            reciterID = player.reciter.id
+                        )
                     }
 
 
@@ -340,12 +342,13 @@ class PlayerViewModel @Inject constructor(
         viewModelScope.launch {
             previousJobs.awaitAll()
             nextJobs.awaitAll()
-            queuePlaylist = (previousMediaItems.reversed() + currentMediaItem + nextMediaItems).toMutableList()
+            queuePlaylist =
+                (previousMediaItems.reversed() + currentMediaItem + nextMediaItems).toMutableList()
             mediaController?.run {
                 clearMediaItems()
                 addMediaItems(queuePlaylist)
                 val currentIndex = previousMediaItems.size
-                seekTo(currentIndex,0L)
+                seekTo(currentIndex, 0L)
             }
         }
     }
@@ -393,16 +396,15 @@ class PlayerViewModel @Inject constructor(
         playerState.value = playerState.value.copy(url = data.url)
         mediaController?.play()
         isCached = false
-        if (queuePlaylist.isEmpty()) {
-            viewModelScope.launch {
-                getQueueUrls(data.surah.id, data.recitation.reciter.id)
+        viewModelScope.launch {
+            getQueueUrls(data.surah.id, data.recitation.reciter.id)
 
-            }
         }
+
     }
 
     fun playQueueItem(mediaItemIndex: Int) {
-        mediaController?.seekTo(mediaItemIndex , 0L)
+        mediaController?.seekTo(mediaItemIndex, 0L)
     }
 
     fun handlePlayPause() {
@@ -616,6 +618,7 @@ class PlayerViewModel @Inject constructor(
 
         }
     }
+
 
     fun localPlay(data: AudioData) {
         playerState.value = playerState.value.copy(isLocal = true, url = data.url)

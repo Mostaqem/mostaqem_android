@@ -7,10 +7,11 @@ import com.mostaqem.features.surahs.data.AudioData
 import com.mostaqem.features.surahs.data.Surah
 import com.mostaqem.features.surahs.data.SurahAudio
 import com.mostaqem.features.surahs.data.SurahResponse
+import com.mostaqem.features.surahs.data.SurahSortBy
 import kotlinx.coroutines.flow.Flow
 
 interface SurahRepository {
-    suspend fun getRemoteSurahs(): Flow<PagingData<Surah>>
+    suspend fun getRemoteSurahs(sortBy: SurahSortBy): Flow<PagingData<Surah>>
 
     suspend fun getSurahUrl(
         surahID: Int,
