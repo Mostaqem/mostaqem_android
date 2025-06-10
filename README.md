@@ -10,6 +10,15 @@
     <img src="screenshots/reading.png" alt="Screenshot 4" width="200" />
 </div>
 
+### Features
+- Localization (English , Arabic , Soon more will be added)
+- Reciter Control (Choose default reciter - change current surah reciter)
+- Recitations
+- Recommendations
+- Sleep Mode
+- Reading
+- Share Ayah 
+- Offline Mode (download and be able to listen offline)
 
 
 ### Credits
