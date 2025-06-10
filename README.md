@@ -1,4 +1,5 @@
-# Mostaqem (Android)
+# Mostaqem | Android
+An app for Islamic media like quran and podcasts without ads and subscriptions
 ## Download [Google Play](https://play.google.com/store/apps/details?id=com.mostaqem) Android 8.0 or more
 
 <div style="display: flex; gap: 10px; justify-content: center;">
@@ -26,5 +27,9 @@
 * Omar Sabra | Backend Engineer
 * Me | Android Developer
 * Islam Khalil | Web Developer
+
+
+## License:
+- This project is licensed under the [Mostaqem Custom License (MCL)](LICENSE) © Mazen Omar - see the LICENSE.md file for details
 
 > You can also get the [Desktop](https://github.com/Mostaqem/mostaqem_desktop) version
