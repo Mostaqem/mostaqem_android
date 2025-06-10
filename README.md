@@ -1,7 +1,7 @@
 # Mostaqem (Android)
+## Download [Google Play](https://play.google.com/store/apps/details?id=com.mostaqem) Android 8.0 or more
 
 ### Screenshots (but it's not over yet):
-
 
 <div style="display: flex; gap: 10px; justify-content: center;">
     <img src="screenshots/home_screen.png" alt="Screenshot 1" width="200" />
@@ -10,7 +10,10 @@
     <img src="screenshots/reading.png" alt="Screenshot 4" width="200" />
 </div>
 
+
+
 ### Credits
 
 * Omar Sabra | Backend Engineer
 * Me | Android Developer
+* Islam Khalil | Web Developer

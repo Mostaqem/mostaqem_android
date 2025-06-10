@@ -17,7 +17,7 @@ data class SurahObject(
 @Entity
 data class Surah(
     @PrimaryKey val id: Int,
-    val image: String,
+    val image: String = "https://img.freepik.com/premium-photo/illustration-mosque-with-crescent-moon-stars-simple-shapes-minimalist-flat-design_217051-15556.jpg",
     @SerializedName("name_arabic") val arabicName: String,
 
     @SerializedName("name_complex") val complexName: String,
@@ -28,3 +28,11 @@ data class Surah(
 
     val lastAccessed: Long = System.currentTimeMillis()
 )
+
+enum class SurahSortBy {
+    ID,
+    NAME,
+    REVELATION_PLACE
+}
+
+data class SortItems(val name:String, val value: SurahSortBy)

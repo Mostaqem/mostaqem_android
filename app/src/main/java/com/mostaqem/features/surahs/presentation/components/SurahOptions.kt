@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -33,12 +34,15 @@ fun SurahOptions(
     selectedRecitationID: Int? = null,
     playerViewModel: PlayerViewModel,
     navController: NavController,
+    isDownloaded: Boolean = false,
+    isArabic: Boolean,
     onDismiss: () -> Unit,
-) {
+
+    ) {
     LazyColumn {
         item {
             ListItem(
-                headlineContent = { Text(text = selectedSurah!!.arabicName) },
+                headlineContent = { Text(text = if (isArabic || isDownloaded) selectedSurah!!.arabicName else selectedSurah!!.complexName) },
                 supportingContent = { selectedReciter?.arabicName?.let { Text(text = it) } },
                 leadingContent = {
                     Box(contentAlignment = Alignment.Center) {
@@ -65,7 +69,7 @@ fun SurahOptions(
                         contentDescription = "play_next"
                     )
                 },
-                headlineContent = { Text(text = "تشغيل التالي") },
+                headlineContent = { Text(text = stringResource(R.string.play_next)) },
                 modifier = Modifier.clickable {
 
                     playerViewModel.addNext(
@@ -87,7 +91,7 @@ fun SurahOptions(
                         contentDescription = "add_queue_item"
                     )
                 },
-                headlineContent = { Text(text = "أضف إلى قائمة التشغيل") },
+                headlineContent = { Text(text = stringResource(R.string.add_queue)) },
                 modifier = Modifier.clickable {
 
                     playerViewModel.addMediaItem(
@@ -110,13 +114,13 @@ fun SurahOptions(
                         contentDescription = "read"
                     )
                 },
-                headlineContent = { Text(text = "اقرأ السورة") },
+                headlineContent = { Text(text = stringResource(R.string.read_chapter)) },
                 modifier = Modifier.clickable {
                     val surahID = selectedSurah!!.id
                     navController.navigate(
                         ReadingDestination(
                             surahID = surahID,
-                            surahName = selectedSurah.arabicName
+                            surahName = if (isArabic) selectedSurah.arabicName else selectedSurah.complexName
                         )
                     )
                     onDismiss()

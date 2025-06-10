@@ -27,7 +27,7 @@ class OfflineViewModel @Inject constructor(
     }
 
     fun getMemoryPercentage(): Float {
-        return repository.calculateMemoryPercentage()
+        return repository.calculateMemoryProgress()
     }
 
     fun delete(path: String) {

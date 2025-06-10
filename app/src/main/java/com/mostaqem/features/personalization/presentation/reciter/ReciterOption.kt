@@ -42,6 +42,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.mostaqem.R
 import com.mostaqem.dataStore
+import com.mostaqem.features.language.presentation.LanguageViewModel
 import com.mostaqem.features.personalization.presentation.PersonalizationViewModel
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.reciters.presentation.ReciterScreen
@@ -74,23 +76,27 @@ fun ReciterOption(
         skipPartiallyExpanded = true
     )
     val showReciters = remember { mutableStateOf(false) }
+    val languageCode =
+        LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
 
-    Box(modifier = modifier
-        .padding(horizontal = 18.dp)
-        .clip(RoundedCornerShape(25.dp))
-        .background(MaterialTheme.colorScheme.primaryContainer)
-        .fillMaxWidth()
-        .pointerInput(Unit) {
-            detectTapGestures(onTap = {
-                playerViewModel.changeReciter(savedReciter)
-            }, onLongPress = {
-                showRecitations = !showRecitations
-            })
-        }
+    val isArabic = languageCode == "ar"
+
+    Box(
+        modifier = modifier
+            .padding(horizontal = 18.dp)
+            .clip(RoundedCornerShape(25.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .fillMaxWidth()
+            .pointerInput(Unit) {
+                detectTapGestures(onTap = {
+                    playerViewModel.changeReciter(savedReciter)
+                }, onLongPress = {
+                    showRecitations = !showRecitations
+                })
+            }
 
     ) {
         Column {
-
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -114,9 +120,9 @@ fun ReciterOption(
                     )
                     Spacer(Modifier.width(15.dp))
                     Text(
-                        text = savedReciter.arabicName,
+                        text = if (isArabic) savedReciter.arabicName else savedReciter.englishName,
 
-                    )
+                        )
                 }
                 Row {
                     IconButton(onClick = {
@@ -153,7 +159,7 @@ fun ReciterOption(
                     LazyColumn {
                         item {
                             Text(
-                                "تلاوات",
+                                stringResource(R.string.recitations),
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.SemiBold
@@ -161,14 +167,21 @@ fun ReciterOption(
                         }
                         items(recitations) {
                             AnimatedVisibility(visible = showRecitations) {
-                                ListItem(headlineContent = { Text(text = it.name) },
+                                ListItem(
+                                    headlineContent = {
+                                        Text(
+                                            text = if (isArabic) it.name else it.englishName
+                                                ?: it.name
+                                        )
+                                    },
                                     modifier = Modifier.clickable {
                                         viewModel.changeRecitationID(it.id)
                                         playerViewModel.changeRecitation(it.id)
                                     },
                                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                                     trailingContent = {
-                                        RadioButton(selected = it.id == savedRecitationID,
+                                        RadioButton(
+                                            selected = it.id == savedRecitationID,
                                             onClick = {
                                                 viewModel.changeRecitationID(it.id)
                                                 playerViewModel.changeRecitation(it.id)

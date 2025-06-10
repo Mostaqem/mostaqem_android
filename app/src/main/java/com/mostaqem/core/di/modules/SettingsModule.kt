@@ -1,6 +1,7 @@
 package com.mostaqem.core.di.modules
 
 import android.content.Context
+import com.mostaqem.features.language.domain.LanguageManager
 import com.mostaqem.features.personalization.domain.PersonalizationRepository
 import com.mostaqem.features.reciters.domain.ReciterRepository
 import com.mostaqem.features.update.domain.ApkHandle
@@ -44,5 +45,14 @@ object SettingsModule {
     ): PersonalizationRepository {
         return PersonalizationRepository(context, repository)
     }
+
+    @Provides
+    @Singleton
+    fun provideLanguageManager(
+        @ApplicationContext context: Context,
+    ): LanguageManager {
+        return LanguageManager(context = context)
+    }
+
 
 }

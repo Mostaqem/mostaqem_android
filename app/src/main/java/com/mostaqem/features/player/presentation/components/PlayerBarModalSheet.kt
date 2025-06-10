@@ -9,6 +9,7 @@ import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -34,11 +35,11 @@ import kotlin.math.roundToInt
 @Composable
 fun PlayerBarModalSheet(
     modifier: Modifier = Modifier,
-    hidePlayer: MutableState<Boolean>,
     navController: NavController,
     playerViewModel: PlayerViewModel,
     sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    onTap: () -> Unit
 ) {
     val playerIcon by playerViewModel.playPauseIcon.collectAsState()
     val surah = playerViewModel.playerState.value.surah
@@ -47,45 +48,46 @@ fun PlayerBarModalSheet(
     var offset by remember { mutableFloatStateOf(0f) }
 
     val dismissThreshold = 100
-    Box(modifier = modifier
+    Box(
+        modifier = modifier
+            .navigationBarsPadding()
             .offset { IntOffset(0, offset.roundToInt()) }
-        .pointerInput(Unit) {
-            detectTapGestures(
-                onTap = {
-                    hidePlayer.value = true
-                    navController.navigate(PlayerDestination)
-
-                }
-            )
-        }
-        .pointerInput(Unit) {
-            // Handle drag gestures
-            detectVerticalDragGestures(
-                onVerticalDrag = { _, dragAmount ->
-                    offset += dragAmount
-                },
-                onDragEnd = {
-                    if (offset > dismissThreshold) {
-                        playerViewModel.clear()
-                    } else {
-                        hidePlayer.value = true
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        onTap()
                         navController.navigate(PlayerDestination)
-                        offset = 0f
+
                     }
-                }
-            )
-        }
-        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-        .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
-        .height(80.dp)
-        .fillMaxWidth()
+                )
+            }
+            .pointerInput(Unit) {
+                detectVerticalDragGestures(
+                    onVerticalDrag = { _, dragAmount ->
+                        offset += dragAmount
+                    },
+                    onDragEnd = {
+                        if (offset > dismissThreshold) {
+                            playerViewModel.clear()
+                        } else {
+                            onTap()
+                            navController.navigate(PlayerDestination)
+                            offset = 0f
+                        }
+                    }
+                )
+            }
+            .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+            .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
+            .height(80.dp)
+            .fillMaxWidth()
 
     ) {
         PlayerBar(
             image = surah!!.image,
             playerIcon = playerIcon,
             onPlayPause = { playerViewModel.handlePlayPause() },
-            surahName = surah.arabicName ,
+            surahName = surah.arabicName,
             reciterName = reciter.arabicName,
             progress = progress,
             sharedTransitionScope = sharedTransitionScope,

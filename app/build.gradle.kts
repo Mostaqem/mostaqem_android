@@ -16,8 +16,8 @@ android {
         applicationId = "com.mostaqem"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.4.0"
+        versionCode = 8
+        versionName = "1.2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -26,6 +26,12 @@ android {
 
 
 
+    }
+    androidResources {
+        generateLocaleConfig = true
+    }
+    lint {
+        checkReleaseBuilds = false
     }
 
     buildTypes {
@@ -47,11 +53,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
@@ -71,6 +77,7 @@ dependencies {
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.graphics.shapes)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
@@ -78,6 +85,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.wavy.slider)
     implementation(libs.coil.compose)
     implementation(libs.jaudiotagger)
     implementation(libs.navigation.compose)
@@ -92,6 +100,10 @@ dependencies {
     implementation(libs.coil.svg)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
+    implementation(libs.material3)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.material3.window.size.class1)
     ksp(libs.androidx.hilt.compiler)
     ksp(libs.androidx.room.compiler)
     implementation(libs.kotlinx.serialization.json)
@@ -99,7 +111,6 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.logging.interceptor)
     implementation(libs.androidx.material3.adaptive.navigation.suite)
-    implementation(libs.androidx.compose.material3.adaptive.navigation)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.dash)
     implementation(libs.androidx.media3.ui)
@@ -108,19 +119,24 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.profileinstaller)
-    implementation(libs.androidx.material3.adaptive.navigation.suite.android)
     implementation(libs.androidx.media3.session)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.logging.interceptor)
     ksp(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    debugImplementation(libs.ui.test.manifest)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     "baselineProfile"(project(":baselineprofile"))
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 ksp {

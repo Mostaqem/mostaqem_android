@@ -1,5 +1,6 @@
 package com.mostaqem.features.reciters.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,8 +29,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,7 +43,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
@@ -51,11 +57,14 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.mostaqem.R
+import com.mostaqem.dataStore
+import com.mostaqem.features.language.presentation.LanguageViewModel
 import com.mostaqem.features.offline.domain.toArabicNumbers
 import com.mostaqem.features.personalization.presentation.PersonalizationViewModel
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.reciters.domain.ReciterEvents
+import com.mostaqem.features.settings.data.AppSettings
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,6 +81,9 @@ fun ReciterScreen(
     val queryReciters = remember { viewModel.queryReciters }
     val loading by viewModel.loading.collectAsStateWithLifecycle()
     val personalizationViewModel: PersonalizationViewModel = hiltViewModel()
+    val languageCode =
+        LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
+    val isArabic = languageCode == "ar"
 
     Column(
         modifier = modifier
@@ -80,7 +92,14 @@ fun ReciterScreen(
         SearchBar(
             colors = SearchBarDefaults.colors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             inputField = {
-                SearchBarDefaults.InputField(query = query,
+                SearchBarDefaults.InputField(
+                    query = query,
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                            5.dp
+                        ),
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp),
+                    ),
                     onQueryChange = {
                         query = it
                         viewModel.searchReciters(it)
@@ -89,7 +108,7 @@ fun ReciterScreen(
                         expanded = false
                         queryReciters.value = emptyList()
                     },
-                    placeholder = { Text("ابحث عن الشيخ") },
+                    placeholder = { Text(stringResource(R.string.search_reciter)) },
                     expanded = expanded,
                     onExpandedChange = { expanded = it },
 
@@ -139,7 +158,8 @@ fun ReciterScreen(
             if (query.isNotEmpty() && !loading && queryReciters.value.isNotEmpty()) {
                 val reciters = queryReciters.value
                 val reciterCount: String = reciters.size.toArabicNumbers()
-                val reciterArabic: String = if (reciters.size > 1) "شيوخ" else "شيخ"
+                val reciterArabic: String =
+                    if (reciters.size > 1) stringResource(R.string.reciters) else stringResource(R.string.reciter)
                 Text(
                     text = "$reciterCount $reciterArabic ",
                     modifier = Modifier.padding(16.dp),
@@ -156,7 +176,8 @@ fun ReciterScreen(
                     items(queryReciters.value.size) { index ->
                         val currentPlayingReciter: Reciter =
                             playerViewModel.playerState.value.reciter
-                        Column(verticalArrangement = Arrangement.Center,
+                        Column(
+                            verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.clickable {
                                 if (!isDefaultBtn) {
@@ -205,7 +226,7 @@ fun ReciterScreen(
 
                             Spacer(modifier = Modifier.height(10.dp))
                             Text(
-                                text = reciters[index].arabicName,
+                                text = if (isArabic) reciters[index].arabicName else reciters[index].englishName,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -229,7 +250,8 @@ fun ReciterScreen(
             items(reciters.itemCount) { index ->
                 if (reciters[index] != null) {
                     val currentPlayingReciter: Reciter = playerViewModel.playerState.value.reciter
-                    Column(verticalArrangement = Arrangement.Center,
+                    Column(
+                        verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier.clickable {
                             if (!isDefaultBtn) {
@@ -276,7 +298,7 @@ fun ReciterScreen(
 
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = reciters[index]!!.arabicName,
+                            text = if (isArabic) reciters[index]!!.arabicName else reciters[index]!!.englishName,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -303,16 +325,14 @@ fun ReciterScreen(
 
                 reciterLoadState is LoadState.Error -> {
                     val error = reciterLoadState.error
+                    Log.e("Reciters", "Failed Loading Reciters:${error.message} ")
                     item {
                         Column(
                             modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                text = error.message.toString(),
-                                textAlign = TextAlign.Center,
-                            )
+
                             IconButton(onClick = { reciters.retry() }) {
                                 Icon(Icons.Outlined.Refresh, contentDescription = "refresh")
                             }

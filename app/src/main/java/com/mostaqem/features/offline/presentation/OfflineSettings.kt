@@ -16,30 +16,28 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,8 +45,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.mostaqem.R
+import com.mostaqem.core.ui.theme.kufamFontFamily
+import com.mostaqem.core.ui.theme.productFontFamily
 import com.mostaqem.dataStore
-import com.mostaqem.features.offline.domain.OfflineRepository
 import com.mostaqem.features.settings.data.AppSettings
 import com.mostaqem.features.surahs.data.AudioData
 
@@ -65,12 +65,17 @@ fun OfflineSettingsScreen(
     val downloads by viewModel.downloaded.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedFile: AudioData? by remember { mutableStateOf(null) }
+    val languageCode =
+        context.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
 
+    val fontFamily = remember(languageCode) {
+        if (languageCode == "en") productFontFamily else kufamFontFamily
+    }
     LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item {
-            TopAppBar(
+            LargeTopAppBar(
                 title = {
-                    Text("الأوفلاين")
+                    Text(stringResource(R.string.offline), fontFamily = fontFamily)
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
@@ -81,9 +86,9 @@ fun OfflineSettingsScreen(
         }
         item {
             ListItem(
-                headlineContent = { Text("تشغيل السور المتحملة تلقائي بدلا من الأنترت") },
+                headlineContent = { Text(stringResource(R.string.automatically_play_offline)) },
                 supportingContent = {
-                    Text("عند تشغيل السور, يتم تشغيلها عبر التحميل اذا كانت السورة محملة بدلا من الأنترنت")
+                    Text(stringResource(R.string.automatically_play_offline_details))
                 },
                 trailingContent = {
                     Switch(checked = playOption, onCheckedChange = {
@@ -94,16 +99,17 @@ fun OfflineSettingsScreen(
         item {
             ListItem(
                 headlineContent = {
-                    Text("المساحة")
+                    Text(stringResource(R.string.storage))
                 },
                 supportingContent = {
-                    Text("مساحة التنزيلات من مساحة الجهاز و يمكنك الضغط للحذف")
+                    Text(stringResource(R.string.storage_downloads))
                 }
             )
         }
         item {
             LinearProgressIndicator(
                 progress = { viewModel.getMemoryPercentage() },
+
                 Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
@@ -129,7 +135,7 @@ fun OfflineSettingsScreen(
                 },
                 trailingContent = {
                     Text(
-                        (it.size / 1000).toString() + " كيلو بايت",
+                        (it.size / 1000).toString() + " " + stringResource(R.string.kilo_byte),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 11.sp
                     )
@@ -180,14 +186,14 @@ fun OfflineSettingsScreen(
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { showDeleteDialog = false }) {
-                            Text("إلغاء", color = MaterialTheme.colorScheme.secondary)
+                            Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.secondary)
                         }
                         TextButton(onClick = {
                             viewModel.delete(selectedFile!!.url)
                             showDeleteDialog = false
 
                         }) {
-                            Text("حذف", color = MaterialTheme.colorScheme.error)
+                            Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
                         }
                     }
                 }

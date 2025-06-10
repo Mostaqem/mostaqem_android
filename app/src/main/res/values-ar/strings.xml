@@ -1,4 +1,87 @@
 <resources>
     <string name="app_name">مستقيم</string>
+    <string name="language">اللغة</string>
+    <string name="hello">السلام عليكم</string>
+    <string name="recommended">مرشح لك</string>
+    <string name="heard">سمع مؤخرا</string>
+    <string name="selected_reciters">شيوخ مختارة</string>
+    <string name="home">الرئيسية</string>
+    <string name="surahs">السور</string>
+    <string name="settings">الاعدادات</string>
+    <string name="listen_choose">لم تقم بإضافة أي شيء إلى السجل بعد</string>
+    <string name="search_chapter">ابحث عن السورة</string>
+    <string name="downloaded">التحميلات</string>
+    <string name="play_next">تشغيل التالي</string>
+    <string name="add_queue">أضف إلي قائمة التشغيل</string>
+    <string name="read_chapter">اقرأ السورة</string>
+    <string name="no_chapter">لا يوجد سورة بهذا الاسم</string>
+    <string name="surah">سورة</string>
+    <string name="player">المشغل</string>
+    <string name="stop_player_language">تغير اللغة سيؤدي الي ايقاف السورة التي تسمعها</string>
+    <string name="share_verse">انشر اية</string>
+    <string name="selectedd">اخترت</string>
+    <string name="change_font">تغير الخط</string>
+    <string name="change_color">تغير اللون</string>
+    <string name="amiri">أميري</string>
+    <string name="uthmani">عثماني</string>
+
+    <string name="change_language">تغيير اللغة</string>
+    <string name="player_decsription">تغير شكل المشغل و الشيخ الافتراضي و ألخ</string>
+
+    <string name="search_reciter">ابحث عن الشيخ</string>
+    <string name="reciter">شيخ</string>
+    <string name="reciters">شيوخ</string>
+
+    <string name="offline">اوفلاين</string>
+    <string name="offline_description">تغير طريقة تشغيل بدون انترنت, عرض المساحة</string>
+    <string name="automatically_play_offline">تشغيل السور المتحملة تلقائي بدلا من الأنترنت</string>
+    <string name="automatically_play_offline_details">عند تشغيل السور, يتم تشغيلها عبر التحميل اذا كانت السورة محملة بدلا من الأنترنت</string>
+    <string name="storage">المساحة</string>
+    <string name="storage_downloads">مساحة التنزيلات من مساحة الجهاز و يمكنك الضغط للحذف</string>
+    <string name="delete">حذف</string>
+    <string name="cancel">إلغاء</string>
+    <string name="kilo_byte">كيلو بايت</string>
+
+    <string name="check_update">تحديث</string>
+    <string name="check_update_description">التحقق من التحديث</string>
+    <string name="no_update">انت تملك اخر نسخة لمستقيم</string>
+    <string name="new_version">النسخة الجديدة</string>
+    <string name="need_wifi">التحديث يحدث فقط عندما تتصل بالواي فاي</string>
+    <string name="update">تحديث</string>
+    <string name="seconds">ثوان..</string>
+
+    <string name="about">عن مستقيم</string>
+    <string name="about_description">النسخة, ابلاغ عن مشكلة , تبرع , من نحن</string>
+    <string name="bug_report">إبلاغ غن مشكلة</string>
+    <string name="bug_report_details">اذاننا صاغية</string>
+    <string name="donate">تبرع</string>
+    <string name="donate_details">تبرع لمستقيم ليكون مستمر</string>
+    <string name="version">النسخة</string>
+    <string name="thank_you">شكرا لك لأستخدام مستقيم</string>
+    <string name="thank_you_details">يمكنك التبرع لكي تساعدنا في تحسين البرنامج, او اظهر انك تقدر عملنا و جزاك الله خيرا</string>
+    <string name="star_us">ضع لنا نجمة</string>
+
+
+    <string name="apperanace">السمات</string>
+    <string name="default_reciter">الشيخ المفضل</string>
+    <string name="change_default_reciter">تغير الشيخ المفضل لديك و يمكنك الضغط طويلا لتغير التلاوة المفضلة لديك</string>
+
+    <string name="recitations">تلاوات</string>
+    <string name="change_shape">تغير شكل عرض السورة في المشغل</string>
+
+    <string name="sleep_timer">توقيت النوم</string>
+    <string name="stop">إيقاف</string>
+    <string name="done">تمّ</string>
+    <string name="min">دقيقة</string>
+    <string name="end_of_chapter">نهاية السورة</string>
+    <string name="start">إبدا</string>
+
+    <string name="download">تحميل</string>
+    <string name="share">انشر السورة</string>
+
+    <string name="sort_by">ترتيب حسب</string>
+    <string name="quran">القران</string>
+    <string name="name">الإسم</string>
+    <string name="revelation_place">مكان الوحي</string>
 
 </resources>

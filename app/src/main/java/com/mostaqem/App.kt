@@ -22,7 +22,7 @@ class App : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         enqueueDeleteOldItemsWorker(this)
-        scheduleUpdateCheck(this)
+//        scheduleUpdateCheck(this)
     }
 
     @Inject

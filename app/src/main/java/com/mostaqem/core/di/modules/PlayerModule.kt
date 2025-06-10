@@ -10,7 +10,10 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.mostaqem.core.database.AppDatabase
 import com.mostaqem.core.database.dao.PlayerDao
 import com.mostaqem.core.media.service.MediaService
-import com.mostaqem.features.player.domain.PlayerRepository
+import com.mostaqem.features.language.domain.LanguageManager
+import com.mostaqem.features.player.domain.controllerHelper.MediaControllerHelper
+import com.mostaqem.features.player.domain.repository.PlayerRepository
+import com.mostaqem.features.surahs.domain.repository.SurahRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,14 +42,23 @@ object PlayerModule {
 
     @Provides
     @ViewModelScoped
+    fun provideMediaControllerHelper(
+        mediaController: ListenableFuture<MediaController>,
+        languageManager: LanguageManager
+    ): MediaControllerHelper {
+        return MediaControllerHelper(
+            mediaControllerFuture = mediaController,
+            languageManager = languageManager
+        )
+    }
+
+
+    @Provides
+    @ViewModelScoped
     fun providePlayerDao(database: AppDatabase): PlayerDao {
         return database.playerDao
     }
 
-    @Provides
-    @ViewModelScoped
-    fun providePlayerRepository(dao:PlayerDao): PlayerRepository {
-        return PlayerRepository(dao)
-    }
+
 
 }

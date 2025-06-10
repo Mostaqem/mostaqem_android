@@ -1,10 +1,13 @@
 package com.mostaqem.features.player.data
 
+import androidx.media3.common.MediaItem
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.mostaqem.core.database.converter.Converters
+import com.mostaqem.features.reciters.data.RecitationData
 import com.mostaqem.features.reciters.data.reciter.Reciter
+import com.mostaqem.features.surahs.data.AudioData
 import com.mostaqem.features.surahs.data.Surah
 import kotlinx.serialization.Serializable
 
@@ -24,3 +27,19 @@ data class PlayerSurah(
     val isLocal: Boolean = false
 )
 
+
+fun PlayerSurah.toAudioData(): AudioData {
+    return AudioData(
+        surah = this.surah!!.copy(complexName = this.surah.arabicName),
+        recitationID = this.recitationID!!,
+        url = this.url!!,
+        size = 0,
+        recitation = RecitationData(
+            id = this.recitationID,
+            reciter = this.reciter,
+            name = "",
+            reciterID = this.reciter.id,
+            englishName = this.reciter.arabicName
+        )
+    )
+}

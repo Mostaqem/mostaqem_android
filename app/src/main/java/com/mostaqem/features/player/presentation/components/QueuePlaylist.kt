@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
 import coil.compose.AsyncImage
@@ -44,7 +45,7 @@ fun QueuePlaylist(
             .fillMaxSize()
             .statusBarsPadding(), state = lazyListState
     ) {
-        item { CenterAlignedTopAppBar(title = { Text(text = "تسمع التالي") }) }
+        item { CenterAlignedTopAppBar(title = { Text(text = stringResource(R.string.play_next)) }) }
         item {
 
             ListItem(
@@ -85,7 +86,6 @@ fun QueuePlaylist(
             val metadata = item.mediaMetadata
             val playingQueue: Boolean =
                 metadata.title.toString() == player.surah?.arabicName && metadata.albumArtist == player.recitationID.toString()
-            Log.d("Playlist", "Item: ${metadata.title} | Index: ${index} ")
 
             ListItem(
                 headlineContent = { Text(text = metadata.title.toString()) },
@@ -105,7 +105,7 @@ fun QueuePlaylist(
 
                 },
                 modifier = Modifier.clickable {
-                    playerViewModel.playQueueItem(index + 1)
+                    playerViewModel.playQueueItem(index)
                 },
 
                 colors = if (playingQueue) ListItemDefaults.colors(

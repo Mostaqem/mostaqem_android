@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -55,8 +55,10 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
@@ -64,6 +66,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
@@ -71,9 +74,12 @@ import androidx.core.view.drawToBitmap
 import androidx.navigation.NavController
 import com.mostaqem.R
 import com.mostaqem.core.ui.theme.kufamFontFamily
+import com.mostaqem.core.ui.theme.productFontFamily
+import com.mostaqem.dataStore
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.reading.presentation.displayVerseNumber
 import com.mostaqem.features.offline.domain.toArabicNumbers
+import com.mostaqem.features.settings.data.AppSettings
 import com.mostaqem.features.share.data.SelectedColor
 import com.mostaqem.features.share.data.SelectedFont
 import kotlinx.coroutines.delay
@@ -85,10 +91,12 @@ import java.io.FileOutputStream
 fun ShareScreen(
     modifier: Modifier = Modifier,
     shareViewModel: ShareViewModel,
-    hidePlayerState: MutableState<Boolean>,
     navController: NavController,
     playerViewModel: PlayerViewModel,
-    chapterName: String
+    chapterName: String,
+    onShowPlayer:()->Unit,
+    onHidePlayer:()->Unit,
+
 ) {
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
     var composableBounds by remember { mutableStateOf<Rect?>(null) }
@@ -113,13 +121,13 @@ fun ShareScreen(
     val availableFonts = listOf(
         SelectedFont(
             font = Font(R.font.uthmani),
-            name = "عثماني",
+            name = stringResource(R.string.uthmani),
             fontSize = 30.sp,
             lineHeight = 45.sp
         ),
         SelectedFont(
             font = Font(R.font.amiri),
-            name = "أميري",
+            name = stringResource(R.string.amiri),
             fontSize = 25.sp,
             lineHeight = 50.sp
         )
@@ -139,7 +147,7 @@ fun ShareScreen(
                     letterSpacing = (-0.5).sp
                 )
             ) {
-                if (selectedFont.name == "عثماني") {
+                if (selectedFont.name == stringResource(R.string.uthmani)) {
                     append(" ${displayVerseNumber(verse.verse)} ")
                 } else {
                     append(" \u06DD${verse.verse.toArabicNumbers()} ")
@@ -147,11 +155,14 @@ fun ShareScreen(
             }
         }
     }
-
-    Log.d("Hide Player", "Hide Player: ${hidePlayerState}")
+    val languageCode =
+        context.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
+    val fontFamily = remember(languageCode) {
+        if (languageCode == "en") productFontFamily else kufamFontFamily
+    }
 
     LaunchedEffect(isButtonVisible) {
-        hidePlayerState.value = true
+        onHidePlayer()
         playerViewModel.pause()
         if (!isButtonVisible) {
             delay(100)
@@ -193,7 +204,7 @@ fun ShareScreen(
                 title = {},
                 navigationIcon = {
                     IconButton(onClick = {
-                        hidePlayerState.value = false
+                        onShowPlayer()
                         navController.popBackStack()
                     }) {
                         Icon(
@@ -231,7 +242,6 @@ fun ShareScreen(
                         Modifier.padding(bottom = 16.dp, start = 16.dp),
                         verticalArrangement = Arrangement.spacedBy(20.dp)
                     ) {
-                        Text("تغير اللون", fontSize = 20.sp)
                         LazyRow(
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically,
@@ -262,8 +272,6 @@ fun ShareScreen(
                                         })
                             }
                         }
-                        Text("تغير الخط", fontSize = 20.sp)
-
                         LazyRow(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceEvenly,
@@ -308,18 +316,20 @@ fun ShareScreen(
                     modifier = Modifier.width(250.dp),
                     colorFilter = ColorFilter.tint(onSelectedColor),
                 )
-                Text(
-                    text = annotatedString,
-                    lineHeight = selectedFont.lineHeight,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Justify,
-                    color = onSelectedColor,
-                    fontSize = selectedFont.fontSize,
-                    fontFamily = selectedFont.font.toFontFamily(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    Text(
+                        text = annotatedString,
+                        lineHeight = selectedFont.lineHeight,
+                        textAlign = TextAlign.Justify,
+                        color = onSelectedColor,
+                        fontSize = selectedFont.fontSize,
+                        fontFamily = selectedFont.font.toFontFamily(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
 
-                )
+                    )
+                }
                 Spacer(Modifier.height(15.dp))
 
                 Text(
@@ -352,8 +362,8 @@ fun ShareScreen(
                     }
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "مستقيم",
-                        fontFamily = kufamFontFamily,
+                        stringResource(R.string.app_name),
+                        fontFamily = fontFamily,
                         fontSize = 16.sp,
                         color = onSelectedColor
                     )
