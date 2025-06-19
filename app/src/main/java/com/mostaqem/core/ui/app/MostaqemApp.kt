@@ -32,8 +32,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -72,6 +74,8 @@ import com.mostaqem.core.navigation.models.BottomScreens
 import com.mostaqem.core.navigation.models.DonationDestination
 import com.mostaqem.core.navigation.models.HomeDestination
 import com.mostaqem.core.navigation.models.LanguagesDestination
+import com.mostaqem.core.navigation.models.LoginDestination
+import com.mostaqem.core.navigation.models.NotificationsDestination
 import com.mostaqem.core.navigation.models.OfflineSettingsDestination
 import com.mostaqem.core.navigation.models.PlayerDestination
 import com.mostaqem.core.navigation.models.ReadingDestination
@@ -83,9 +87,11 @@ import com.mostaqem.core.network.NetworkConnectivityObserver
 import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.core.ui.controller.ObserveAsEvents
 import com.mostaqem.core.ui.controller.SnackbarController
+import com.mostaqem.features.auth.presentation.LoginScreen
 import com.mostaqem.features.donate.presentation.DonateScreen
 import com.mostaqem.features.history.presentation.HistoryScreen
 import com.mostaqem.features.language.presentation.LanguageScreen
+import com.mostaqem.features.notifications.presentation.NotificationsScreen
 import com.mostaqem.features.offline.presentation.OfflineSettingsScreen
 import com.mostaqem.features.personalization.presentation.AppearanceScreen
 import com.mostaqem.features.player.presentation.PlayerScreen
@@ -144,15 +150,18 @@ fun MostaqemApp() {
     Scaffold(
         contentWindowInsets = WindowInsets.safeDrawing,
         snackbarHost = {
-        SnackbarHost(snackbarHostState) { data ->
-            Snackbar(
-                snackbarData = data,
-                modifier = Modifier.padding(bottom = if (showBottomBar) 160.dp else 0.dp)
-            )
-        }
-    }) { padding ->
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    modifier = Modifier.padding(bottom = if (showBottomBar) 160.dp else 0.dp)
+                )
+            }
+        }) { padding ->
+        val adaptiveInfo = currentWindowAdaptiveInfo()
         NavigationSuiteScaffold(
-            layoutType = if (showBottomBar) NavigationSuiteType.NavigationBar else NavigationSuiteType.None,
+            layoutType = if (showBottomBar) NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
+                adaptiveInfo
+            ) else NavigationSuiteType.None,
             navigationSuiteColors = NavigationSuiteDefaults.colors(
                 navigationBarContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                     3.dp
@@ -243,11 +252,15 @@ fun MostaqemApp() {
                                     animationSpec = tween(durationMillis = 300)
                                 )
                             }) {
+                            composable<LoginDestination> {
+                                LoginScreen()
+                            }
                             composable<HomeDestination> {
                                 HistoryScreen(
                                     playerViewModel = playerViewModel,
                                     navController = navController,
-                                    paddingValues = padding
+                                    paddingValues = padding,
+                                    onHideBottom = { isSearchExpanded = it }
                                 )
                             }
                             composable<SurahsDestination> {
@@ -319,6 +332,9 @@ fun MostaqemApp() {
                                     navController = navController,
                                     playerViewModel = playerViewModel
                                 )
+                            }
+                            composable<NotificationsDestination> {
+                                NotificationsScreen(navController = navController)
                             }
                         }
                     }

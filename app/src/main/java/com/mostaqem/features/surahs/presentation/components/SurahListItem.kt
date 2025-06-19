@@ -62,6 +62,8 @@ fun SurahListItem(
     onClick: () -> Unit,
 ) {
 
+
+
     ListItem(
         headlineContent = {
             Text(text = if (isArabic) surah.arabicName else surah.complexName)

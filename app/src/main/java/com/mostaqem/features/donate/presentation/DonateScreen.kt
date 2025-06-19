@@ -2,15 +2,10 @@ package com.mostaqem.features.donate.presentation
 
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.telephony.TelephonyManager
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,16 +15,21 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -57,9 +57,8 @@ import com.mostaqem.features.player.domain.CustomShape
 import com.mostaqem.features.player.domain.Octagon
 import com.mostaqem.features.settings.data.AppSettings
 import kotlinx.coroutines.launch
-import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
@@ -70,8 +69,11 @@ fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
     val fontFamily = remember(languageCode) {
         if (languageCode == "en") productFontFamily else kufamFontFamily
     }
-    Column(modifier = modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        LargeTopAppBar(
+    Column(
+        modifier = modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        LargeFlexibleTopAppBar(
             title = {
                 Text(stringResource(R.string.donate), fontFamily = fontFamily)
             },
@@ -118,7 +120,7 @@ fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
             contentPadding = PaddingValues(horizontal = 10.dp),
             verticalItemSpacing = 4.dp,
             horizontalArrangement = Arrangement.spacedBy(10.dp),
-
+            modifier = Modifier.heightIn(max = (Short.MAX_VALUE).toInt().dp)
 
             ) {
             item {
@@ -137,9 +139,7 @@ fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
                                     SnackbarController.sendEvent(
                                         events = SnackbarEvents(message = "لا يوجد حاجة لفتح اللينك")
                                     )
-
                                 }
-
                             }
                         },
                     contentAlignment = Alignment.Center
@@ -160,6 +160,7 @@ fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
                             modifier = Modifier.padding(10.dp),
                             textAlign = TextAlign.Center,
                             fontFamily = fontFamily,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                 }
@@ -256,6 +257,7 @@ fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
             }
 
         }
+        Spacer(Modifier.height(120.dp))
     }
 
 

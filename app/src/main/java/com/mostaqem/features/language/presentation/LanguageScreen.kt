@@ -18,8 +18,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
@@ -50,7 +52,7 @@ import com.mostaqem.features.language.domain.AppLanguages
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.settings.data.AppSettings
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LanguageScreen(
     navController: NavController,
@@ -61,13 +63,12 @@ fun LanguageScreen(
     val selectedLanguageCode =
         context.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
     val isPlaying = playerViewModel.playerState.value.surah != null
-    val activity = LocalActivity.current
     val fontFamily = remember(selectedLanguageCode) {
         if (selectedLanguageCode == "en") productFontFamily else kufamFontFamily
     }
     LazyColumn {
         item {
-            LargeTopAppBar(
+            LargeFlexibleTopAppBar(
                 title = {
                     Text(stringResource(R.string.language), fontFamily = fontFamily)
                 },

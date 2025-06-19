@@ -64,7 +64,9 @@ class PersonalizationRepository @Inject constructor(
         context.dataStore.updateData { settings -> settings.copy(sortBy = sortBy) }
     }
 
-
+    suspend fun changeFridayNotification(value: Boolean) {
+        context.dataStore.updateData { settings -> settings.copy(fridayNotificationEnabled = value) }
+    }
 
 
 }

@@ -348,10 +348,9 @@ fun SurahsScreen(
             },
             modifier = Modifier
                 .semantics { traversalIndex = 0f }
-                .padding(horizontal = 15.dp)
                 .then(
                     if (!expanded) {
-                        Modifier.padding(horizontal = 8.dp)
+                        Modifier.padding(horizontal = 15.dp)
                     } else {
                         Modifier
                     }

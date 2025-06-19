@@ -3,6 +3,9 @@ package com.mostaqem.core.navigation.models
 import kotlinx.serialization.Serializable
 
 @Serializable
+object LoginDestination
+
+@Serializable
 object HomeDestination
 
 @Serializable
@@ -32,6 +35,9 @@ object PlayerDestination
 
 @Serializable
 object LanguagesDestination
+
+@Serializable
+object NotificationsDestination
 
 @Serializable
 object DonationDestination

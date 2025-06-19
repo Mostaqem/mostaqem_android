@@ -23,6 +23,8 @@
     <string name="change_color">Change color</string>
     <string name="amiri">Amiri</string>
     <string name="uthmani">Uthmani</string>
+    <string name="all">All</string>
+    <string name="search_reciters_chapters">Search chapters, reciters…</string>
 
     <string name="stop_player_language">Changing language while playing will stop what you hear</string>
 
@@ -85,6 +87,13 @@
     <string name="name">Name</string>
     <string name="revelation_place">Revelation place</string>
 
+    <string name="notifications">Notifications</string>
+    <string name="notifications_desc">Enable weekly notifications , friday , etc</string>
+
+    <string name="friday_reminder">Friday Reminder</string>
+    <string name="friday_reminder_description">Get a weekly reminder to listen to Surah Al-Kahf every Friday</string>
+    <string name="friday_await">Friday Blessings Await</string>
+    <string name="listen_friday">Listen to Surah Al-Kahf and fill your day with light and reward</string>
 
 
 

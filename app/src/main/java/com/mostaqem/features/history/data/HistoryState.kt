@@ -10,5 +10,8 @@ data class HistoryState(
     val savedSurahs: List<Surah> = emptyList(),
     val savedReciters: List<Reciter> = emptyList(),
     val loading: Boolean = false,
-    val randomSurah: Result<List<AudioData>, DataError.Network> = Result.Loading
+    val randomSurah: Result<List<AudioData>, DataError.Network> = Result.Loading,
+    val queryList: List<SearchFilter> = emptyList(),
+    val selectedFilter: SearchFilter = AllFilter(),
+    val searchQuery: String = ""
 )

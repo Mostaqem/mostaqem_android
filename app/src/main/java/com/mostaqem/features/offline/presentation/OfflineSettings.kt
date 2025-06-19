@@ -16,10 +16,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
@@ -52,7 +55,7 @@ import com.mostaqem.dataStore
 import com.mostaqem.features.settings.data.AppSettings
 import com.mostaqem.features.surahs.data.AudioData
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun OfflineSettingsScreen(
     modifier: Modifier = Modifier,
@@ -73,7 +76,7 @@ fun OfflineSettingsScreen(
     }
     LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         item {
-            LargeTopAppBar(
+            LargeFlexibleTopAppBar(
                 title = {
                     Text(stringResource(R.string.offline), fontFamily = fontFamily)
                 },
@@ -91,9 +94,18 @@ fun OfflineSettingsScreen(
                     Text(stringResource(R.string.automatically_play_offline_details))
                 },
                 trailingContent = {
-                    Switch(checked = playOption, onCheckedChange = {
-                        viewModel.changePlayOption(it)
-                    })
+                    Switch(
+                        checked = playOption,
+                        thumbContent = {
+                            if (playOption)
+                                Icon(
+                                    Icons.Default.Check, contentDescription = "check",
+                                    Modifier.size(15.dp)
+                                )
+                        },
+                        onCheckedChange = {
+                            viewModel.changePlayOption(it)
+                        })
                 })
         }
         item {
@@ -161,9 +173,11 @@ fun OfflineSettingsScreen(
                     .padding(16.dp),
                 shape = RoundedCornerShape(16.dp),
             ) {
-                Column(modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxHeight()) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxHeight()
+                ) {
                     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                         Column(modifier) {
                             selectedFile?.surah?.let { Text(it.arabicName) }
@@ -186,14 +200,20 @@ fun OfflineSettingsScreen(
                         horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { showDeleteDialog = false }) {
-                            Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.secondary)
+                            Text(
+                                stringResource(R.string.cancel),
+                                color = MaterialTheme.colorScheme.secondary
+                            )
                         }
                         TextButton(onClick = {
                             viewModel.delete(selectedFile!!.url)
                             showDeleteDialog = false
 
                         }) {
-                            Text(stringResource(R.string.delete), color = MaterialTheme.colorScheme.error)
+                            Text(
+                                stringResource(R.string.delete),
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
                     }
                 }

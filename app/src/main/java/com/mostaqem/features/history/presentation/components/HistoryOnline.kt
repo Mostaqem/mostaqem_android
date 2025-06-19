@@ -62,11 +62,10 @@ import com.mostaqem.features.surahs.presentation.components.SurahOptions
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 fun HistoryOnline(
     playerViewModel: PlayerViewModel,
-    navController: NavController,
-    languageCode: String,
+    isArabic: Boolean,
     fontFamily: FontFamily,
     state: HistoryState,
-
+    onCardClick: (Surah) -> Unit,
     onAddSurah: (AudioData) -> Unit,
     onFetchData: () -> Unit
 ) {
@@ -74,33 +73,9 @@ fun HistoryOnline(
     val reciters = state.savedReciters
     val loading = state.loading
     val randomSurahs = state.randomSurah
-    var selectedSurah: Surah? by remember {
-        mutableStateOf(null)
-    }
-    var selectedReciter: Reciter? by remember { mutableStateOf(null) }
-    var selectedRecitation: Int? by remember { mutableStateOf(null) }
-    var openOptionsSheet by remember { mutableStateOf(false) }
+
     Column {
 
-        if (openOptionsSheet) {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    openOptionsSheet = false
-                }
-            ) {
-                SurahOptions(
-                    selectedSurah = selectedSurah,
-                    playerViewModel = playerViewModel,
-                    navController = navController,
-                    selectedReciter = selectedReciter,
-                    isArabic = languageCode == "ar",
-                    selectedRecitationID = selectedRecitation,
-
-                    ) {
-                    openOptionsSheet = false
-                }
-            }
-        }
 
         if (!loading) {
             Text(
@@ -164,8 +139,8 @@ fun HistoryOnline(
                                     .background(MaterialTheme.colorScheme.primaryContainer)
                                     .pointerInput(Unit) {
                                         detectTapGestures(onLongPress = {
-                                            selectedSurah = audio.surah
-                                            openOptionsSheet = true
+
+                                            onCardClick(audio.surah)
                                         }, onTap = {
                                             onAddSurah(audio)
                                         })
@@ -182,13 +157,14 @@ fun HistoryOnline(
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            if (languageCode == "en") audio.surah.complexName else audio.surah.arabicName,
+                                            if (!isArabic) audio.surah.complexName else audio.surah.arabicName,
                                             style = MaterialTheme.typography.titleLarge,
                                             fontFamily = fontFamily,
-                                            modifier = Modifier.fillMaxWidth()
+                                            modifier = Modifier.fillMaxWidth(),
+                                            color = MaterialTheme.colorScheme.onPrimaryContainer
                                         )
                                         Text(
-                                            if (languageCode == "en") audio.recitation.reciter.englishName else audio.recitation.reciter.arabicName,
+                                            if (!isArabic) audio.recitation.reciter.englishName else audio.recitation.reciter.arabicName,
                                             maxLines = 2,
                                             overflow = TextOverflow.Ellipsis,
                                             fontSize = 14.sp,
@@ -281,12 +257,12 @@ fun HistoryOnline(
                 items(surahs) { surah ->
                     SurahCard(
                         image = surah.image,
-                        name = if (languageCode == "ar") surah.arabicName else surah.complexName,
+                        name = if (isArabic) surah.arabicName else surah.complexName,
                         onClick = {
                             playerViewModel.changeSurah(surah)
                         }) {
-                        selectedSurah = surah
-                        openOptionsSheet = true
+                        onCardClick(surah)
+
                     }
                 }
 
@@ -315,7 +291,7 @@ fun HistoryOnline(
                     items(reciters) {
                         ReciterCard(
                             image = it.image,
-                            name = if (languageCode == "ar") it.arabicName else it.englishName,
+                            name = if (isArabic) it.arabicName else it.englishName,
                         ) {
                             playerViewModel.changeReciter(it)
                         }

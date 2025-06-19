@@ -260,7 +260,7 @@ fun PlayerScreen(
                 ) {
                     Column(modifier = Modifier.padding(vertical = 10.dp)) {
                         BoxWithConstraints(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                            val size = if (maxHeight <= 640.dp) 200.dp else 340.dp
+                            val size = if (maxHeight <= 640.dp) 200.dp else 320.dp
                             AsyncImage(
                                 model = playerSurah.surah?.image,
                                 contentDescription = "",

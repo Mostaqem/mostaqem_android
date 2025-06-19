@@ -486,20 +486,14 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-
     fun pause() {
         mediaController?.pause()
     }
 
     fun clear() {
-        viewModelScope.launch {
-            personalizationRepository.getDefaultReciter().collectLatest {
-                playerState.value =
-                    playerState.value.copy(surah = null, recitationID = null, reciter = it)
-                mediaController?.pause()
-                savePlayer()
-            }
-        }
+        playerState.value = playerState.value.copy(surah = null)
+        savePlayer()
+        mediaController?.clearMediaItems()
     }
 
     fun addMediaItem(surahID: Int, reciterID: Int? = null, recitationID: Int? = null) {
@@ -596,9 +590,14 @@ class PlayerViewModel @Inject constructor(
                 reciter = reciter, isLocal = false
             )
             fetchMediaUrl(reciterId = reciter.id)
+        } else {
+            playerState.value = playerState.value.copy(
+                reciter = reciter, isLocal = false
+            )
+            fetchMediaUrl(reciterId = reciter.id, surahId = 1)
         }
-
     }
+
 
     fun changeRecitation(id: Int) {
         playerState.value = playerState.value.copy(

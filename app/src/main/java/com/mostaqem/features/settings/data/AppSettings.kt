@@ -18,7 +18,8 @@ data class AppSettings(
     ),
     val recitationID: Int = 178,
     val playDownloaded: Boolean = true,
+    val fridayNotificationEnabled: Boolean = true
 
-    )
+)
 
 
