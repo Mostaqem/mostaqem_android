@@ -62,14 +62,13 @@ fun MostaqemTheme(
         else -> LightColorScheme
     }
     val context = LocalContext.current
-    val languageCode = context.
-        dataStore.data.map { it.language.code }
-            .collectAsStateWithLifecycle(initialValue = "en")
+    val languageCode = context.dataStore.data.map { it.language.code }
+        .collectAsStateWithLifecycle(initialValue = "en")
 
     val adaptiveFontFamily = if (languageCode.value == "ar") {
-        kufamFontFamily // Your Arabic font family
+        kufamFontFamily
     } else {
-        productFontFamily // Your English font family
+        productFontFamily
     }
 
     val typography = androidx.compose.material3.Typography(
@@ -80,6 +79,11 @@ fun MostaqemTheme(
         ),
         labelLarge = TextStyle(
             fontFamily = adaptiveFontFamily,
+        ),
+        headlineLarge = TextStyle(
+            fontFamily = adaptiveFontFamily,
+            fontSize = 32.sp,
+            fontWeight = FontWeight.SemiBold
         )
     )
 

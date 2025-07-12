@@ -17,9 +17,16 @@ class NotificationViewModel @Inject constructor(
 
     ) : ViewModel() {
 
-    fun toggle(value: Boolean) {
+    fun toggleFriday(value: Boolean) {
         viewModelScope.launch {
             personalizationRepository.changeFridayNotification(value)
+        }
+
+    }
+
+    fun toggleNights(value: Boolean) {
+        viewModelScope.launch {
+            personalizationRepository.changeNightsNotification(value)
         }
 
     }

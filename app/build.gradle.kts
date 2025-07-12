@@ -8,7 +8,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-android {
+android { 
     namespace = "com.mostaqem"
     compileSdk = 36
 
@@ -16,17 +16,20 @@ android {
         applicationId = "com.mostaqem"
         minSdk = 26
         targetSdk = 36
-        versionCode = 8
-        versionName = "1.2.1"
+        versionCode = 10
+        versionName = "1.4.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
         vectorDrawables {
             useSupportLibrary = true
         }
-
-
-
     }
+
+    sourceSets {
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
+
     androidResources {
         generateLocaleConfig = true
     }
@@ -74,7 +77,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.graphics.shapes)
@@ -85,50 +87,64 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.wavy.slider)
     implementation(libs.coil.compose)
-    implementation(libs.jaudiotagger)
     implementation(libs.navigation.compose)
-    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.datastore)
-    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.paging.compose)
-    implementation(libs.androidx.hilt.common)
-    implementation(libs.androidx.hilt.work)
+
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.coil.svg)
-    implementation(libs.androidx.glance.appwidget)
-    implementation(libs.androidx.glance.material3)
     implementation(libs.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.material3.window.size.class1)
-    ksp(libs.androidx.hilt.compiler)
-    ksp(libs.androidx.room.compiler)
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.retrofit)
-    implementation(libs.hilt.android)
-    implementation(libs.logging.interceptor)
+    implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.material3.adaptive.navigation.suite)
+
+    // Room
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+
+    //Hilt
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.hilt.android)
+    ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.hilt.work)
+
+    // Glance
+    implementation(libs.androidx.glance.appwidget)
+    implementation(libs.androidx.glance.material3)
+
+    // Media 3
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.dash)
     implementation(libs.androidx.media3.ui)
+    implementation(libs.androidx.media3.session)
+
+    // Retrofit
+    implementation(libs.retrofit)
     implementation(libs.gson)
     implementation(libs.converter.gson)
-    implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.profileinstaller)
-    implementation(libs.androidx.media3.session)
-    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.logging.interceptor)
+    implementation(libs.kotlinx.serialization.json)
     ksp(libs.hilt.android.compiler)
+
+    // Testing
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    debugImplementation(libs.ui.test.manifest)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.mockito.core)
+
+    //Android Testing
+    androidTestImplementation(libs.androidx.room.testing)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.androidx.runner)
+
     "baselineProfile"(project(":baselineprofile"))
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

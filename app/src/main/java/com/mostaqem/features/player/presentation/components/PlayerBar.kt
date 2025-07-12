@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.mostaqem.features.player.domain.MaterialShapes
 
@@ -49,7 +50,8 @@ fun PlayerBar(
 ) {
 
     Box(
-        contentAlignment = Alignment.BottomEnd
+        contentAlignment = Alignment.BottomEnd,
+        modifier = modifier
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -58,7 +60,7 @@ fun PlayerBar(
                 .fillMaxWidth()
                 .padding(15.dp)
         ) {
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 with(sharedTransitionScope) {
                     AsyncImage(
                         model = image,
@@ -76,24 +78,20 @@ fun PlayerBar(
                     )
                 }
                 Spacer(modifier = Modifier.width(10.dp))
-                Column {
+                Column(verticalArrangement = Arrangement.Center) {
                     Text(
                         text = surahName,
                         fontWeight = FontWeight.W600,
                         color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.titleMedium
+                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 15.sp)
                     )
                     Text(
                         text = reciterName,
                         color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.bodyMedium
                     )
-
                 }
-
-
             }
-
 
             IconButton(onClick = {
                 onPlayPause()
@@ -104,19 +102,6 @@ fun PlayerBar(
                     tint = MaterialTheme.colorScheme.onSurface
                 )
             }
-
-//            IconButton(
-//                onClick = {},
-//            ) {
-//                Icon(
-//                    painter = painterResource(id = R.drawable.outline_skip_previous_24),
-//                    contentDescription = "play",
-//                    tint = MaterialTheme.colorScheme.onPrimaryContainer
-//                )
-//            }
-
-
-
         }
         val progressAnimation by animateFloatAsState(
             targetValue = progress,

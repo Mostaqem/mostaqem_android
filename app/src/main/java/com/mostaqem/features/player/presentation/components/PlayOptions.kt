@@ -1,8 +1,6 @@
 package com.mostaqem.features.player.presentation.components
 
 import android.content.Intent
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -11,19 +9,24 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalWithComputedDefaultOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -34,17 +37,22 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import com.mostaqem.R
+import com.mostaqem.core.navigation.models.DownloadDestination
 import com.mostaqem.core.navigation.models.ReadingDestination
 import com.mostaqem.features.player.data.BottomSheetType
 import com.mostaqem.features.player.data.PlayerSurah
+import com.mostaqem.features.player.data.toAudioData
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.player.presentation.components.sleep.SleepDialog
 import com.mostaqem.features.player.presentation.components.sleep.SleepViewModel
 import com.mostaqem.features.player.presentation.components.sleep.toMinSec
 
+@androidx.annotation.OptIn(UnstableApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PlayOptions(
     modifier: Modifier = Modifier,
@@ -57,6 +65,12 @@ fun PlayOptions(
     val showSleepDialog = remember { mutableStateOf(false) }
     val remainingTime by viewModel.remainingTime.collectAsState()
     val context = LocalContext.current
+    var repeatMode by remember { mutableIntStateOf(Player.REPEAT_MODE_OFF) }
+    var isShuffle by remember { mutableStateOf(false) }
+    val surahID = playerSurah.surah?.id!!.toInt()
+    val recitationID = playerSurah.recitationID!!.toInt()
+    val isDownloaded = playerViewModel.isDownloaded(surahID, recitationID)
+
     if (showSleepDialog.value) {
         SleepDialog(
             showSleepDialog = showSleepDialog,
@@ -102,24 +116,38 @@ fun PlayOptions(
             }
             Spacer(modifier = Modifier.width(15.dp))
 
-
             IconButton(onClick = {
-                playerViewModel.showBottomSheet(BottomSheetType.Recitations)
+                val nextRepeatMode = when (repeatMode) {
+                    Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
+                    Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
+                    else -> Player.REPEAT_MODE_OFF
+                }
+                repeatMode = nextRepeatMode
+                playerViewModel.repeat(nextRepeatMode)
             }) {
                 Icon(
-                    painter = painterResource(R.drawable.baseline_radio_button_checked_24),
-                    contentDescription = "recitation",
-
-                    )
+                    imageVector = when (repeatMode) {
+                        Player.REPEAT_MODE_ONE -> Icons.Default.RepeatOne
+                        Player.REPEAT_MODE_ALL -> Icons.Default.Repeat
+                        else -> Icons.Default.Repeat
+                    },
+                    contentDescription = "repeat",
+                    tint = if (repeatMode == Player.REPEAT_MODE_OFF) MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = 0.5f
+                    ) else MaterialTheme.colorScheme.primary,
+                )
             }
             Spacer(modifier = Modifier.width(15.dp))
+
             IconButton(onClick = {
-                playerViewModel.showBottomSheet(BottomSheetType.Reciters)
+                isShuffle = !isShuffle
+                playerViewModel.shuffle(isShuffle)
             }) {
                 Icon(
-                    Icons.Outlined.Person, contentDescription = "reciter",
-
-                    )
+                    imageVector = Icons.Default.Shuffle,
+                    contentDescription = "shuffle",
+                    tint = if (!isShuffle) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.primary,
+                )
             }
 
             Spacer(modifier = Modifier.width(15.dp))
@@ -135,8 +163,8 @@ fun PlayOptions(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    DropdownMenuItem(
 
+                    DropdownMenuItem(
                         text = { Text(stringResource(R.string.read_chapter)) },
                         leadingIcon = {
                             Icon(
@@ -156,7 +184,6 @@ fun PlayOptions(
                         }
                     )
                     DropdownMenuItem(
-
                         text = { Text(stringResource(R.string.share)) },
                         leadingIcon = {
                             Icon(
@@ -177,7 +204,33 @@ fun PlayOptions(
 
                         }
                     )
-                    if (!playerViewModel.isCurrentSurahDownloaded()) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.change_reciter)) },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Person, contentDescription = "reciter",
+                            )
+                        },
+                        onClick = {
+                            playerViewModel.showBottomSheet(BottomSheetType.Reciters)
+                            expanded = false
+
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.change_recitation)) },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_radio_button_checked_24),
+                                contentDescription = "recitation",
+                            )
+                        },
+                        onClick = {
+                            playerViewModel.showBottomSheet(BottomSheetType.Recitations)
+                            expanded = false
+                        }
+                    )
+                    if (!isDownloaded) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.download)) },
                             leadingIcon = {
@@ -187,11 +240,18 @@ fun PlayOptions(
                                 )
                             },
                             onClick = {
-                                if (!isDownloading) playerViewModel.download()
+                                if (!isDownloading) playerViewModel.download(
+                                    audio = playerSurah.toAudioData(),
+                                    context
+                                )
+                                navController.navigate(DownloadDestination)
                                 isDownloading = true
+                                expanded = false
                             }
                         )
+
                     }
+
 
                 }
             }

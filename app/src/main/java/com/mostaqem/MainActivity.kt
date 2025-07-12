@@ -43,8 +43,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun attachBaseContext(newBase: Context?) {
-        val languageTag = getSavedLanguage(newBase!!)
+    override fun attachBaseContext(newBase: Context) {
+        val languageTag = getSavedLanguage(newBase)
         val contextWithLocale = getContextForLanguage(newBase, languageTag)
         super.attachBaseContext(contextWithLocale)
     }
@@ -66,10 +66,7 @@ private fun startCrashReportActivity(context: Context, th: Throwable) {
 }
 
 fun getSavedLanguage(context: Context): String {
-    return runBlocking {
-        LanguageManager(context).getLanguageCode()
-
-    }
+    return LanguageManager(context).getLanguageCode()
 }
 
 fun getContextForLanguage(context: Context, languageTag: String): Context {

@@ -2,24 +2,21 @@
 <project version="4">
   <component name="deploymentTargetSelector">
     <selectionStates>
-      <SelectionState runConfigName="Generate Baseline Profile for app">
-        <option name="selectionMode" value="DROPDOWN" />
-      </SelectionState>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-06-19T20:36:32.363215900Z">
+        <DropdownSelection timestamp="2025-07-12T12:14:29.484792871Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=U4YYD22419507802" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=/home/mazen/.config/.android/avd/Medium_Phone.avd" />
             </handle>
           </Target>
         </DropdownSelection>
         <DialogSelection />
       </SelectionState>
-      <SelectionState runConfigName="ExampleStartupBenchmark">
+      <SelectionState runConfigName="AppMigrationTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="AdvancedSearchPreview">
+      <SelectionState runConfigName="testMigration2To3()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>

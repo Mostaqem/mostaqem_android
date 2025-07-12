@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import com.mostaqem.R
 import com.mostaqem.core.network.models.Result
@@ -58,6 +59,7 @@ import com.mostaqem.features.surahs.data.AudioData
 import com.mostaqem.features.surahs.data.Surah
 import com.mostaqem.features.surahs.presentation.components.SurahOptions
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 fun HistoryOnline(
@@ -101,7 +103,6 @@ fun HistoryOnline(
                                     .background(MaterialTheme.colorScheme.errorContainer)
                                     .clickable {
                                         onFetchData()
-
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -139,8 +140,7 @@ fun HistoryOnline(
                                     .background(MaterialTheme.colorScheme.primaryContainer)
                                     .pointerInput(Unit) {
                                         detectTapGestures(onLongPress = {
-
-                                            onCardClick(audio.surah)
+                                            onCardClick(audio.surah!!)
                                         }, onTap = {
                                             onAddSurah(audio)
                                         })
@@ -163,144 +163,146 @@ fun HistoryOnline(
                                             modifier = Modifier.fillMaxWidth(),
                                             color = MaterialTheme.colorScheme.onPrimaryContainer
                                         )
-                                        Text(
-                                            if (!isArabic) audio.recitation.reciter.englishName else audio.recitation.reciter.arabicName,
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis,
-                                            fontSize = 14.sp,
-                                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                                        )
-                                    }
 
-                                    Box(
-                                        modifier = Modifier
-                                            .clip(CircleShape)
-                                            .background(
-                                                MaterialTheme.colorScheme.onPrimaryContainer.copy(
-                                                    alpha = 0.3f
-                                                )
+
+                                    Text(
+                                        if (!isArabic) audio.recitation.reciter.englishName else audio.recitation.reciter.arabicName,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis,
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(
+                                            MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                                alpha = 0.3f
                                             )
-                                            .size(30.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            Icons.Default.PlayArrow,
-                                            modifier = Modifier.size(20.dp),
-                                            contentDescription = "sd"
                                         )
-                                    }
-
-
+                                        .size(30.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        Icons.Default.PlayArrow,
+                                        modifier = Modifier.size(20.dp),
+                                        contentDescription = "sd"
+                                    )
                                 }
 
 
                             }
+
+
                         }
                     }
                 }
-
-            }
-        }
-
-
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (surahs.isEmpty() && reciters.isEmpty() && !loading) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = 70.dp, end = 40.dp, start = 40.dp)
-            ) {
-
-                Image(
-                    painter = painterResource(id = R.drawable.baseline_album_24),
-                    contentDescription = "empty",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
-                )
-                Text(
-                    text = stringResource(R.string.listen_choose),
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        fontFamily = fontFamily, fontWeight = FontWeight.W500
-                    )
-                )
             }
 
         }
-        if (loading) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                LoadingIndicator()
-            }
-        }
-        if (surahs.isNotEmpty()) {
-            Text(
-                text = stringResource(R.string.heard),
-                style = MaterialTheme.typography.titleLarge,
-                fontFamily = fontFamily,
-                modifier = Modifier.padding(
-                    horizontal = 30.dp
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(14.dp),
-                contentPadding = PaddingValues(horizontal = 30.dp, vertical = 20.dp)
-            ) {
-                items(surahs) { surah ->
-                    SurahCard(
-                        image = surah.image,
-                        name = if (isArabic) surah.arabicName else surah.complexName,
-                        onClick = {
-                            playerViewModel.changeSurah(surah)
-                        }) {
-                        onCardClick(surah)
-
-                    }
-                }
-
-
-            }
-        }
-
-
-        Spacer(modifier = Modifier.height(24.dp))
-        if (reciters.isNotEmpty()) {
-            Text(
-                text = stringResource(R.string.selected_reciters),
-                style = MaterialTheme.typography.titleLarge,
-                fontFamily = fontFamily,
-                modifier = Modifier.padding(
-                    horizontal = 30.dp
-                )
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Box {
-                LazyRow(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(14.dp),
-                    contentPadding = PaddingValues(horizontal = 30.dp, vertical = 20.dp),
-                ) {
-                    items(reciters) {
-                        ReciterCard(
-                            image = it.image,
-                            name = if (isArabic) it.arabicName else it.englishName,
-                        ) {
-                            playerViewModel.changeReciter(it)
-                        }
-
-                    }
-                }
-
-            }
-        }
-        Spacer(modifier = Modifier.height(100.dp))
     }
+
+
+
+    Spacer(modifier = Modifier.height(24.dp))
+
+    if (surahs.isEmpty() && reciters.isEmpty() && !loading) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = 70.dp, end = 40.dp, start = 40.dp)
+        ) {
+
+            Image(
+                painter = painterResource(id = R.drawable.baseline_album_24),
+                contentDescription = "empty",
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
+            )
+            Text(
+                text = stringResource(R.string.listen_choose),
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp,
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontFamily = fontFamily, fontWeight = FontWeight.W500
+                )
+            )
+        }
+
+    }
+    if (loading) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            LoadingIndicator()
+        }
+    }
+    if (surahs.isNotEmpty()) {
+        Text(
+            text = stringResource(R.string.heard),
+            style = MaterialTheme.typography.titleLarge,
+            fontFamily = fontFamily,
+            modifier = Modifier.padding(
+                horizontal = 30.dp
+            )
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            contentPadding = PaddingValues(horizontal = 30.dp, vertical = 20.dp)
+        ) {
+            items(surahs) { surah ->
+                SurahCard(
+                    image = surah.image,
+                    name = if (isArabic) surah.arabicName else surah.complexName,
+                    onClick = {
+                        playerViewModel.changeSurah(surah)
+                    }) {
+                    onCardClick(surah)
+
+                }
+            }
+
+
+        }
+    }
+
+
+    Spacer(modifier = Modifier.height(24.dp))
+    if (reciters.isNotEmpty()) {
+        Text(
+            text = stringResource(R.string.selected_reciters),
+            style = MaterialTheme.typography.titleLarge,
+            fontFamily = fontFamily,
+            modifier = Modifier.padding(
+                horizontal = 30.dp
+            )
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Box {
+            LazyRow(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                contentPadding = PaddingValues(horizontal = 30.dp, vertical = 20.dp),
+            ) {
+                items(reciters) {
+                    ReciterCard(
+                        image = it.image,
+                        name = if (isArabic) it.arabicName else it.englishName,
+                    ) {
+                        playerViewModel.changeReciter(it)
+                    }
+
+                }
+            }
+
+        }
+    }
+    Spacer(modifier = Modifier.height(100.dp))
+}
 }

@@ -23,8 +23,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
-import androidx.compose.material3.LargeTopAppBar
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -37,8 +36,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,15 +43,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
 import com.mostaqem.R
-import com.mostaqem.core.ui.theme.kufamFontFamily
-import com.mostaqem.core.ui.theme.productFontFamily
+import com.mostaqem.core.navigation.models.DownloadDestination
 import com.mostaqem.dataStore
+import com.mostaqem.features.offline.data.DownloadedAudioEntity
 import com.mostaqem.features.settings.data.AppSettings
-import com.mostaqem.features.surahs.data.AudioData
+import java.text.DecimalFormat
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun OfflineSettingsScreen(
@@ -65,103 +63,94 @@ fun OfflineSettingsScreen(
     val context = LocalContext.current
     val playOption =
         context.dataStore.data.collectAsState(initial = AppSettings()).value.playDownloaded
-    val downloads by viewModel.downloaded.collectAsState()
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var selectedFile: AudioData? by remember { mutableStateOf(null) }
-    val languageCode =
-        context.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
+    var selectedFile: DownloadedAudioEntity? by remember { mutableStateOf(null) }
 
-    val fontFamily = remember(languageCode) {
-        if (languageCode == "en") productFontFamily else kufamFontFamily
-    }
-    LazyColumn(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        item {
-            LargeFlexibleTopAppBar(
-                title = {
-                    Text(stringResource(R.string.offline), fontFamily = fontFamily)
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
-                    }
-                },
-            )
-        }
-        item {
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.automatically_play_offline)) },
-                supportingContent = {
-                    Text(stringResource(R.string.automatically_play_offline_details))
-                },
-                trailingContent = {
-                    Switch(
-                        checked = playOption,
-                        thumbContent = {
-                            if (playOption)
-                                Icon(
-                                    Icons.Default.Check, contentDescription = "check",
-                                    Modifier.size(15.dp)
-                                )
-                        },
-                        onCheckedChange = {
-                            viewModel.changePlayOption(it)
-                        })
+    val downloads by viewModel.downloadedAudios.collectAsState()
+
+    Column(
+        modifier = modifier, verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+
+        LargeFlexibleTopAppBar(
+            title = {
+                Text(
+                    stringResource(R.string.offline),
+                    fontFamily = MaterialTheme.typography.labelLarge.fontFamily
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() }) {
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
+                }
+            },
+        )
+
+
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.automatically_play_offline)) },
+            supportingContent = {
+                Text(stringResource(R.string.automatically_play_offline_details))
+            },
+            trailingContent = {
+                Switch(checked = playOption, thumbContent = {
+                    if (playOption) Icon(
+                        Icons.Default.Check, contentDescription = "check", Modifier.size(15.dp)
+                    )
+                }, onCheckedChange = {
+                    viewModel.changePlayOption(it)
                 })
-        }
-        item {
-            ListItem(
-                headlineContent = {
-                    Text(stringResource(R.string.storage))
-                },
-                supportingContent = {
-                    Text(stringResource(R.string.storage_downloads))
-                }
-            )
-        }
-        item {
-            LinearProgressIndicator(
-                progress = { viewModel.getMemoryPercentage() },
+            })
 
-                Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .height(8.dp)
-            )
+        ListItem(
+            headlineContent = {
+                Text(stringResource(R.string.downloads_title))
+            }, supportingContent = {
+                Text(stringResource(R.string.downloads_description))
+            },
+            modifier = Modifier.clickable {
+                navController.navigate(DownloadDestination)
+            }
+
+        )
+
+        ListItem(headlineContent = {
+            Text(stringResource(R.string.storage))
+        }, supportingContent = {
+            Text(stringResource(R.string.storage_downloads))
+        })
+
+
+        LinearWavyProgressIndicator(
+            progress = { viewModel.getMemoryPercentage() },
+
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .height(8.dp)
+        )
+
+
+        LazyColumn {
+            items(downloads) {
+                ListItem(
+                    headlineContent = { Text(it.title) },
+                    supportingContent = {
+                        Text(it.reciter)
+                    }, trailingContent = {
+                        Text(
+                            it.size.toFileSizeString(),
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 11.sp
+                        )
+                    }, modifier = Modifier.clickable {
+                        showDeleteDialog = true
+                        selectedFile = it
+                    })
+            }
         }
 
-        items(downloads) {
-            ListItem(
-                headlineContent = { Text(it.surah.arabicName) },
-                leadingContent = {
-                    AsyncImage(
-                        model = it.surah.image,
-                        contentDescription = "surah",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .size(55.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                    )
-                },
-                supportingContent = {
-                    Text(it.recitation.reciter.arabicName)
-                },
-                trailingContent = {
-                    Text(
-                        (it.size / 1000).toString() + " " + stringResource(R.string.kilo_byte),
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 11.sp
-                    )
-                },
-                modifier = Modifier.clickable {
-                    showDeleteDialog = true
-                    selectedFile = it
-                }
-            )
-        }
-        item {
-            Spacer(Modifier.height(100.dp))
-
-        }
+        Spacer(Modifier.height(100.dp))
 
     }
     if (showDeleteDialog) {
@@ -178,26 +167,13 @@ fun OfflineSettingsScreen(
                         .padding(16.dp)
                         .fillMaxHeight()
                 ) {
-                    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Column(modifier) {
-                            selectedFile?.surah?.let { Text(it.arabicName) }
-                            selectedFile?.recitation?.reciter?.let { Text(it.arabicName) }
-                        }
-                        AsyncImage(
-                            model = selectedFile!!.surah.image,
-                            contentDescription = "surah",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .size(55.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                        )
-
+                    Column(modifier) {
+                        selectedFile?.title?.let { Text(it) }
+                        selectedFile?.reciter?.let { Text(it) }
                     }
                     Spacer(modifier = Modifier.height(25.dp))
-
                     Row(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalArrangement = Arrangement.End
+                        modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.End
                     ) {
                         TextButton(onClick = { showDeleteDialog = false }) {
                             Text(
@@ -206,7 +182,7 @@ fun OfflineSettingsScreen(
                             )
                         }
                         TextButton(onClick = {
-                            viewModel.delete(selectedFile!!.url)
+                            viewModel.delete(selectedFile!!.id)
                             showDeleteDialog = false
 
                         }) {
@@ -219,5 +195,20 @@ fun OfflineSettingsScreen(
                 }
             }
         }
+    }
+}
+
+fun Long.toFileSizeString(): String {
+    val df = DecimalFormat("#.##") // For formatting to two decimal places
+
+    val kb = this / 1024.0
+    val mb = kb / 1024.0
+    val gb = mb / 1024.0
+
+    return when {
+        gb >= 1.0 -> df.format(gb) + " GB"
+        mb >= 1.0 -> df.format(mb) + " MB"
+        kb >= 1.0 -> df.format(kb) + " KB"
+        else -> "$this Bytes" // For sizes less than 1 KB
     }
 }

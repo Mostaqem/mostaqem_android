@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "8a9b860422179a83aa7bc5f91d9122e3",
+    "identityHash": "9e0cd850c4e05804ef4b4bf6e458e125",
     "entities": [
       {
         "tableName": "Surah",
@@ -56,9 +56,7 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "Reciter",
@@ -100,13 +98,11 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
       },
       {
         "tableName": "PlayerSurah",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `surah` TEXT, `reciter` TEXT NOT NULL, `url` TEXT, `recitationID` INTEGER, `position` REAL NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `surah` TEXT, `reciter` TEXT NOT NULL, `url` TEXT, `recitationID` INTEGER, `progress` REAL NOT NULL, `position` INTEGER NOT NULL, `isLocal` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -117,8 +113,7 @@
           {
             "fieldPath": "surah",
             "columnName": "surah",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "reciter",
@@ -129,19 +124,29 @@
           {
             "fieldPath": "url",
             "columnName": "url",
-            "affinity": "TEXT",
-            "notNull": false
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "recitationID",
             "columnName": "recitationID",
-            "affinity": "INTEGER",
-            "notNull": false
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "progress",
+            "columnName": "progress",
+            "affinity": "REAL",
+            "notNull": true
           },
           {
             "fieldPath": "position",
             "columnName": "position",
-            "affinity": "REAL",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isLocal",
+            "columnName": "isLocal",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -150,15 +155,125 @@
           "columnNames": [
             "id"
           ]
-        },
-        "indices": [],
-        "foreignKeys": []
+        }
+      },
+      {
+        "tableName": "downloaded_audios",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `title` TEXT NOT NULL, `size` INTEGER NOT NULL, `reciter` TEXT NOT NULL, `reciterID` TEXT NOT NULL, `recitationID` TEXT NOT NULL, `surahID` TEXT NOT NULL, `remoteUrl` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "size",
+            "columnName": "size",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reciter",
+            "columnName": "reciter",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reciterID",
+            "columnName": "reciterID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recitationID",
+            "columnName": "recitationID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "surahID",
+            "columnName": "surahID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remoteUrl",
+            "columnName": "remoteUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
+      },
+      {
+        "tableName": "favorited_audio",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `surahName` TEXT, `reciter` TEXT NOT NULL, `reciterID` TEXT NOT NULL, `recitationID` TEXT NOT NULL, `surahID` TEXT NOT NULL, `remoteUrl` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "surahName",
+            "columnName": "surahName",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reciter",
+            "columnName": "reciter",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reciterID",
+            "columnName": "reciterID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recitationID",
+            "columnName": "recitationID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "surahID",
+            "columnName": "surahID",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "remoteUrl",
+            "columnName": "remoteUrl",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        }
       }
     ],
-    "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8a9b860422179a83aa7bc5f91d9122e3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9e0cd850c4e05804ef4b4bf6e458e125')"
     ]
   }
 }

@@ -181,7 +181,6 @@ fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
                                         .setPackage("com.egyptianbanks.instapay")
                                     context.startActivity(intent)
                                 } catch (e: ActivityNotFoundException) {
-
                                     scope.launch {
                                         SnackbarController.sendEvent(
                                             SnackbarEvents(message = "عفوا لا يوجد انستا باي على الجهاز")

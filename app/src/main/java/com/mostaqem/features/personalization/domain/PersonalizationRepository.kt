@@ -68,5 +68,10 @@ class PersonalizationRepository @Inject constructor(
         context.dataStore.updateData { settings -> settings.copy(fridayNotificationEnabled = value) }
     }
 
+    suspend fun changeNightsNotification(value: Boolean) {
+        context.dataStore.updateData { settings -> settings.copy(almulkNotificationEnabled = value) }
+    }
+
+
 
 }

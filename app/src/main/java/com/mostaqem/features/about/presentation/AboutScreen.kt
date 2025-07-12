@@ -57,12 +57,7 @@ fun AboutScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val languageCode =
-        context.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
 
-    val fontFamily = remember(languageCode) {
-        if (languageCode == "en") productFontFamily else kufamFontFamily
-    }
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -87,7 +82,7 @@ fun AboutScreen(
         Text(
             text = stringResource(R.string.app_name),
             style = MaterialTheme.typography.titleLarge,
-            fontFamily = fontFamily
+            fontFamily = MaterialTheme.typography.titleLarge.fontFamily
         )
         Spacer(Modifier.height(18.dp))
 
@@ -138,7 +133,7 @@ fun AboutScreen(
                 ) {
                     Text(stringResource(R.string.version))
                     Text(
-                        BuildConfig.VERSION_NAME,
+                          BuildConfig.VERSION_NAME,
                         fontSize = 25.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSecondaryContainer
@@ -157,7 +152,7 @@ fun AboutScreen(
             ListItem(
                 modifier = Modifier.clickable {
                     val url = "https://github.com/Mostaqem/mostaqem_android/issues/new"
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
                     try {
                         context.startActivity(intent)
                     } catch (e: ActivityNotFoundException) {
@@ -177,7 +172,7 @@ fun AboutScreen(
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(horizontal = 10.dp),
                         color = MaterialTheme.colorScheme.primary,
-                        fontFamily = fontFamily
+                        fontFamily = MaterialTheme.typography.titleLarge.fontFamily
 
                     )
                 },
@@ -210,7 +205,7 @@ fun AboutScreen(
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(horizontal = 10.dp),
                         color = MaterialTheme.colorScheme.primary,
-                        fontFamily = fontFamily
+                        fontFamily = MaterialTheme.typography.titleLarge.fontFamily
                     )
                 },
                 supportingContent = {

@@ -46,3 +46,10 @@ object DonationDestination
 data class ShareDestination(
     val chapterName: String
 )
+
+@Serializable
+object DownloadDestination
+
+@Serializable
+object FavoritesDestination
+

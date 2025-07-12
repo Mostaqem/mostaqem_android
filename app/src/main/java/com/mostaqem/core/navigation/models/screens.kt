@@ -15,7 +15,7 @@ sealed class BottomScreens<T>(
 ) {
     @Serializable
     data object Home : BottomScreens<HomeDestination>(
-        id = R.string.home,
+        id = R.string.history,
         icon = R.drawable.outline_home_24,
         route = HomeDestination,
         selectedIcon = R.drawable.baseline_home_24,

@@ -1,10 +1,5 @@
 package com.mostaqem.features.surahs.presentation
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateIntAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -43,20 +37,16 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -65,6 +55,7 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -74,13 +65,13 @@ import com.mostaqem.core.database.events.SurahEvents
 import com.mostaqem.dataStore
 import com.mostaqem.features.offline.domain.toArabicNumbers
 import com.mostaqem.features.player.presentation.PlayerViewModel
-import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.settings.data.AppSettings
 import com.mostaqem.features.surahs.data.Surah
 import com.mostaqem.features.surahs.presentation.components.SurahListItem
 import com.mostaqem.features.surahs.presentation.components.SurahOptions
 import com.mostaqem.features.surahs.presentation.components.SurahSortBottomSheet
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun SurahsScreen(
@@ -97,14 +88,12 @@ fun SurahsScreen(
     var isOptionsShown by remember {
         mutableStateOf(false)
     }
-    var selectedSurah: Surah? by remember {
-        mutableStateOf(null)
-    }
-    var selectedReciter: Reciter? by remember { mutableStateOf(null) }
-    var selectedRecitation: Int? by remember { mutableStateOf(null) }
+
+    var selectedSurahName: String? by remember { mutableStateOf(null) }
+    var selectedSurahID: Int by remember { mutableIntStateOf(0) }
 
     val bottomSheetState = rememberModalBottomSheetState()
-    val downloadedSurahs by viewModel.downloaded.collectAsState()
+    val downloadedSurahs by viewModel.downloadedAudios.collectAsState()
     var showDownloads by remember { mutableStateOf(false) }
     val player = playerViewModel.playerState.value
     val languageCode =
@@ -116,8 +105,9 @@ fun SurahsScreen(
 
     val context = LocalContext.current
     val defaultSortBy = context.dataStore.data.collectAsState(AppSettings()).value.sortBy
-
-    if (isBottomSheetShown.value && showDownloads == false) {
+    val defaultReciter by playerViewModel.defaultReciterState.collectAsState()
+    val defaultReciterName = if (isArabic) defaultReciter.arabicName else defaultReciter.englishName
+    if (isBottomSheetShown.value && !showDownloads) {
         SurahSortBottomSheet(
             viewModel = viewModel,
             defaultSortBy = defaultSortBy
@@ -142,20 +132,19 @@ fun SurahsScreen(
 
                     }) {
                         Text(
-                            if (showDownloads) stringResource(R.string.downloaded) else stringResource(
+                            if (showDownloads) stringResource(R.string.downloads) else stringResource(
                                 R.string.surahs
                             )
                         )
                     }
                     TextButton(onClick = {
                         showDownloads = !showDownloads
-                        if (showDownloads) viewModel.displayDownloaded()
                     }) {
                         Row(
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(stringResource(R.string.downloaded))
+                            Text(stringResource(R.string.downloads))
                             Icon(Icons.Outlined.ArrowDropDown, contentDescription = "")
                         }
                     }
@@ -172,14 +161,13 @@ fun SurahsScreen(
                         onDismissRequest = { isOptionsShown = false }, sheetState = bottomSheetState
                     ) {
                         SurahOptions(
-                            selectedSurah = selectedSurah,
+                            selectedSurah = selectedSurahName,
                             playerViewModel = playerViewModel,
                             navController = navController,
-                            selectedReciter = selectedReciter,
-                            selectedRecitationID = selectedRecitation,
-                            isArabic = isArabic,
-                            isDownloaded = showDownloads
-                        ) {
+
+                            selectedSurahID = selectedSurahID,
+                            context = context
+                            ) {
                             isOptionsShown = false
                         }
                     }
@@ -189,9 +177,9 @@ fun SurahsScreen(
             if (showDownloads) {
                 items(downloadedSurahs) {
                     ListItem(headlineContent = {
-                        Text(it.surah.arabicName)
+                        Text(it.title)
                     }, supportingContent = {
-                        Text(it.recitation.reciter.arabicName)
+                        Text(it.reciter)
                     }, leadingContent = {
                         AsyncImage(
                             model = "https://img.freepik.com/premium-photo/illustration-mosque-with-crescent-moon-stars-simple-shapes-minimalist-flat-design_217051-15556.jpg",
@@ -200,19 +188,26 @@ fun SurahsScreen(
                             modifier = Modifier
                                 .size(55.dp)
                                 .clip(RoundedCornerShape(12.dp))
+
+
                         )
                     }, trailingContent = {
                         IconButton(onClick = {
-                            selectedSurah = it.surah
-                            selectedReciter = it.recitation.reciter
-                            selectedRecitation = it.recitation.id
+                            selectedSurahName = it.title
+                            selectedSurahID = it.surahID.toInt()
+
                             isOptionsShown = true
                         }) {
                             Icon(
                                 Icons.Outlined.MoreVert, contentDescription = "options"
                             )
                         }
-                    }, modifier = Modifier.clickable { playerViewModel.localPlay(it) })
+                    }, modifier = Modifier.clickable {
+                        playerViewModel.fetchMediaUrl(
+                            surahId = it.surahID.toInt(),
+                            recID = it.recitationID.toInt()
+                        )
+                    })
                 }
             } else {
                 val surahLoadState = surahs.loadState.refresh
@@ -257,8 +252,11 @@ fun SurahsScreen(
                                     surah = surahs[index]!!,
                                     isCurrentSurahPlayed = isCurrentSurahPlayed,
                                     isArabic = isArabic,
+                                    defaultReciterName = defaultReciterName,
                                     onMenu = {
-                                        selectedSurah = surahs[index]
+                                        selectedSurahName =
+                                            if (isArabic) surahs[index]?.arabicName else surahs[index]?.complexName
+                                        selectedSurahID = surahs[index]?.id ?: 0
                                         isOptionsShown = true
                                     }) {
                                     playerViewModel.changeSurah(surahs[index]!!)
@@ -272,8 +270,6 @@ fun SurahsScreen(
                 item {
                     Spacer(modifier = Modifier.height(100.dp))
                 }
-
-
             }
         }
 
@@ -407,8 +403,11 @@ fun SurahsScreen(
                                 surah = surah,
                                 isCurrentSurahPlayed = isCurrentSurahPlayed,
                                 isArabic = isArabic,
+                                defaultReciterName = defaultReciterName,
                                 onMenu = {
-                                    selectedSurah = surah
+                                    selectedSurahName =
+                                        if (isArabic) surah.arabicName else surah.complexName
+                                    selectedSurahID = surah.id
                                     isOptionsShown = true
                                 }
                             ) {

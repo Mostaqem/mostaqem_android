@@ -2,6 +2,7 @@ package com.mostaqem.features.player.presentation
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -27,13 +28,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
@@ -63,11 +67,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.mostaqem.R
 import com.mostaqem.dataStore
 import com.mostaqem.features.player.data.BottomSheetType
+import com.mostaqem.features.player.data.toAudioData
 import com.mostaqem.features.player.domain.CustomShape
 import com.mostaqem.features.player.domain.MaterialShapes
 import com.mostaqem.features.player.domain.Octagon
@@ -81,6 +87,7 @@ import com.mostaqem.features.reciters.presentation.recitations.RecitationList
 import com.mostaqem.features.settings.data.AppSettings
 import kotlin.math.roundToInt
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(
     ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class,
@@ -104,8 +111,7 @@ fun PlayerScreen(
     }
     LaunchedEffect(Unit) {
         if (surahId != null && recitationID != null) playerViewModel.fetchMediaUrl(
-            surahId = surahId.toInt(),
-            recID = recitationID.toInt()
+            surahId = surahId, recID = recitationID
         )
         onShowBar()
         val isCached = playerViewModel.isCached
@@ -128,7 +134,14 @@ fun PlayerScreen(
         LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value
     var offset by remember { mutableFloatStateOf(0f) }
     val dismissThreshold = 300f
-
+    val languageCode =
+        LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
+    val isArabic = languageCode == "ar"
+    val isFavorited by playerViewModel.isFavorited.collectAsState()
+    val uniqueID = "${playerSurah.surah?.id}-${playerSurah.recitationID}"
+    val downloadState by playerViewModel.downloadState.collectAsState()
+    val downloadProgress = downloadState[uniqueID]
+    Log.d("Download", "PlayerScreen: ${downloadProgress?.progress}")
     Box(
         modifier = Modifier
             .navigationBarsPadding()
@@ -186,13 +199,16 @@ fun PlayerScreen(
                             verticalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column {
-                                Text(
-                                    text = playerSurah.surah!!.arabicName,
-                                    fontSize = 30.sp,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(text = playerSurah.reciter.arabicName)
+                                Column {
+                                    Text(
+                                        text = playerSurah.surah!!.arabicName,
+                                        fontSize = 30.sp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(text = playerSurah.reciter.arabicName)
+                                }
+
                                 Slider(
                                     value = percentage,
                                     onValueChange = { playerViewModel.seekToPosition(it) },
@@ -209,7 +225,7 @@ fun PlayerScreen(
                                     Text(text = duration.toHoursMinutesSeconds())
                                 }
 
-                                PlayButtons(playerViewModel = playerViewModel)
+                                PlayButtons(playerViewModel = playerViewModel, isArabic = isArabic)
                             }
                             Column {
                                 if (bottomSheetType != BottomSheetType.None) {
@@ -222,7 +238,6 @@ fun PlayerScreen(
                                         }) {
                                         when (bottomSheetType) {
                                             BottomSheetType.Queue -> QueuePlaylist(
-                                                playlists = playerViewModel.queuePlaylist,
                                                 playerViewModel = playerViewModel
                                             )
 
@@ -250,6 +265,7 @@ fun PlayerScreen(
 
                 }
             }
+
             else -> {
                 Column(
                     modifier = Modifier
@@ -274,20 +290,48 @@ fun PlayerScreen(
                                     .size(size)
                             )
                         }
-                        Column(modifier = Modifier.padding(20.dp)) {
-                            playerSurah.surah?.let {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Column(modifier = Modifier.padding(20.dp)) {
+                                playerSurah.surah?.let {
+                                    Text(
+                                        text = it.arabicName,
+                                        fontSize = 30.sp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                                 Text(
-                                    text = it.arabicName,
-                                    fontSize = 30.sp,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold
+                                    text = playerSurah.reciter.arabicName,
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                 )
                             }
-                            Text(
-                                text = playerSurah.reciter.arabicName,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                            )
+                            IconButton(
+                                onClick = {
+                                    playerViewModel.favorite(playerSurah.toAudioData())
+                                },
+                                shape = IconButtonDefaults.largeRoundShape,
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
+                                        alpha = 0.3f
+                                    )
+                                ),
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp)
+                            ) {
+                                Icon(
+                                    if (isFavorited) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                                    contentDescription = "favorite",
+                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+
+
+                                    )
+                            }
                         }
+
 
                         Slider(
                             value = percentage,
@@ -310,19 +354,17 @@ fun PlayerScreen(
                             )
                         }
                         Spacer(modifier = Modifier.height(18.dp))
-                        PlayButtons(playerViewModel = playerViewModel)
+                        PlayButtons(playerViewModel = playerViewModel, isArabic = isArabic)
                     }
                     if (bottomSheetType != BottomSheetType.None) {
                         ModalBottomSheet(
                             sheetState = bottomSheetState,
 
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            onDismissRequest = {
+                            containerColor = MaterialTheme.colorScheme.surface, onDismissRequest = {
                                 playerViewModel.hideBottomSheet()
                             }) {
                             when (bottomSheetType) {
                                 BottomSheetType.Queue -> QueuePlaylist(
-                                    playlists = playerViewModel.queuePlaylist,
                                     playerViewModel = playerViewModel
                                 )
 

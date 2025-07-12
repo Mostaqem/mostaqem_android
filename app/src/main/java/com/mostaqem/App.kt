@@ -11,6 +11,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.mostaqem.features.history.domain.worker.DeleteWorker
 import com.mostaqem.features.notifications.domain.FridayWorker
+import com.mostaqem.features.notifications.domain.NightsWorker
 import com.mostaqem.features.notifications.domain.NotificationService
 import dagger.hilt.android.HiltAndroidApp
 import java.util.Calendar
@@ -25,6 +26,7 @@ class App : Application(), Configuration.Provider {
         enqueueDeleteOldItemsWorker(this)
         createNotificationChannel()
         enqueueFridayNotification(this)
+        enqueueNightsNotification(this)
     }
 
     @Inject
@@ -43,6 +45,7 @@ class App : Application(), Configuration.Provider {
         )
     }
 
+
     private fun enqueueFridayNotification(context: Context) {
         val initialDelay = calculateInitialDelay()
         val fridayRequest =
@@ -59,6 +62,23 @@ class App : Application(), Configuration.Provider {
         )
     }
 
+    private fun enqueueNightsNotification(context: Context) {
+        val initialDelay = calculateInitialDelay()
+        val nightlyRequest =
+            PeriodicWorkRequestBuilder<NightsWorker>(
+                1, TimeUnit.DAYS // Changed from 7 days to 1 day for daily
+            )
+                .setInitialDelay(initialDelay, TimeUnit.MILLISECONDS)
+                .addTag("nights_notification_tag")
+                .build()
+
+        WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            "NightsNotificationWorker",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            nightlyRequest
+        )
+    }
+
 
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
@@ -70,8 +90,22 @@ class App : Application(), Configuration.Provider {
         val notificationManager =
             getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
+    }
 
+    private fun calculateNightsInitialDay(): Long {
+        val now = Calendar.getInstance()
+        val desiredNotificationTime = Calendar.getInstance().apply {
+            timeInMillis = System.currentTimeMillis()
+            set(Calendar.HOUR_OF_DAY, 21)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }
+        if (desiredNotificationTime.before(now)) {
+            desiredNotificationTime.add(Calendar.DAY_OF_MONTH, 1)
+        }
 
+        return desiredNotificationTime.timeInMillis - now.timeInMillis
     }
 
     private fun calculateInitialDelay(): Long {
@@ -79,7 +113,6 @@ class App : Application(), Configuration.Provider {
         val today = calendar.get(Calendar.DAY_OF_WEEK)
         val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
         val currentMinute = calendar.get(Calendar.MINUTE)
-
         var daysUntilFriday = 0
         daysUntilFriday = if (today <= Calendar.FRIDAY) {
             Calendar.FRIDAY - today
@@ -87,9 +120,8 @@ class App : Application(), Configuration.Provider {
             (Calendar.SATURDAY - today) + Calendar.FRIDAY
         }
 
-        // Set the target time for Friday morning (e.g., 9 AM)
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
-        calendar.set(Calendar.HOUR_OF_DAY, 9) // 9 AM
+        calendar.set(Calendar.HOUR_OF_DAY, 9)
         calendar.set(Calendar.MINUTE, 0)
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
@@ -110,6 +142,8 @@ class App : Application(), Configuration.Provider {
 
         return targetTimeMillis - currentTimeMillis
     }
+
+
 
 
 }

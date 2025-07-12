@@ -1,5 +1,7 @@
 package com.mostaqem.features.surahs.presentation.components
 
+import android.content.Context
+import androidx.annotation.OptIn
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -12,6 +14,8 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,35 +23,53 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.mostaqem.R
 import com.mostaqem.core.navigation.models.ReadingDestination
+import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.surahs.data.Surah
 
+@OptIn(UnstableApi::class)
 @Composable
 fun SurahOptions(
-    selectedSurah: Surah?,
-    selectedReciter: Reciter? = null,
-    selectedRecitationID: Int? = null,
+    selectedSurah: String?,
+    selectedSurahID: Int,
+    context: Context,
+    selectedReciter: String? = null,
+    selectedReciterID: Int? =null,
+    selectedRecitation: Int? = null,
     playerViewModel: PlayerViewModel,
     navController: NavController,
-    isDownloaded: Boolean = false,
-    isArabic: Boolean,
     onDismiss: () -> Unit,
 
+
     ) {
+    val defaultReciter by playerViewModel.defaultReciterState.collectAsState()
+    val defaultRecitationID by playerViewModel.defaultRecitationID.collectAsState()
+    val isArabic = MaterialTheme.typography.titleLarge.fontFamily == kufamFontFamily
     LazyColumn {
         item {
             ListItem(
-                headlineContent = { Text(text = if (isArabic || isDownloaded) selectedSurah!!.arabicName else selectedSurah!!.complexName) },
-                supportingContent = { selectedReciter?.arabicName?.let { Text(text = it) } },
+                headlineContent = {
+                    if (selectedSurah != null) {
+                        Text(selectedSurah)
+                    }
+                },
+                supportingContent = {
+                    Text(
+                        selectedReciter
+                            ?: if (isArabic) defaultReciter.arabicName else defaultReciter.englishName
+                    )
+                },
+
                 leadingContent = {
                     Box(contentAlignment = Alignment.Center) {
                         AsyncImage(
-                            model = selectedSurah!!.image,
+                            model = "https://img.freepik.com/premium-photo/illustration-mosque-with-crescent-moon-stars-simple-shapes-minimalist-flat-design_217051-15556.jpg",
                             contentDescription = "surah",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -56,7 +78,8 @@ fun SurahOptions(
                         )
                     }
                 },
-                colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+                colors =
+                    ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
             )
             HorizontalDivider()
         }
@@ -73,9 +96,10 @@ fun SurahOptions(
                 modifier = Modifier.clickable {
 
                     playerViewModel.addNext(
-                        selectedSurah!!.id,
-                        selectedReciter?.id,
-                        selectedRecitationID
+                        selectedSurahID,
+                        selectedReciterID ?: defaultReciter.id,
+                        selectedRecitation ?: defaultRecitationID,
+                        context
                     )
 
                     onDismiss()
@@ -95,9 +119,10 @@ fun SurahOptions(
                 modifier = Modifier.clickable {
 
                     playerViewModel.addMediaItem(
-                        selectedSurah!!.id,
-                        selectedReciter?.id,
-                        selectedRecitationID
+                        selectedSurahID,
+                        selectedReciterID ?: defaultReciter.id,
+                        selectedRecitation ?: defaultRecitationID,
+                        context
                     )
                     onDismiss()
                 },
@@ -116,13 +141,14 @@ fun SurahOptions(
                 },
                 headlineContent = { Text(text = stringResource(R.string.read_chapter)) },
                 modifier = Modifier.clickable {
-                    val surahID = selectedSurah!!.id
-                    navController.navigate(
-                        ReadingDestination(
-                            surahID = surahID,
-                            surahName = if (isArabic) selectedSurah.arabicName else selectedSurah.complexName
+                    selectedSurah?.let {
+                        navController.navigate(
+                            ReadingDestination(
+                                surahID = selectedSurahID,
+                                surahName = it
+                            )
                         )
-                    )
+                    }
                     onDismiss()
 
                 },

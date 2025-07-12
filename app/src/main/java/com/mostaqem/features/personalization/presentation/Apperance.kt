@@ -31,12 +31,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mostaqem.R
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.core.ui.theme.productFontFamily
 import com.mostaqem.dataStore
+import com.mostaqem.features.personalization.presentation.components.LargeTopBar
 import com.mostaqem.features.personalization.presentation.reciter.ReciterOption
 import com.mostaqem.features.player.domain.MaterialShapes
 import com.mostaqem.features.player.presentation.PlayerViewModel
@@ -51,22 +53,10 @@ fun AppearanceScreen(
     val context = LocalContext.current
     val userSettings = context.dataStore.data.collectAsState(initial = AppSettings()).value
 
-    val languageCode =
-        LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
-
-    val fontFamily = remember(languageCode) {
-        if (languageCode == "en") productFontFamily else kufamFontFamily
-    }
+    val fontFamily = MaterialTheme.typography.titleLarge.fontFamily!!
 
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        LargeFlexibleTopAppBar(
-            title = { Text(text = stringResource(R.string.apperanace), fontFamily = fontFamily) },
-            navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back ")
-                }
-            },
-        )
+        LargeTopBar(navController, title = stringResource(R.string.player))
         ListItem(
             headlineContent = {
                 Text(
@@ -84,16 +74,23 @@ fun AppearanceScreen(
         )
         Spacer(Modifier.height(15.dp))
 
-        ReciterOption(playerViewModel = playerViewModel)
-
-        Spacer(Modifier.height(15.dp))
-
-        Text(
-            stringResource(R.string.change_shape),
-            fontFamily = fontFamily,
-            modifier = Modifier.padding(horizontal = 18.dp)
+        ReciterOption(
+            playerViewModel = playerViewModel, modifier = Modifier.padding(horizontal = 18.dp)
         )
+
         Spacer(Modifier.height(15.dp))
+
+        ListItem(
+            headlineContent = {
+                Text(
+                    stringResource(R.string.change_shape),
+                    fontFamily = fontFamily,
+                    modifier = Modifier.padding(horizontal = 18.dp)
+                )
+            },
+
+
+            )
         LazyRow(
             horizontalArrangement = Arrangement.SpaceEvenly,
             contentPadding = WindowInsets.safeContent.asPaddingValues(),

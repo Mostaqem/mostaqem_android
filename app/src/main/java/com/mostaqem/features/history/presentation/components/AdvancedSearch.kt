@@ -14,8 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ChipDefaults
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Close
@@ -63,7 +61,7 @@ import com.mostaqem.features.surahs.data.Surah
 import com.mostaqem.features.surahs.presentation.components.SurahListItem
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdvancedSearch(
     modifier: Modifier = Modifier,
@@ -75,6 +73,7 @@ fun AdvancedSearch(
     onSearchQueryChange: (String) -> Unit,
     isArabic: Boolean = false,
     player: PlayerSurah?,
+    defaultReciterName: String,
     onReciterclick: (Reciter) -> Unit,
     onSurahMenuClick: (Surah) -> Unit,
     onSurahClick: (Surah) -> Unit,
@@ -198,7 +197,8 @@ fun AdvancedSearch(
                                             onClick = { onSurahClick(it) },
                                             onMenu = { onSurahMenuClick(it) },
                                             isCurrentSurahPlayed = isCurrentSurahPlayed,
-                                            isArabic = isArabic
+                                            isArabic = isArabic,
+                                            defaultReciterName = defaultReciterName
                                         )
                                     }
                                 }
@@ -256,7 +256,6 @@ fun AdvancedSearch(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun AssistLabels(
     modifier: Modifier = Modifier,
@@ -294,12 +293,6 @@ fun AssistLabels(
                     selectedLabelColor = MaterialTheme.colorScheme.onPrimary
                 )
 
-//                colors = ChipDefaults.filterChipColors(
-//                    selectedBackgroundColor = MaterialTheme.colorScheme.primary,
-//                    selectedContentColor = MaterialTheme.colorScheme.onPrimary,
-//                    backgroundColor = Color.Transparent,
-//                    contentColor = MaterialTheme.colorScheme.primary,
-//                ),
             )
         }
     }
@@ -319,7 +312,8 @@ private fun AdvancedSearchPreview() {
             player = null,
             onSurahMenuClick = {},
             onSurahClick = {},
-            onReciterclick = {}
+            onReciterclick = {},
+            defaultReciterName = ""
         )
     }
 

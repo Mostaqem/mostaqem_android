@@ -83,7 +83,6 @@ fun ReciterOption(
 
     Box(
         modifier = modifier
-            .padding(horizontal = 18.dp)
             .clip(RoundedCornerShape(25.dp))
             .background(MaterialTheme.colorScheme.primaryContainer)
             .fillMaxWidth()

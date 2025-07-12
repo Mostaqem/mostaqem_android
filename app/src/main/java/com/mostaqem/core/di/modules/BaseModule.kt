@@ -62,7 +62,7 @@ object BaseModule {
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
         return Room.databaseBuilder(
             context, AppDatabase::class.java, name = "database.db"
-        ).build()
+        ).addMigrations(AppDatabase.migrate2To3).build()
     }
 
     @Provides
