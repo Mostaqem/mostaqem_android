@@ -138,7 +138,6 @@ class PlayerViewModel @Inject constructor(
                 }
             }
         }
-
         setupMediaController()
     }
 
@@ -247,7 +246,6 @@ class PlayerViewModel @Inject constructor(
 
     fun applyCachedState() {
         val player = playerState.value
-        Log.d("Player", "Local Player : ${player.isLocal}")
         isCached = false
         if (player.surah != null) {
             if (!player.isLocal) {
@@ -258,7 +256,6 @@ class PlayerViewModel @Inject constructor(
                         recitationID = player.recitationID
                     )
                     if (metadataData is Result.Success) {
-
                         val metadata = setMetadata(metadataData.data.response)
                         mediaController?.setMediaItem(metadata, player.position)
                         mediaController?.prepare()
@@ -294,14 +291,14 @@ class PlayerViewModel @Inject constructor(
     private suspend fun restoreCachedState() {
         playerRepository.getPlayer()?.let { cachedPlayer ->
             playerState.value = cachedPlayer
-            Log.d("Player Reciter", "Changed Player to Cache")
+            Log.i("Player Reciter", "Changed Player to Cache")
         }
         isCached = true
     }
 
     private fun setMetadata(data: AudioData): MediaItem {
         val isDefaultEnglish = languageManager.getLanguageCode() == "en"
-        val surahName = if (isDefaultEnglish) data.surah!!.complexName else data.surah!!.arabicName
+        val surahName = if (isDefaultEnglish) data.surah.complexName else data.surah.arabicName
         val reciterName =
             if (isDefaultEnglish) data.recitation.reciter.englishName else data.recitation.reciter.arabicName
         val metadata: MediaMetadata =
@@ -324,7 +321,7 @@ class PlayerViewModel @Inject constructor(
         val previousChapters = (1..3).map { currentSurahID - it }.filter { it > 0 }
         val nextChapters = (1..3).map { currentSurahID + it }.filter { it <= 114 }
         val previousMediaItems = mutableSetOf<MediaItem>()
-        val currentMediaItem: MediaItem = mediaController?.currentMediaItem!!
+        val currentMediaItemIndex: Int = mediaController?.currentMediaItemIndex ?: 0
         val nextMediaItems = mutableSetOf<MediaItem>()
 
         val previousJobs = previousChapters.map { id ->
@@ -373,14 +370,12 @@ class PlayerViewModel @Inject constructor(
         viewModelScope.launch {
             previousJobs.awaitAll()
             nextJobs.awaitAll()
-            val queuePlaylist: MutableList<MediaItem> =
-                (previousMediaItems.reversed() + currentMediaItem + nextMediaItems).toMutableList()
             mediaController?.run {
-                clearMediaItems()
-                addMediaItems(queuePlaylist)
-                val currentIndex = previousMediaItems.size
-                seekTo(currentIndex, 0L)
+                addMediaItems(currentMediaItemIndex,previousMediaItems.toList())
+                addMediaItems(nextMediaItems.toList())
+
             }
+
         }
     }
 
@@ -461,7 +456,7 @@ class PlayerViewModel @Inject constructor(
     }
 
 
-    fun addNext(surahID: Int, reciterID: Int? = null, recitationID: Int? = null,context: Context) {
+    fun addNext(surahID: Int, reciterID: Int? = null, recitationID: Int? = null, context: Context) {
         val currentMediaItemIndex: Int? = mediaController?.currentMediaItemIndex
         val reID: Int = reciterID ?: defaultReciter.id
         if (currentMediaItemIndex != null) {
@@ -523,7 +518,12 @@ class PlayerViewModel @Inject constructor(
         mediaController?.clearMediaItems()
     }
 
-    fun addMediaItem(surahID: Int, reciterID: Int? = null, recitationID: Int? = null,context: Context) {
+    fun addMediaItem(
+        surahID: Int,
+        reciterID: Int? = null,
+        recitationID: Int? = null,
+        context: Context
+    ) {
         val reID: Int = reciterID ?: defaultReciter.id
         viewModelScope.launch {
             val recID: Int =
@@ -631,7 +631,7 @@ class PlayerViewModel @Inject constructor(
         fetchMediaUrl(recID = id)
     }
 
-    fun download(audio: AudioData,context: Context) {
+    fun download(audio: AudioData, context: Context) {
         val isCurrentMediaItemDownloaded =
             playerRepository.getDownloadedMediaItem(audio.surah.id, audio.recitationID) != null
         if (isCurrentMediaItemDownloaded) return
@@ -643,7 +643,7 @@ class PlayerViewModel @Inject constructor(
                 events = SnackbarEvents(
                     message = context.getString(R.string.downloading_now),
 
-                )
+                    )
             )
         }
 

@@ -38,12 +38,14 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.toShape
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -74,8 +76,7 @@ import com.mostaqem.R
 import com.mostaqem.dataStore
 import com.mostaqem.features.player.data.BottomSheetType
 import com.mostaqem.features.player.data.toAudioData
-import com.mostaqem.features.player.domain.CustomShape
-import com.mostaqem.features.player.domain.MaterialShapes
+import com.mostaqem.features.player.domain.AppShapes
 import com.mostaqem.features.player.domain.Octagon
 import com.mostaqem.features.player.presentation.components.PlayButtons
 import com.mostaqem.features.player.presentation.components.PlayOptions
@@ -184,8 +185,8 @@ fun PlayerScreen(
                                         animatedVisibilityScope = animatedVisibilityScope
                                     )
                                     .clip(
-                                        MaterialShapes.entries.find { it.id == customShapeData.shapeID }?.shape
-                                            ?: MaterialShapes.RECT.shape
+                                        AppShapes.entries.find { it.id == customShapeData.shapeID }?.shape?.toShape()
+                                            ?: AppShapes.RECT.shape.toShape()
                                     )
                                     .size(300.dp)
                             )
@@ -284,8 +285,8 @@ fun PlayerScreen(
                                 modifier = Modifier
                                     .padding(16.dp)
                                     .clip(
-                                        MaterialShapes.entries.find { it.id == customShapeData.shapeID }?.shape
-                                            ?: MaterialShapes.RECT.shape
+                                        AppShapes.entries.find { it.id == customShapeData.shapeID }?.shape?.toShape()
+                                            ?: AppShapes.RECT.shape.toShape()
                                     )
                                     .size(size)
                             )
@@ -391,6 +392,7 @@ fun PlayerScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(
     showBackground = true,
     locale = "ar",
@@ -410,18 +412,11 @@ private fun Shape() {
 
             Box(
                 modifier = Modifier
-                    .clip(
-                        CustomShape(
-                            shapeType = Octagon()
-                        )
-                    )
+                    .clip(MaterialShapes.Cookie12Sided.toShape())
                     .background(Color.Green)
                     .size(200.dp)
                     .aspectRatio(1f)
             )
-
-
-
 
             Column(modifier = Modifier.padding(vertical = 45.dp, horizontal = 25.dp)) {
                 Text(
