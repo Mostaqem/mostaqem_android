@@ -83,14 +83,11 @@ fun ReciterOption(
 
     Box(
         modifier = modifier
-            .padding(horizontal = 18.dp)
             .clip(RoundedCornerShape(25.dp))
             .background(MaterialTheme.colorScheme.primaryContainer)
             .fillMaxWidth()
             .pointerInput(Unit) {
-                detectTapGestures(onTap = {
-                    playerViewModel.changeReciter(savedReciter)
-                }, onLongPress = {
+                detectTapGestures(onLongPress = {
                     showRecitations = !showRecitations
                 })
             }
@@ -121,6 +118,8 @@ fun ReciterOption(
                     Spacer(Modifier.width(15.dp))
                     Text(
                         text = if (isArabic) savedReciter.arabicName else savedReciter.englishName,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+
 
                         )
                 }
@@ -130,16 +129,18 @@ fun ReciterOption(
                     }) {
                         Icon(
                             painter = painterResource(R.drawable.baseline_radio_button_checked_24),
-                            contentDescription = "recitation"
+                            contentDescription = "recitation",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
                     IconButton(onClick = { showReciters.value = true }) {
-                        Icon(Icons.Outlined.Edit, contentDescription = "edit")
+                        Icon(
+                            Icons.Outlined.Edit,
+                            contentDescription = "edit",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     }
-
                 }
-
-
             }
 
             if (showReciters.value) {

@@ -25,4 +25,6 @@ interface SurahRepository {
         limit: Int,
         reciterID: Int? = null
     ): Result<List<AudioData>, DataError.Network>
+
+    suspend fun getAllSurahsUrls(): Result<List<AudioData>, DataError.Network>
 }

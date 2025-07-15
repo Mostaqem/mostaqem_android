@@ -53,6 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.media3.common.util.UnstableApi
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
@@ -66,6 +67,7 @@ import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.reciters.domain.ReciterEvents
 import com.mostaqem.features.settings.data.AppSettings
 
+@androidx.annotation.OptIn(UnstableApi::class)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReciterScreen(
@@ -202,14 +204,14 @@ fun ReciterScreen(
                                     contentDescription = "reciter",
                                     contentScale = ContentScale.Crop,
                                     modifier = Modifier
-                                        .size(140.dp)
+                                        .size(100.dp)
                                         .clip(CircleShape)
                                 )
                                 if (currentPlayingReciter.arabicName == reciters[index].arabicName) {
                                     Box(
                                         contentAlignment = Alignment.Center,
                                         modifier = Modifier
-                                            .size(140.dp)
+                                            .size(100.dp)
                                             .clip(CircleShape)
                                             .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
                                     ) {
@@ -277,7 +279,7 @@ fun ReciterScreen(
                                     .size(140.dp)
                                     .clip(CircleShape)
                             )
-                            if (currentPlayingReciter.arabicName == reciters[index]?.arabicName) {
+                            if (currentPlayingReciter.id == reciters[index]?.id) {
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier
@@ -290,7 +292,6 @@ fun ReciterScreen(
                                         contentDescription = "play",
                                         tint = MaterialTheme.colorScheme.onSurface,
                                         modifier = Modifier.size(30.dp)
-
                                     )
                                 }
                             }

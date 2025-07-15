@@ -10,7 +10,15 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mostaqem.dataStore
+import com.mostaqem.features.settings.data.AppSettings
+import kotlinx.coroutines.flow.map
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -53,10 +61,35 @@ fun MostaqemTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
+    val context = LocalContext.current
+    val languageCode = context.dataStore.data.map { it.language.code }
+        .collectAsStateWithLifecycle(initialValue = "en")
+
+    val adaptiveFontFamily = if (languageCode.value == "ar") {
+        kufamFontFamily
+    } else {
+        productFontFamily
+    }
+
+    val typography = androidx.compose.material3.Typography(
+        titleLarge = TextStyle(
+            fontFamily = adaptiveFontFamily,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.W500
+        ),
+        labelLarge = TextStyle(
+            fontFamily = adaptiveFontFamily,
+        ),
+        headlineLarge = TextStyle(
+            fontFamily = adaptiveFontFamily,
+            fontSize = 32.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    )
 
     MaterialExpressiveTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = typography,
         content = content
     )
 }

@@ -5,12 +5,14 @@
     <string name="recommended">مرشح لك</string>
     <string name="heard">سمع مؤخرا</string>
     <string name="selected_reciters">شيوخ مختارة</string>
-    <string name="home">الرئيسية</string>
+    <string name="history">ذكرياتي</string>
+    <string name="shuffle">عشوائي</string>
+
     <string name="surahs">السور</string>
     <string name="settings">الاعدادات</string>
     <string name="listen_choose">لم تقم بإضافة أي شيء إلى السجل بعد</string>
     <string name="search_chapter">ابحث عن السورة</string>
-    <string name="downloaded">التحميلات</string>
+    <string name="downloads">التحميلات</string>
     <string name="play_next">تشغيل التالي</string>
     <string name="add_queue">أضف إلي قائمة التشغيل</string>
     <string name="read_chapter">اقرأ السورة</string>
@@ -24,6 +26,8 @@
     <string name="change_color">تغير اللون</string>
     <string name="amiri">أميري</string>
     <string name="uthmani">عثماني</string>
+    <string name="all">الكل</string>
+    <string name="search_reciters_chapters">ابحث عن سور، شيوخ…</string>
 
     <string name="change_language">تغيير اللغة</string>
     <string name="player_decsription">تغير شكل المشغل و الشيخ الافتراضي و ألخ</string>
@@ -84,4 +88,40 @@
     <string name="name">الإسم</string>
     <string name="revelation_place">مكان الوحي</string>
 
+    <string name="notifications">إشعارات</string>
+    <string name="notifications_desc">تمكين الإخطارات الأسبوعية، يوم الجمعة، الخ</string>
+    <string name="friday_reminder">تذكير يوم الجمعة</string>
+    <string name="friday_reminder_description">إشعار أسبوعي للاستماع إلى سورة الكهف كل يوم جمعة</string>
+    <string name="friday_await">جمعة مباركة</string>
+    <string name="listen_friday">استمع لسورة الكهف وابدأ يومك بالبركة والنور</string>
+
+    <string name="notification_permission">تحتاج إلى السماح إذن الإشعارات للسماح لـ مستقيم بإرسال تذكيرات إليك</string>
+
+    <string name="nights_reminder">تذكير سورة الملك</string>
+    <string name="nights_reminder_description">استقبل تذكيرًا لطيفًا كل ليلة للاستماع إلى سورة الملك</string>
+    <string name="nights_await">نور ليلتك</string>
+    <string name="listen_almulk">دع سورة الملك تضيء ليلتك وتحميك — اضغط للاستماع</string>
+
+    <string name="downloads_title">التنزيلات</string>
+    <string name="downloads_description">احتفظ بتلاواتك المفضلة على جهازك واستمع إليها في أي وقت، حتى بدون اتصال بالإنترنت</string>
+    <string name="pause">إيقاف مؤقت</string>
+    <string name="resume">استئناف</string>
+    <string name="downloaded">تم التنزيل</string>
+
+    <string name="favorites">المفضلات</string>
+
+    <string name="added_next">تم اضافة السورة في التالي</string>
+    <string name="added_queue">تم اضافة السورة في قائمة التشغيل</string>
+    <string name="downloading_now">يتم تحميل السورة</string>
+
+    <string name="no_downloads">لا توجد تنزيلات بعد</string>
+
+    <string name="download_all_chapters_question">هل تريد تنزيل جميع السور؟</string>
+    <string name="download_all_chapters_description">سيتم تنزيل جميع السور من القارئ الافتراضي والتلاوات.</string>
+
+    <string name="delete_all_downloads_question">هل تريد حذف جميع التنزيلات؟</string>
+    <string name="delete_all_downloads_description">سيؤدي هذا إلى حذف كل شيء بما في ذلك المحتوى الذي تم تنزيله.</string>
+
+    <string name="change_reciter">تغير الشيخ</string>
+    <string name="change_recitation">تغير التلاواة</string>
 </resources>

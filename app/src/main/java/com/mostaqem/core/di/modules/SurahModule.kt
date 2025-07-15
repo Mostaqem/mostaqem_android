@@ -1,7 +1,11 @@
 package com.mostaqem.core.di.modules
 
 import com.mostaqem.core.database.AppDatabase
+import com.mostaqem.core.database.dao.DownloadedAudioDao
+import com.mostaqem.core.database.dao.FavoritesDao
 import com.mostaqem.core.database.dao.SurahDao
+import com.mostaqem.features.favorites.domain.FavoritesRepository
+import com.mostaqem.features.personalization.domain.PersonalizationRepository
 import com.mostaqem.features.surahs.data.SurahRepositoryImpl
 import com.mostaqem.features.surahs.domain.repository.SurahRepository
 import com.mostaqem.features.surahs.domain.repository.SurahService
@@ -26,8 +30,11 @@ object SurahModule {
 
     @Provides
     @Singleton
-    fun provideSurahRepository(api: SurahService): SurahRepository {
-        return SurahRepositoryImpl(api)
+    fun provideSurahRepository(
+        api: SurahService,
+        repository: PersonalizationRepository
+    ): SurahRepository {
+        return SurahRepositoryImpl(api, repository)
     }
 
     @Provides
@@ -35,4 +42,18 @@ object SurahModule {
     fun provideSurahDao(database: AppDatabase): SurahDao {
         return database.surahDao
     }
+
+
+    @Provides
+    @Singleton
+    fun provideFavoritedSurahs(database: AppDatabase): FavoritesDao {
+        return database.favoritesDao
+    }
+
+    @Provides
+    @Singleton
+    fun provideFavoritesRepository(dao: FavoritesDao): FavoritesRepository {
+        return FavoritesRepository(dao = dao)
+    }
+
 }

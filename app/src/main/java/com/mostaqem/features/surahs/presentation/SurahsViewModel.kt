@@ -8,10 +8,11 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.mostaqem.core.database.dao.SurahDao
 import com.mostaqem.core.database.events.SurahEvents
+import com.mostaqem.features.offline.data.DownloadedAudioEntity
+import com.mostaqem.features.offline.domain.OfflineManager
 import com.mostaqem.features.offline.domain.OfflineRepository
 import com.mostaqem.features.personalization.domain.PersonalizationRepository
 import com.mostaqem.features.settings.data.AppSettings
-import com.mostaqem.features.surahs.data.AudioData
 import com.mostaqem.features.surahs.data.Surah
 import com.mostaqem.features.surahs.data.SurahSortBy
 import com.mostaqem.features.surahs.domain.repository.SurahRepository
@@ -33,7 +34,7 @@ import javax.inject.Inject
 class SurahsViewModel @Inject constructor(
     private val repository: SurahRepository,
     private val dao: SurahDao,
-    private val offlineRepository: OfflineRepository,
+    private val manager: OfflineManager,
     private val personalizationRepository: PersonalizationRepository,
 ) : ViewModel() {
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
@@ -57,26 +58,17 @@ class SurahsViewModel @Inject constructor(
             initialValue = PagingData.empty()
         )
 
-
     val queryState = mutableStateOf<List<Surah>>(emptyList())
-
-    private val _downloaded: MutableStateFlow<List<AudioData>> =
-        MutableStateFlow(value = emptyList())
-    val downloaded: StateFlow<List<AudioData>> = _downloaded
-
+    val downloadedAudios: StateFlow<List<DownloadedAudioEntity>> = manager.getAllDownloads()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     private val _loading: MutableStateFlow<Boolean> =
         MutableStateFlow(value = false)
     val loading: StateFlow<Boolean> = _loading
-
-
-    init {
-        viewModelScope.launch {
-            val localFiles = offlineRepository.getAudioDataFiles()
-            _downloaded.value = localFiles
-        }
-    }
-
 
     fun onSurahEvents(event: SurahEvents) {
         when (event) {
@@ -99,7 +91,6 @@ class SurahsViewModel @Inject constructor(
     fun setSortBy(value: SurahSortBy) {
         viewModelScope.launch(errorHandler) {
             personalizationRepository.changeSortBy(value)
-            Log.d("SortValue", "setSortBy: ${value}")
         }
     }
 
@@ -114,12 +105,6 @@ class SurahsViewModel @Inject constructor(
         }
     }
 
-    fun displayDownloaded() {
-        viewModelScope.launch {
-            val localFiles = offlineRepository.getAudioDataFiles()
-            _downloaded.value = localFiles
-        }
-    }
 
 
 }

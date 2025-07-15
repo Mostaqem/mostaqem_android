@@ -12,6 +12,12 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
@@ -27,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,8 +40,8 @@ import androidx.navigation.NavController
 import com.mostaqem.R
 import com.mostaqem.core.navigation.models.AppearanceDestination
 import com.mostaqem.core.navigation.models.LanguagesDestination
+import com.mostaqem.core.navigation.models.NotificationsDestination
 import com.mostaqem.core.navigation.models.OfflineSettingsDestination
-import com.mostaqem.core.navigation.models.UpdateDestination
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.core.ui.theme.productFontFamily
 import com.mostaqem.dataStore
@@ -53,35 +58,37 @@ fun SettingsScreen(navController: NavController) {
         Options(
             name = stringResource(R.string.language),
             description = stringResource(R.string.change_language),
-            icon = R.drawable.translate,
+            icon = Icons.Outlined.Translate,
             onClick = {
                 navController.navigate(LanguagesDestination)
             }),
         Options(
+            name = stringResource(R.string.notifications),
+            description = stringResource(R.string.notifications_desc),
+            icon = Icons.Outlined.Notifications,
+            onClick = {
+                navController.navigate(NotificationsDestination)
+            }),
+        Options(
             name = stringResource(R.string.player),
             description = stringResource(R.string.player_decsription),
-            icon = R.drawable.outline_play_arrow_24,
+            icon = Icons.Outlined.PlayArrow,
             onClick = {
                 navController.navigate(AppearanceDestination)
             }),
+
         Options(
             name = stringResource(R.string.offline),
             description = stringResource(R.string.offline_description),
-            icon = R.drawable.outline_folder,
+            icon = Icons.Outlined.Folder,
             onClick = {
                 navController.navigate(OfflineSettingsDestination)
             }),
-//        Options(
-//            name = stringResource(R.string.check_update),
-//            description = stringResource(R.string.check_update_description),
-//            icon = R.drawable.outline_update_24,
-//            onClick = {
-//                navController.navigate(UpdateDestination)
-//            }),
+
         Options(
             name = stringResource(R.string.about),
             description = stringResource(R.string.about_description),
-            icon = R.drawable.info_outline,
+            icon = Icons.Outlined.Info,
             onClick = {
                 showSheet = true
             }),
@@ -128,7 +135,7 @@ fun SettingsScreen(navController: NavController) {
                         verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
-                            painter = painterResource(id = it.icon),
+                            it.icon,
                             contentDescription = it.name,
                             modifier = Modifier.size(25.dp)
                         )

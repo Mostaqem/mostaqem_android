@@ -1,7 +1,5 @@
 package com.mostaqem.core.ui.app
 
-import android.content.Intent
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -12,18 +10,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,13 +25,13 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,15 +40,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -64,14 +53,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mostaqem.core.navigation.models.AppearanceDestination
 import com.mostaqem.core.navigation.models.BottomScreens
 import com.mostaqem.core.navigation.models.DonationDestination
+import com.mostaqem.core.navigation.models.DownloadDestination
+import com.mostaqem.core.navigation.models.FavoritesDestination
 import com.mostaqem.core.navigation.models.HomeDestination
 import com.mostaqem.core.navigation.models.LanguagesDestination
+import com.mostaqem.core.navigation.models.LoginDestination
+import com.mostaqem.core.navigation.models.NotificationsDestination
 import com.mostaqem.core.navigation.models.OfflineSettingsDestination
 import com.mostaqem.core.navigation.models.PlayerDestination
 import com.mostaqem.core.navigation.models.ReadingDestination
@@ -79,13 +71,15 @@ import com.mostaqem.core.navigation.models.SettingsDestination
 import com.mostaqem.core.navigation.models.ShareDestination
 import com.mostaqem.core.navigation.models.SurahsDestination
 import com.mostaqem.core.navigation.models.UpdateDestination
-import com.mostaqem.core.network.NetworkConnectivityObserver
-import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.core.ui.controller.ObserveAsEvents
 import com.mostaqem.core.ui.controller.SnackbarController
+import com.mostaqem.features.auth.presentation.LoginScreen
 import com.mostaqem.features.donate.presentation.DonateScreen
+import com.mostaqem.features.download_all.presentation.DownloadAlLScreen
+import com.mostaqem.features.favorites.presentation.FavoritesScreen
 import com.mostaqem.features.history.presentation.HistoryScreen
 import com.mostaqem.features.language.presentation.LanguageScreen
+import com.mostaqem.features.notifications.presentation.NotificationsScreen
 import com.mostaqem.features.offline.presentation.OfflineSettingsScreen
 import com.mostaqem.features.personalization.presentation.AppearanceScreen
 import com.mostaqem.features.player.presentation.PlayerScreen
@@ -128,7 +122,6 @@ fun MostaqemApp() {
         ), label = "bottomBarOffset"
     )
 
-
     ObserveAsEvents(flow = SnackbarController.events, snackbarHostState) { event ->
         scope.launch {
             snackbarHostState.currentSnackbarData?.dismiss()
@@ -142,17 +135,20 @@ fun MostaqemApp() {
         }
     }
     Scaffold(
-        contentWindowInsets = WindowInsets.safeDrawing,
+        contentWindowInsets = WindowInsets.systemBars,
         snackbarHost = {
-        SnackbarHost(snackbarHostState) { data ->
-            Snackbar(
-                snackbarData = data,
-                modifier = Modifier.padding(bottom = if (showBottomBar) 160.dp else 0.dp)
-            )
-        }
-    }) { padding ->
+            SnackbarHost(snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    modifier = Modifier.padding(bottom = if (showBottomBar) 160.dp else 0.dp)
+                )
+            }
+        }) { padding ->
+        val adaptiveInfo = currentWindowAdaptiveInfo()
         NavigationSuiteScaffold(
-            layoutType = if (showBottomBar) NavigationSuiteType.NavigationBar else NavigationSuiteType.None,
+            layoutType = if (showBottomBar) NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
+                adaptiveInfo
+            ) else NavigationSuiteType.None,
             navigationSuiteColors = NavigationSuiteDefaults.colors(
                 navigationBarContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                     3.dp
@@ -243,11 +239,15 @@ fun MostaqemApp() {
                                     animationSpec = tween(durationMillis = 300)
                                 )
                             }) {
+                            composable<LoginDestination> {
+                                LoginScreen()
+                            }
                             composable<HomeDestination> {
                                 HistoryScreen(
                                     playerViewModel = playerViewModel,
                                     navController = navController,
-                                    paddingValues = padding
+                                    paddingValues = padding,
+                                    onHideBottom = { isSearchExpanded = it }
                                 )
                             }
                             composable<SurahsDestination> {
@@ -269,8 +269,7 @@ fun MostaqemApp() {
                                 deepLinks = listOf(
                                     navDeepLink<PlayerDestination>(basePath = "mostaqem://player"),
                                     navDeepLink<PlayerDestination>(basePath = "https://mostaqemapp.online/quran/{surahID}/{recitationID}"),
-
-                                    ),
+                                ),
 
                                 ) {
                                 val surahID = it.arguments?.getString("surahID")?.toInt()
@@ -307,7 +306,6 @@ fun MostaqemApp() {
                                     onHidePlayer = { hidePlayer = true }
                                 )
                             }
-
                             composable<OfflineSettingsDestination> {
                                 OfflineSettingsScreen(navController = navController)
                             }
@@ -316,6 +314,21 @@ fun MostaqemApp() {
                             }
                             composable<LanguagesDestination> {
                                 LanguageScreen(
+                                    navController = navController,
+                                    playerViewModel = playerViewModel
+                                )
+                            }
+                            composable<NotificationsDestination> {
+                                NotificationsScreen(navController = navController)
+                            }
+                            composable<DownloadDestination> {
+                                DownloadAlLScreen(
+                                    navController = navController,
+                                    playerViewModel = playerViewModel
+                                )
+                            }
+                            composable<FavoritesDestination> {
+                                FavoritesScreen(
                                     navController = navController,
                                     playerViewModel = playerViewModel
                                 )

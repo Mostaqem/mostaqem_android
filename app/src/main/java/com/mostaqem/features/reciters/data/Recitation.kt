@@ -1,7 +1,10 @@
 package com.mostaqem.features.reciters.data
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import com.mostaqem.features.reciters.data.reciter.Reciter
+import kotlinx.serialization.Serializable
 
 data class Recitation(
     @SerializedName("data")
@@ -9,6 +12,7 @@ data class Recitation(
     val status: Boolean
 )
 
+@Serializable
 data class RecitationData(
     val id: Int,
     val name: String,

@@ -3,6 +3,8 @@ package com.mostaqem.features.reciters.presentation.recitations
 import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ListItem
@@ -38,7 +40,6 @@ fun RecitationList(
     val currentRecitationID: Int = player.recitationID ?: 0
     viewModel.getRecitations(currentPlayingReciter)
     val recitations by viewModel.recitationState.collectAsState()
-    Log.d("Recitation", "RecitationList: ${recitations}")
     val languageCode =
         LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
 
@@ -53,9 +54,9 @@ fun RecitationList(
             )
         }
         items(recitations) {
-            ListItem(headlineContent = { },
+            ListItem(headlineContent = {},
                 leadingContent = { Text(text = if (isArabic) it.name else it.englishName
-                    ?: it.name) },
+                    ?: it.name, modifier = Modifier.width(width = 200.dp)) },
                 modifier = Modifier.clickable {
                     playerViewModel.changeRecitation(it.id)
                 },

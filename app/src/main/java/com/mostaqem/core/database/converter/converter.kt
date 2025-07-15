@@ -2,6 +2,8 @@ package com.mostaqem.core.database.converter
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.mostaqem.features.reciters.data.RecitationData
 import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.surahs.data.Surah
 
@@ -26,5 +28,20 @@ class Converters {
     @TypeConverter
     fun toReciter(json: String): Reciter {
         return gson.fromJson(json, Reciter::class.java)
+    }
+}
+class RecitationDataConverter {
+    @TypeConverter
+    fun fromRecitationData(recitationData: RecitationData?): String? {
+        return Gson().toJson(recitationData)
+    }
+
+    @TypeConverter
+    fun toRecitationData(recitationDataString: String?): RecitationData? {
+        if (recitationDataString == null) {
+            return null
+        }
+        val type = object : TypeToken<RecitationData>() {}.type
+        return Gson().fromJson(recitationDataString, type)
     }
 }

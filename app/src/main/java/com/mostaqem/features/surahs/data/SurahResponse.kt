@@ -26,7 +26,8 @@ data class Surah(
 
     @SerializedName("verses_count") val versusCount: Int,
 
-    val lastAccessed: Long = System.currentTimeMillis()
+    val lastAccessed: Long = System.currentTimeMillis(),
+
 )
 
 enum class SurahSortBy {
@@ -35,4 +36,4 @@ enum class SurahSortBy {
     REVELATION_PLACE
 }
 
-data class SortItems(val name:String, val value: SurahSortBy)
+data class SortItems(val name: String, val value: SurahSortBy)

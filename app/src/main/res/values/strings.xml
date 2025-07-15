@@ -5,12 +5,12 @@
     <string name="recommended">Recommended</string>
     <string name="heard">Heard recently</string>
     <string name="selected_reciters">Selected reciters</string>
-    <string name="home">Home</string>
+    <string name="history">History</string>
     <string name="surahs">Chapters</string>
     <string name="settings">Settings</string>
     <string name="listen_choose">Your history will appear here</string>
     <string name="search_chapter">Search for a chapter</string>
-    <string name="downloaded">Downloaded</string>
+    <string name="downloads">Downloaded</string>
     <string name="play_next">Play Next</string>
     <string name="add_queue">Add to queue</string>
     <string name="read_chapter">Read chapter</string>
@@ -23,6 +23,9 @@
     <string name="change_color">Change color</string>
     <string name="amiri">Amiri</string>
     <string name="uthmani">Uthmani</string>
+    <string name="all">All</string>
+    <string name="search_reciters_chapters">Search chapters, reciters…</string>
+    <string name="shuffle">Random</string>
 
     <string name="stop_player_language">Changing language while playing will stop what you hear</string>
 
@@ -38,7 +41,7 @@
     <string name="automatically_play_offline">Automatically play downloaded chapter</string>
     <string name="automatically_play_offline_details">When playing the chapter, the downloaded chapter will play instead of using online if it is downloaded</string>
     <string name="storage">Storage</string>
-    <string name="storage_downloads">Downloads space from the device space and you can click to delete</string>
+    <string name="storage_downloads">How much free space from your device left and you can click to delete</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="kilo_byte">Kilobyte</string>
@@ -64,11 +67,11 @@
 
 
     <string name="apperanace">Appearance</string>
-    <string name="default_reciter">Favorite Reciter</string>
+    <string name="default_reciter">Default Reciter</string>
     <string name="change_default_reciter">Change your default reciter, long press to change recitations too</string>
 
     <string name="recitations">Recitations</string>
-    <string name="change_shape">Change surah shape</string>
+    <string name="change_shape">Change image shape</string>
 
     <string name="sleep_timer">Sleep timer</string>
     <string name="stop">Stop</string>
@@ -77,7 +80,7 @@
     <string name="end_of_chapter">End of the chapter</string>
     <string name="start">Start</string>
 
-    <string name="download">download</string>
+    <string name="download">Download</string>
     <string name="share">Share</string>
 
     <string name="sort_by">Sort by</string>
@@ -85,6 +88,41 @@
     <string name="name">Name</string>
     <string name="revelation_place">Revelation place</string>
 
+    <string name="notifications">Notifications</string>
+    <string name="notifications_desc">Enable weekly notifications , friday , etc</string>
+
+    <string name="notification_permission">You need to allow notifications permission to allow mostaqem to send reminders to you</string>
+
+    <string name="friday_reminder">Friday Reminder</string>
+    <string name="friday_reminder_description">Get a weekly reminder to listen to Surah Al-Kahf every Friday</string>
+    <string name="friday_await">Friday Blessings Await</string>
+    <string name="listen_friday">Listen to Surah Al-Kahf and fill your day with light and reward</string>
+
+    <string name="nights_reminder">Surah Al-Mulk Reminder</string>
+    <string name="nights_reminder_description"> Receive a gentle reminder every night to listen to Surah Al-Mulk</string>
+    <string name="nights_await">A Light for Your Night</string>
+    <string name="listen_almulk">Let Surah Al-Mulk protect you tonight — tap to listen</string>
+
+    <string name="downloads_title">Downloads</string>
+    <string name="downloads_description">Keep your favorite recitations offline and listen anytime, anywhere — even without internet</string>
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+    <string name="downloaded">Downloaded</string>
+
+    <string name="favorites">Favorites</string>
+
+    <string name="added_next">Added next in queue</string>
+    <string name="added_queue">Added in queue</string>
+    <string name="downloading_now">Downloading audio</string>
+
+    <string name="no_downloads">No downloads yet</string>
+    <string name="download_all_chapters_question">Download all chapters?</string>
+    <string name="download_all_chapters_description">This will download all chapters from the default reciter and recitations</string>
+
+    <string name="delete_all_downloads_question">Delete all downloads?</string>
+    <string name="delete_all_downloads_description">This will delete everything including downloaded content.</string>
+    <string name="change_reciter">Change reciter</string>
+    <string name="change_recitation">Change recitation</string>
 
 
 

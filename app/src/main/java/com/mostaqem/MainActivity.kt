@@ -1,5 +1,7 @@
 package com.mostaqem
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -13,6 +15,7 @@ import androidx.datastore.dataStore
 import com.mostaqem.core.ui.app.MostaqemApp
 import com.mostaqem.core.ui.theme.MostaqemTheme
 import com.mostaqem.features.language.domain.LanguageManager
+import com.mostaqem.features.notifications.domain.NotificationService
 import com.mostaqem.features.settings.domain.AppSettingsSerializer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
@@ -40,8 +43,8 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun attachBaseContext(newBase: Context?) {
-        val languageTag = getSavedLanguage(newBase!!)
+    override fun attachBaseContext(newBase: Context) {
+        val languageTag = getSavedLanguage(newBase)
         val contextWithLocale = getContextForLanguage(newBase, languageTag)
         super.attachBaseContext(contextWithLocale)
     }
@@ -63,10 +66,7 @@ private fun startCrashReportActivity(context: Context, th: Throwable) {
 }
 
 fun getSavedLanguage(context: Context): String {
-    return runBlocking {
-        LanguageManager(context).getLanguageCode()
-
-    }
+    return LanguageManager(context).getLanguageCode()
 }
 
 fun getContextForLanguage(context: Context, languageTag: String): Context {

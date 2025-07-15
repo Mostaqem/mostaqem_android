@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -21,12 +22,14 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.MediaItem
 import coil.compose.AsyncImage
 import com.mostaqem.R
@@ -35,15 +38,15 @@ import com.mostaqem.features.player.presentation.PlayerViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QueuePlaylist(
-    modifier: Modifier = Modifier, playlists: List<MediaItem>, playerViewModel: PlayerViewModel
+    modifier: Modifier = Modifier, playerViewModel: PlayerViewModel
 ) {
     val player = playerViewModel.playerState.value
-    val lazyListState = rememberLazyListState()
+    val playlist by playerViewModel.currentPlaylist.collectAsStateWithLifecycle()
 
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .statusBarsPadding(), state = lazyListState
+            .statusBarsPadding()
     ) {
         item { CenterAlignedTopAppBar(title = { Text(text = stringResource(R.string.play_next)) }) }
         item {
@@ -81,8 +84,8 @@ fun QueuePlaylist(
 
 
         }
-        Log.d("Playlist", "QueuePlaylist:${playlists.size} ")
-        itemsIndexed(playlists) { index, item ->
+        Log.d("Playlist", "QueuePlaylist:${playlist.size} ")
+        itemsIndexed(playlist) { index, item ->
             val metadata = item.mediaMetadata
             val playingQueue: Boolean =
                 metadata.title.toString() == player.surah?.arabicName && metadata.albumArtist == player.recitationID.toString()
@@ -91,7 +94,7 @@ fun QueuePlaylist(
                 headlineContent = { Text(text = metadata.title.toString()) },
                 leadingContent = {
                     AsyncImage(
-                        model = metadata.artworkUri,
+                        model = "https://img.freepik.com/premium-photo/illustration-mosque-with-crescent-moon-stars-simple-shapes-minimalist-flat-design_217051-15556.jpg",
                         contentDescription = "surah",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -101,7 +104,7 @@ fun QueuePlaylist(
                 },
                 trailingContent = {
 
-                    Icon(Icons.Default.PlayArrow, contentDescription = "")
+                    Icon(Icons.Outlined.PlayArrow, contentDescription = "")
 
                 },
                 modifier = Modifier.clickable {

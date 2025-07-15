@@ -48,6 +48,7 @@ import androidx.graphics.shapes.star
 import androidx.graphics.shapes.toPath
 import coil.compose.AsyncImage
 import com.mostaqem.R
+import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.surahs.data.Surah
 import kotlin.math.max
 import android.graphics.Path as AndroidPath
@@ -57,16 +58,17 @@ fun SurahListItem(
     modifier: Modifier = Modifier,
     surah: Surah,
     isArabic: Boolean,
+    defaultReciterName: String,
     isCurrentSurahPlayed: Boolean,
     onMenu: () -> Unit,
     onClick: () -> Unit,
 ) {
-
+    // TODO("Refactor This")
     ListItem(
         headlineContent = {
             Text(text = if (isArabic) surah.arabicName else surah.complexName)
         },
-        supportingContent = { Text(text = if (isArabic) surah.complexName else surah.arabicName) },
+        supportingContent = { Text(text = defaultReciterName) },
         leadingContent = {
 
             Box(contentAlignment = Alignment.Center) {

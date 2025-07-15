@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.LocaleList
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import com.mostaqem.MainActivity
@@ -31,7 +32,7 @@ class LanguageManager @Inject constructor(val context: Context) {
     fun changeLanguage(languageCode: String) {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val localeManager = context.getSystemService(LocaleManager::class.java)
+            val localeManager = context.getSystemService(LocaleManager::class.java) as LocaleManager
             localeManager.applicationLocales = LocaleList.forLanguageTags(languageCode)
         } else {
             AppCompatDelegate.setApplicationLocales(
@@ -41,7 +42,6 @@ class LanguageManager @Inject constructor(val context: Context) {
             )
             restartApp(context)
         }
-
     }
 
 
@@ -62,10 +62,8 @@ class LanguageManager @Inject constructor(val context: Context) {
 
     fun restartApp(context: Context) {
         val intent = Intent(context, MainActivity::class.java).apply {
-            // Clear all activities and create new task
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            // Optional: Add flags to prevent animation
-//            addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+
         }
 
         context.startActivity(intent)
@@ -77,8 +75,7 @@ class LanguageManager @Inject constructor(val context: Context) {
             context.overridePendingTransition(0, 0)
         }
 
-        // Kill process if needed (not recommended for normal use)
-        // android.os.Process.killProcess(android.os.Process.myPid())
+
     }
 
 

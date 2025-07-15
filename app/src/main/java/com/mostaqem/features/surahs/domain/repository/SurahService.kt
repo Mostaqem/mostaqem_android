@@ -1,6 +1,6 @@
 package com.mostaqem.features.surahs.domain.repository
 
-import com.mostaqem.features.surahs.data.RandomSurahAudio
+import com.mostaqem.features.player.data.RandomSurahAudio
 import com.mostaqem.features.surahs.data.SurahAudio
 import com.mostaqem.features.surahs.data.SurahResponse
 import retrofit2.Response
