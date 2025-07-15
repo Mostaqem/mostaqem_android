@@ -148,7 +148,7 @@ fun HistoryScreen(
                     .padding(PaddingValues(horizontal = 30.dp, vertical = 20.dp))
             ) {
                 IconButton(
-                    shape = IconButtonDefaults.xLargePressedShape,
+                    shape = IconButtonDefaults.extraLargePressedShape,
                     onClick = { navController.navigate(FavoritesDestination) },
                     modifier = Modifier.size(
                         height = 100.dp,
@@ -178,7 +178,7 @@ fun HistoryScreen(
 
                 }
                 IconButton(
-                    shape = IconButtonDefaults.xLargePressedShape,
+                    shape = IconButtonDefaults.extraLargePressedShape,
                     onClick = {
                         playerViewModel.playRandom()
                     },
