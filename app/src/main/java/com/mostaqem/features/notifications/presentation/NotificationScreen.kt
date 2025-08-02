@@ -50,7 +50,6 @@ import com.mostaqem.features.settings.data.AppSettings
 @Composable
 fun NotificationsScreen(modifier: Modifier = Modifier, navController: NavController) {
     val context = LocalContext.current
-
     val viewModel: NotificationViewModel = hiltViewModel()
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         LargeFlexibleTopAppBar(
@@ -68,7 +67,7 @@ fun NotificationsScreen(modifier: Modifier = Modifier, navController: NavControl
             supportingContent = { Text(stringResource(R.string.friday_reminder_description)) },
             isSettingEnabled = isFridayEnabled,
             onToggleSetting = { isEnabled ->
-                viewModel.toggleFriday(isEnabled) // Call your ViewModel's method for daily reminder
+                viewModel.toggleFriday(isEnabled)
             }
         )
         val alMulkEnabled =
@@ -78,7 +77,7 @@ fun NotificationsScreen(modifier: Modifier = Modifier, navController: NavControl
             supportingContent = { Text(stringResource(R.string.nights_reminder_description)) },
             isSettingEnabled = alMulkEnabled,
             onToggleSetting = { isEnabled ->
-                viewModel.toggleNights(isEnabled) // Call your ViewModel's method for daily reminder
+                viewModel.toggleNights(isEnabled)
             }
         )
 

@@ -59,6 +59,7 @@ fun PlayOptions(
     playerViewModel: PlayerViewModel,
     playerSurah: PlayerSurah,
     viewModel: SleepViewModel,
+
     navController: NavController
 ) {
     var isDownloading by remember { mutableStateOf(false) }
@@ -67,8 +68,8 @@ fun PlayOptions(
     val context = LocalContext.current
     var repeatMode by remember { mutableIntStateOf(Player.REPEAT_MODE_OFF) }
     var isShuffle by remember { mutableStateOf(false) }
-    val surahID = playerSurah.surah?.id!!.toInt()
-    val recitationID = playerSurah.recitationID!!.toInt()
+    val surahID = playerSurah.surah?.id
+    val recitationID = playerSurah.recitationID
     val isDownloaded = playerViewModel.isDownloaded(surahID, recitationID)
 
     if (showSleepDialog.value) {
@@ -163,47 +164,53 @@ fun PlayOptions(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.read_chapter)) },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.baseline_menu_book_24),
-                                contentDescription = "read"
-                            )
-                        },
-                        onClick = {
-                            val surahID = playerSurah.surah?.id ?: 0
-                            val surahName = playerSurah.surah?.arabicName
-                            navController.navigate(
-                                ReadingDestination(
-                                    surahID = surahID,
-                                    surahName = surahName.toString()
+                    if (surahID != null) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.read_chapter)) },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(R.drawable.baseline_menu_book_24),
+                                    contentDescription = "read"
                                 )
-                            )
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text(stringResource(R.string.share)) },
-                        leadingIcon = {
-                            Icon(
-                                Icons.Default.Share,
-                                contentDescription = "share"
-                            )
-                        },
-                        onClick = {
-                            val surahID = playerSurah.surah?.id
-                            val recitationID = playerSurah.recitationID
-                            val deepLinkUrl =
-                                "https://mostaqemapp.online/quran/${surahID}/${recitationID}"
-                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, deepLinkUrl)
-                            }
-                            context.startActivity(Intent.createChooser(shareIntent, "Share via"))
+                            },
+                            onClick = {
+                                val surahName = playerSurah.surah.arabicName
+                                expanded = false
 
-                        }
-                    )
+                                navController.navigate(
+                                    ReadingDestination(
+                                        surahID = surahID,
+                                        surahName = surahName.toString()
+                                    )
+                                )
+
+                            }
+                        )
+                    }
+                    if (surahID != null){
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.share)) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Share,
+                                    contentDescription = "share"
+                                )
+                            },
+                            onClick = {
+                                val recitationID = playerSurah.recitationID
+                                val deepLinkUrl =
+                                    "https://mostaqemapp.online/quran/${surahID}/${recitationID}"
+                                val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, deepLinkUrl)
+                                }
+                                expanded = false
+                                context.startActivity(Intent.createChooser(shareIntent, "Share via"))
+
+                            }
+                        )
+                    }
+
                     DropdownMenuItem(
                         text = { Text(stringResource(R.string.change_reciter)) },
                         leadingIcon = {

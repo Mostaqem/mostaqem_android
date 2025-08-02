@@ -60,9 +60,6 @@ fun OfflineSettingsScreen(
     navController: NavController,
     viewModel: OfflineViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val playOption =
-        context.dataStore.data.collectAsState(initial = AppSettings()).value.playDownloaded
     var showDeleteDialog by remember { mutableStateOf(false) }
     var selectedFile: DownloadedAudioEntity? by remember { mutableStateOf(null) }
 
@@ -85,22 +82,6 @@ fun OfflineSettingsScreen(
                 }
             },
         )
-
-
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.automatically_play_offline)) },
-            supportingContent = {
-                Text(stringResource(R.string.automatically_play_offline_details))
-            },
-            trailingContent = {
-                Switch(checked = playOption, thumbContent = {
-                    if (playOption) Icon(
-                        Icons.Default.Check, contentDescription = "check", Modifier.size(15.dp)
-                    )
-                }, onCheckedChange = {
-                    viewModel.changePlayOption(it)
-                })
-            })
 
         ListItem(
             headlineContent = {

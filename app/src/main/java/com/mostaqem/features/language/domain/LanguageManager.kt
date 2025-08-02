@@ -72,13 +72,10 @@ class LanguageManager @Inject constructor(val context: Context) {
         if (context is Activity) {
             context.finish()
             // Optional: Add animation override
-            context.overridePendingTransition(0, 0)
         }
 
 
     }
-
-
 
 
 }

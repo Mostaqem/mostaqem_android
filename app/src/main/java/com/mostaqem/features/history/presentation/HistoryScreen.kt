@@ -154,7 +154,7 @@ fun HistoryScreen(
                         height = 100.dp,
                         width = 200.dp
                     ), colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
                     )
                 ) {
                     Column(
@@ -164,7 +164,7 @@ fun HistoryScreen(
                         Icon(
                             Icons.Default.FavoriteBorder,
                             contentDescription = "favorites",
-                            tint = MaterialTheme.colorScheme.onTertiary,
+                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
                             modifier = Modifier.size(
                                 IconButtonDefaults.mediumIconSize
                             )
@@ -172,7 +172,7 @@ fun HistoryScreen(
                         Text(
                             stringResource(R.string.favorites),
                             style = MaterialTheme.typography.titleMediumEmphasized,
-                            color = MaterialTheme.colorScheme.onTertiary
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                     }
 
@@ -187,7 +187,7 @@ fun HistoryScreen(
                         width = 200.dp
                     ),
                     colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer
                     )
                 ) {
                     Column(
@@ -197,7 +197,7 @@ fun HistoryScreen(
                         Icon(
                             Icons.Outlined.Shuffle,
                             contentDescription = "Shuffle",
-                            tint = MaterialTheme.colorScheme.onPrimary,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier.size(
                                 IconButtonDefaults.mediumIconSize
                             )
@@ -205,7 +205,7 @@ fun HistoryScreen(
                         Text(
                             stringResource(R.string.shuffle),
                             style = MaterialTheme.typography.titleMediumEmphasized,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
 

@@ -65,7 +65,6 @@ class PlayerViewModel @Inject constructor(
     private val personalizationRepository: PersonalizationRepository,
     private val networkObserver: NetworkConnectivityObserver,
     private val languageManager: LanguageManager,
-    private val offlineRepository: OfflineRepository,
     private val manager: OfflineManager
 ) : ViewModel() {
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
@@ -329,8 +328,7 @@ class PlayerViewModel @Inject constructor(
                 val recitationID = defaultRecitationID.value
                 val downloadedMediaItem =
                     playerRepository.getDownloadedMediaItem(id, recitationID)
-                val playDownloaded = offlineRepository.getPlayDownloadedOption().first()
-                if (downloadedMediaItem != null && playDownloaded) {
+                if (downloadedMediaItem != null) {
                     val metadata = playerRepository.getLocalMetadata(downloadedMediaItem)!!
                     previousMediaItems.add(metadata)
                 } else {
@@ -351,8 +349,7 @@ class PlayerViewModel @Inject constructor(
                 val recitationID = personalizationRepository.getDefaultRecitationID().first()
                 val downloadedMediaItem =
                     playerRepository.getDownloadedMediaItem(id, recitationID)
-                val playDownloaded = offlineRepository.getPlayDownloadedOption().first()
-                if (downloadedMediaItem != null && playDownloaded) {
+                if (downloadedMediaItem != null) {
                     val metadata = playerRepository.getLocalMetadata(downloadedMediaItem)!!
                     nextMediaItems.add(metadata)
                 } else {
@@ -387,10 +384,9 @@ class PlayerViewModel @Inject constructor(
 
             val downloadedMediaItem =
                 playerRepository.getDownloadedMediaItem(surahID, recitationID)
-            val playDownloaded = offlineRepository.getPlayDownloadedOption().first()
             isCached = false
 
-            if (downloadedMediaItem != null && playDownloaded) {
+            if (downloadedMediaItem != null ) {
                 val mediaItem = playerRepository.getLocalMetadata(downloadedMediaItem)
                 mediaController?.setMediaItem(mediaItem!!)
                 mediaController?.prepare()
@@ -465,9 +461,8 @@ class PlayerViewModel @Inject constructor(
                     recitationID ?: defaultRecitationID.value
                 val downloadedMediaItem =
                     playerRepository.getDownloadedMediaItem(surahID, recID)
-                val playDownloaded = offlineRepository.getPlayDownloadedOption().first()
 
-                if (downloadedMediaItem != null && playDownloaded) {
+                if (downloadedMediaItem != null) {
                     val mediaItem = playerRepository.getLocalMetadata(downloadedMediaItem)
                     mediaController?.addMediaItem(currentMediaItemIndex + 1, mediaItem!!)
                     SnackbarController.sendEvent(
@@ -530,9 +525,8 @@ class PlayerViewModel @Inject constructor(
                 recitationID ?: defaultRecitationID.value
             val downloadedMediaItem =
                 playerRepository.getDownloadedMediaItem(surahID, recID)
-            val playDownloaded = offlineRepository.getPlayDownloadedOption().first()
 
-            if (downloadedMediaItem != null && playDownloaded) {
+            if (downloadedMediaItem != null) {
                 val mediaItem = playerRepository.getLocalMetadata(downloadedMediaItem)
                 mediaController?.addMediaItem(mediaItem!!)
                 SnackbarController.sendEvent(
@@ -686,7 +680,8 @@ class PlayerViewModel @Inject constructor(
 
     }
 
-    fun isDownloaded(surahID: Int, recitationID: Int): Boolean {
+    fun isDownloaded(surahID: Int?, recitationID: Int?): Boolean {
+        if (surahID == null || recitationID == null ) return false
         val mediaItem = playerRepository.getDownloadedMediaItem(surahID, recitationID)
         return mediaItem != null
     }

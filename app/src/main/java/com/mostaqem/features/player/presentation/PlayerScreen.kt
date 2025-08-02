@@ -110,10 +110,17 @@ fun PlayerScreen(
         navController.popBackStack()
         onBack()
     }
-    LaunchedEffect(Unit) {
-        if (surahId != null && recitationID != null) playerViewModel.fetchMediaUrl(
-            surahId = surahId, recID = recitationID
-        )
+    LaunchedEffect(surahId, key2 = recitationID) {
+        if (surahId != null && recitationID != null) {
+            Log.d("Got SurahID", "PlayerScreen: ${surahId}")
+            playerViewModel.fetchMediaUrl(
+                surahId = surahId, recID = recitationID
+            )
+            val player = playerViewModel.playerState.value
+
+            Log.d("Got SurahID", "Player Surah ID: ${player.surah?.id}")
+
+        }
         onShowBar()
         val isCached = playerViewModel.isCached
         val player = playerViewModel.playerState.value
@@ -205,7 +212,8 @@ fun PlayerScreen(
                                         text = playerSurah.surah!!.arabicName,
                                         fontSize = 30.sp,
                                         color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = MaterialTheme.typography.titleLarge.fontFamily
                                     )
                                     Text(text = playerSurah.reciter.arabicName)
                                 }
@@ -277,7 +285,7 @@ fun PlayerScreen(
                 ) {
                     Column(modifier = Modifier.padding(vertical = 10.dp)) {
                         BoxWithConstraints(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                            val size = if (maxHeight <= 640.dp) 200.dp else 320.dp
+                            val size = if (maxHeight <= 640.dp) 170.dp else 260.dp
                             AsyncImage(
                                 model = playerSurah.surah?.image,
                                 contentDescription = "",
@@ -302,11 +310,15 @@ fun PlayerScreen(
                                         text = it.arabicName,
                                         fontSize = 30.sp,
                                         color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = MaterialTheme.typography.titleLarge.fontFamily
+
                                     )
                                 }
                                 Text(
                                     text = playerSurah.reciter.arabicName,
+                                    fontFamily = MaterialTheme.typography.titleLarge.fontFamily,
+
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                 )
                             }
@@ -327,13 +339,9 @@ fun PlayerScreen(
                                     if (isFavorited) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                     contentDescription = "favorite",
                                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
-
-
-                                    )
+                                )
                             }
                         }
-
-
                         Slider(
                             value = percentage,
                             onValueChange = { playerViewModel.seekToPosition(it) },

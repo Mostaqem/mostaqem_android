@@ -1,4 +1,4 @@
-package com.mostaqem.features.personalization.presentation.shapes
+package com.mostaqem.features.personalization.presentation.components.shapes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mostaqem.features.personalization.presentation.PersonalizationViewModel
@@ -23,16 +24,15 @@ import com.mostaqem.features.player.domain.AppShapes
 fun OptionShape(
     materialShape: AppShapes,
     isSelected: Boolean,
-    personalizationViewModel: PersonalizationViewModel = hiltViewModel(),
+    size: Dp = 100.dp,
 ) {
     Box(contentAlignment = Alignment.Center) {
-        Box(modifier = Modifier
-            .clip(materialShape.shape.toShape())
-            .background(MaterialTheme.colorScheme.primary)
-            .size(100.dp)
-            .clickable {
-                personalizationViewModel.changeShape(materialShape.id)
-            })
+        Box(
+            modifier = Modifier
+                .clip(materialShape.shape.toShape())
+                .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface)
+                .size(size)
+              )
         if (isSelected) Box(
             modifier = Modifier
                 .clip(CircleShape)

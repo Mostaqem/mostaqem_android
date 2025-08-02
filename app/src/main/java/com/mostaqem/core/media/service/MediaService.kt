@@ -163,6 +163,7 @@ class MediaService : MediaSessionService() {
 class CustomNotificationProvider(context: Context) : DefaultMediaNotificationProvider(context) {
 
 
+
     override fun addNotificationActions(
         mediaSession: MediaSession,
         mediaButtons: ImmutableList<CommandButton>,
@@ -188,6 +189,7 @@ class CustomNotificationProvider(context: Context) : DefaultMediaNotificationPro
         }
         return super.addNotificationActions(
             mediaSession,
+
             notificationsButtons,
             builder,
             actionFactory,

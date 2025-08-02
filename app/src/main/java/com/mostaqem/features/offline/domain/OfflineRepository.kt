@@ -16,17 +16,6 @@ class OfflineRepository(
     private val manager: OfflineManager,
 ) {
 
-
-    suspend fun changePlayOption(value: Boolean) {
-        context.dataStore.updateData { settings ->
-            settings.copy(playDownloaded = value)
-        }
-    }
-
-    fun getPlayDownloadedOption(): Flow<Boolean> = context.dataStore.data.map {
-        it.playDownloaded
-    }
-
     private fun getDirectorySize(file: File): Long {
         if (file.isFile) {
             return file.length()
