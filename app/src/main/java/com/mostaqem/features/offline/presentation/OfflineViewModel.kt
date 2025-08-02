@@ -80,12 +80,6 @@ class OfflineViewModel @Inject constructor(
         manager.resumeDownload()
     }
 
-    fun changePlayOption(value: Boolean) {
-        viewModelScope.launch {
-            repository.changePlayOption(value)
-        }
-    }
-
     fun downloadAll() {
         viewModelScope.launch {
             _loading.value = true

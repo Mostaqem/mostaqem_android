@@ -19,11 +19,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -59,16 +61,12 @@ fun PlayButtons(
 
         )
     )
-
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-
         Row(
             horizontalArrangement = Arrangement.Center,
             modifier = modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-
-
             Icon(
                 painter = painterResource(id = R.drawable.outline_skip_next_24),
                 contentDescription = "previous",
@@ -101,7 +99,6 @@ fun PlayButtons(
                 painter = painterResource(id = R.drawable.outline_skip_previous_24),
                 contentDescription = "next",
                 tint = MaterialTheme.colorScheme.onTertiary,
-
                 modifier = Modifier
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.tertiary)
@@ -110,8 +107,6 @@ fun PlayButtons(
                         if (isArabic) playerViewModel.seekNext() else playerViewModel.seekPrevious()
 
                     })
-
-
         }
     }
 }

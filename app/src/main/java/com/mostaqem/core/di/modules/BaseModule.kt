@@ -50,7 +50,7 @@ object BaseModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://209.38.241.76/api/v1/")
+            .baseUrl("https://api.mostaqemapp.online/api/v1/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient.newBuilder()
                 .build())

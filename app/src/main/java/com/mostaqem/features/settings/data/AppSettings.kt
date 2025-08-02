@@ -17,7 +17,6 @@ data class AppSettings(
         image = "https://upload.wikimedia.org/wikipedia/ar/7/73/%D8%B5%D9%88%D8%B1%D8%A9_%D8%B4%D8%AE%D8%B5%D9%8A%D8%A9_%D8%B9%D8%A8%D8%AF_%D8%A7%D9%84%D8%A8%D8%A7%D8%B3%D8%B7_%D8%B9%D8%A8%D8%AF_%D8%A7%D9%84%D8%B5%D9%85%D8%AF.png",
     ),
     val recitationID: Int = 178,
-    val playDownloaded: Boolean = true,
     val fridayNotificationEnabled: Boolean = true,
     val almulkNotificationEnabled: Boolean = true,
 

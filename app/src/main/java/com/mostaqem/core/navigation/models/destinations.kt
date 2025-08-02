@@ -53,3 +53,8 @@ object DownloadDestination
 @Serializable
 object FavoritesDestination
 
+@Serializable
+object ShapesDestination
+
+@Serializable
+object BoardingDestination

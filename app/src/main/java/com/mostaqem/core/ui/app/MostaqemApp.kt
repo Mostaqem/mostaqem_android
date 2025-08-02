@@ -56,6 +56,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mostaqem.core.navigation.models.AppearanceDestination
+import com.mostaqem.core.navigation.models.BoardingDestination
 import com.mostaqem.core.navigation.models.BottomScreens
 import com.mostaqem.core.navigation.models.DonationDestination
 import com.mostaqem.core.navigation.models.DownloadDestination
@@ -68,12 +69,14 @@ import com.mostaqem.core.navigation.models.OfflineSettingsDestination
 import com.mostaqem.core.navigation.models.PlayerDestination
 import com.mostaqem.core.navigation.models.ReadingDestination
 import com.mostaqem.core.navigation.models.SettingsDestination
+import com.mostaqem.core.navigation.models.ShapesDestination
 import com.mostaqem.core.navigation.models.ShareDestination
 import com.mostaqem.core.navigation.models.SurahsDestination
 import com.mostaqem.core.navigation.models.UpdateDestination
 import com.mostaqem.core.ui.controller.ObserveAsEvents
 import com.mostaqem.core.ui.controller.SnackbarController
 import com.mostaqem.features.auth.presentation.LoginScreen
+import com.mostaqem.features.boarding.presentation.BoardingScreen
 import com.mostaqem.features.donate.presentation.DonateScreen
 import com.mostaqem.features.download_all.presentation.DownloadAlLScreen
 import com.mostaqem.features.favorites.presentation.FavoritesScreen
@@ -82,6 +85,8 @@ import com.mostaqem.features.language.presentation.LanguageScreen
 import com.mostaqem.features.notifications.presentation.NotificationsScreen
 import com.mostaqem.features.offline.presentation.OfflineSettingsScreen
 import com.mostaqem.features.personalization.presentation.AppearanceScreen
+import com.mostaqem.features.personalization.presentation.PersonalizationViewModel
+import com.mostaqem.features.personalization.presentation.ShapesScreen
 import com.mostaqem.features.player.presentation.PlayerScreen
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.player.presentation.components.PlayerBarModalSheet
@@ -154,7 +159,6 @@ fun MostaqemApp() {
                     3.dp
                 )
             ),
-            modifier = Modifier.fillMaxSize(),
             navigationSuiteItems = {
                 items.forEach { screen ->
                     val isSelected: Boolean = screen.route::class.qualifiedName == currentRoute
@@ -202,6 +206,7 @@ fun MostaqemApp() {
             val playerViewModel: PlayerViewModel = hiltViewModel()
             val shareViewModel: ShareViewModel = viewModel()
             val sleepViewModel: SleepViewModel = hiltViewModel<SleepViewModel>()
+            val personalizationViewModel: PersonalizationViewModel = hiltViewModel()
 
             SharedTransitionLayout {
                 Box(
@@ -214,7 +219,7 @@ fun MostaqemApp() {
                     ) {
                         NavHost(
                             navController = navController,
-                            startDestination = HomeDestination,
+                            startDestination = BoardingDestination,
                             enterTransition = {
                                 fadeIn(animationSpec = tween(durationMillis = 300)) + scaleIn(
                                     initialScale = 0.9f,
@@ -332,6 +337,15 @@ fun MostaqemApp() {
                                     navController = navController,
                                     playerViewModel = playerViewModel
                                 )
+                            }
+                            composable<ShapesDestination> {
+                                ShapesScreen(
+                                    navController=navController,
+                                    viewModel = personalizationViewModel
+                                )
+                            }
+                            composable<BoardingDestination> {
+                                BoardingScreen()
                             }
                         }
                     }

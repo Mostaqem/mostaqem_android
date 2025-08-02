@@ -52,7 +52,7 @@ import com.mostaqem.R
 import com.mostaqem.features.download_all.presentation.components.DownloadingScreen
 import com.mostaqem.features.offline.presentation.OfflineViewModel
 import com.mostaqem.features.personalization.presentation.components.LargeTopBar
-import com.mostaqem.features.personalization.presentation.reciter.ReciterOption
+import com.mostaqem.features.personalization.presentation.components.reciter.ReciterOption
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import kotlinx.coroutines.launch
 

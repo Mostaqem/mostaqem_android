@@ -38,12 +38,14 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.toShape
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -74,8 +76,7 @@ import com.mostaqem.R
 import com.mostaqem.dataStore
 import com.mostaqem.features.player.data.BottomSheetType
 import com.mostaqem.features.player.data.toAudioData
-import com.mostaqem.features.player.domain.CustomShape
-import com.mostaqem.features.player.domain.MaterialShapes
+import com.mostaqem.features.player.domain.AppShapes
 import com.mostaqem.features.player.domain.Octagon
 import com.mostaqem.features.player.presentation.components.PlayButtons
 import com.mostaqem.features.player.presentation.components.PlayOptions
@@ -109,10 +110,17 @@ fun PlayerScreen(
         navController.popBackStack()
         onBack()
     }
-    LaunchedEffect(Unit) {
-        if (surahId != null && recitationID != null) playerViewModel.fetchMediaUrl(
-            surahId = surahId, recID = recitationID
-        )
+    LaunchedEffect(surahId, key2 = recitationID) {
+        if (surahId != null && recitationID != null) {
+            Log.d("Got SurahID", "PlayerScreen: ${surahId}")
+            playerViewModel.fetchMediaUrl(
+                surahId = surahId, recID = recitationID
+            )
+            val player = playerViewModel.playerState.value
+
+            Log.d("Got SurahID", "Player Surah ID: ${player.surah?.id}")
+
+        }
         onShowBar()
         val isCached = playerViewModel.isCached
         val player = playerViewModel.playerState.value
@@ -184,8 +192,8 @@ fun PlayerScreen(
                                         animatedVisibilityScope = animatedVisibilityScope
                                     )
                                     .clip(
-                                        MaterialShapes.entries.find { it.id == customShapeData.shapeID }?.shape
-                                            ?: MaterialShapes.RECT.shape
+                                        AppShapes.entries.find { it.id == customShapeData.shapeID }?.shape?.toShape()
+                                            ?: AppShapes.RECT.shape.toShape()
                                     )
                                     .size(300.dp)
                             )
@@ -204,7 +212,8 @@ fun PlayerScreen(
                                         text = playerSurah.surah!!.arabicName,
                                         fontSize = 30.sp,
                                         color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = MaterialTheme.typography.titleLarge.fontFamily
                                     )
                                     Text(text = playerSurah.reciter.arabicName)
                                 }
@@ -276,7 +285,7 @@ fun PlayerScreen(
                 ) {
                     Column(modifier = Modifier.padding(vertical = 10.dp)) {
                         BoxWithConstraints(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                            val size = if (maxHeight <= 640.dp) 200.dp else 320.dp
+                            val size = if (maxHeight <= 640.dp) 170.dp else 260.dp
                             AsyncImage(
                                 model = playerSurah.surah?.image,
                                 contentDescription = "",
@@ -284,8 +293,8 @@ fun PlayerScreen(
                                 modifier = Modifier
                                     .padding(16.dp)
                                     .clip(
-                                        MaterialShapes.entries.find { it.id == customShapeData.shapeID }?.shape
-                                            ?: MaterialShapes.RECT.shape
+                                        AppShapes.entries.find { it.id == customShapeData.shapeID }?.shape?.toShape()
+                                            ?: AppShapes.RECT.shape.toShape()
                                     )
                                     .size(size)
                             )
@@ -301,11 +310,15 @@ fun PlayerScreen(
                                         text = it.arabicName,
                                         fontSize = 30.sp,
                                         color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily = MaterialTheme.typography.titleLarge.fontFamily
+
                                     )
                                 }
                                 Text(
                                     text = playerSurah.reciter.arabicName,
+                                    fontFamily = MaterialTheme.typography.titleLarge.fontFamily,
+
                                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                 )
                             }
@@ -326,13 +339,9 @@ fun PlayerScreen(
                                     if (isFavorited) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                                     contentDescription = "favorite",
                                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
-
-
-                                    )
+                                )
                             }
                         }
-
-
                         Slider(
                             value = percentage,
                             onValueChange = { playerViewModel.seekToPosition(it) },
@@ -391,6 +400,7 @@ fun PlayerScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview(
     showBackground = true,
     locale = "ar",
@@ -410,18 +420,11 @@ private fun Shape() {
 
             Box(
                 modifier = Modifier
-                    .clip(
-                        CustomShape(
-                            shapeType = Octagon()
-                        )
-                    )
+                    .clip(MaterialShapes.Cookie12Sided.toShape())
                     .background(Color.Green)
                     .size(200.dp)
                     .aspectRatio(1f)
             )
-
-
-
 
             Column(modifier = Modifier.padding(vertical = 45.dp, horizontal = 25.dp)) {
                 Text(

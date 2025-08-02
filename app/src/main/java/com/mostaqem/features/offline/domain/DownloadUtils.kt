@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Environment
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.database.DatabaseProvider
-import androidx.media3.database.ExoDatabaseProvider
 import androidx.media3.database.StandaloneDatabaseProvider
 import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.datasource.cache.Cache

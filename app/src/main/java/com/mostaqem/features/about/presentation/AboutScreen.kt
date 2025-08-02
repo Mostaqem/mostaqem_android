@@ -2,7 +2,6 @@ package com.mostaqem.features.about.presentation
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,14 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,21 +34,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.mostaqem.BuildConfig
 import com.mostaqem.R
 import com.mostaqem.core.navigation.models.DonationDestination
 import com.mostaqem.core.ui.controller.SnackbarController
 import com.mostaqem.core.ui.controller.SnackbarEvents
-import com.mostaqem.features.player.domain.CustomShape
 import com.mostaqem.features.player.domain.Octagon
 import kotlinx.coroutines.launch
-import androidx.core.net.toUri
-import com.mostaqem.core.ui.theme.kufamFontFamily
-import com.mostaqem.core.ui.theme.productFontFamily
-import com.mostaqem.dataStore
-import com.mostaqem.features.settings.data.AppSettings
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun AboutScreen(
     modifier: Modifier = Modifier,
@@ -66,7 +62,7 @@ fun AboutScreen(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .clip(CustomShape(Octagon()))
+                .clip(MaterialShapes.Cookie12Sided.toShape())
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .size(100.dp)
         ) {

@@ -25,11 +25,14 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,7 +55,6 @@ import com.mostaqem.R
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.core.ui.theme.productFontFamily
 import com.mostaqem.dataStore
-import com.mostaqem.features.player.domain.CustomShape
 import com.mostaqem.features.player.domain.Octagon
 import com.mostaqem.features.settings.data.AppSettings
 
@@ -101,6 +103,7 @@ fun UpdateScreen(
 
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun UpdateButton(
     viewModel: UpdateViewModel, context: Context, fontFamily: FontFamily
@@ -166,7 +169,7 @@ private fun UpdateButton(
             ElevatedButton(
                 modifier = Modifier
                     .rotate(rotationAngle)
-                    .clip(CustomShape(Octagon()))
+                    .clip(MaterialShapes.Cookie12Sided.toShape())
                     .size(200.dp),
                 onClick = {
                     if (!isDownloading) {

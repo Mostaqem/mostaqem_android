@@ -1,4 +1,4 @@
-package com.mostaqem.features.personalization.presentation.reciter
+package com.mostaqem.features.personalization.presentation.components.reciter
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
