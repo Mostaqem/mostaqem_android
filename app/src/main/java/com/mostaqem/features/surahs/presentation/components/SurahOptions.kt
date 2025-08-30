@@ -49,7 +49,7 @@ fun SurahOptions(
 
     ) {
     val defaultReciter by playerViewModel.defaultReciterState.collectAsState()
-    val defaultRecitationID by playerViewModel.defaultRecitationID.collectAsState()
+    val defaultRecitation by playerViewModel.defaultRecitation.collectAsState()
     val isArabic = MaterialTheme.typography.titleLarge.fontFamily == kufamFontFamily
     LazyColumn {
         item {
@@ -98,7 +98,7 @@ fun SurahOptions(
                     playerViewModel.addNext(
                         selectedSurahID,
                         selectedReciterID ?: defaultReciter.id,
-                        selectedRecitation ?: defaultRecitationID,
+                        selectedRecitation ?: defaultRecitation.id,
                         context
                     )
 
@@ -121,7 +121,7 @@ fun SurahOptions(
                     playerViewModel.addMediaItem(
                         selectedSurahID,
                         selectedReciterID ?: defaultReciter.id,
-                        selectedRecitation ?: defaultRecitationID,
+                        selectedRecitation ?: defaultRecitation.id,
                         context
                     )
                     onDismiss()

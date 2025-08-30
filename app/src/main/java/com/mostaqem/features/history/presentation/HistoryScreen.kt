@@ -6,10 +6,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -43,6 +46,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
+import com.materialkolor.ktx.harmonize
+import com.materialkolor.ktx.harmonizeWithPrimary
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
 import com.mostaqem.core.navigation.models.FavoritesDestination
@@ -71,7 +76,6 @@ fun HistoryScreen(
     surahViewModel: SurahsViewModel = hiltViewModel(),
     reciterViewModel: ReciterViewModel = hiltViewModel(),
     navController: NavController,
-    paddingValues: PaddingValues,
     onHideBottom: (Boolean) -> Unit,
 ) {
     val languageCode =
@@ -85,6 +89,7 @@ fun HistoryScreen(
     val defaultReciterName = if (isArabic) defaultReciter.arabicName else defaultReciter.englishName
     val context = LocalContext.current
     Scaffold(
+
         topBar = {
             AdvancedSearch(
                 onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
@@ -154,7 +159,7 @@ fun HistoryScreen(
                         height = 100.dp,
                         width = 200.dp
                     ), colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.harmonize(Color.Red)
                     )
                 ) {
                     Column(
@@ -164,7 +169,7 @@ fun HistoryScreen(
                         Icon(
                             Icons.Default.FavoriteBorder,
                             contentDescription = "favorites",
-                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer.harmonize(Color.Red),
                             modifier = Modifier.size(
                                 IconButtonDefaults.mediumIconSize
                             )
@@ -172,7 +177,7 @@ fun HistoryScreen(
                         Text(
                             stringResource(R.string.favorites),
                             style = MaterialTheme.typography.titleMediumEmphasized,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.harmonize(Color.Red)
                         )
                     }
 
@@ -235,7 +240,7 @@ fun HistoryScreen(
                     )
                     reciterViewModel.onReciterEvents(
                         ReciterEvents.AddReciter(
-                            audio.recitation.reciter
+                            audio.recitation.reciter!!
                         )
                     )
                 }

@@ -60,8 +60,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,10 +71,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mostaqem.R
 import com.mostaqem.core.navigation.models.ShareDestination
+import com.mostaqem.core.ui.theme.chapterCaliFontFamily
 import com.mostaqem.core.ui.theme.uthmaniFont
 import com.mostaqem.dataStore
-import com.mostaqem.features.reading.data.models.Verse
 import com.mostaqem.features.offline.domain.toArabicNumbers
+import com.mostaqem.features.reading.data.models.Verse
 import com.mostaqem.features.settings.data.AppSettings
 import com.mostaqem.features.share.ShareViewModel
 import kotlinx.coroutines.launch
@@ -139,7 +142,7 @@ fun ReadingScreen(
                         if (selectedVerses.isNotEmpty()) {
                             IconButton(onClick = {
                                 sharingViewModel.updateVerses(selectedVerses)
-                                navController.navigate(ShareDestination(chapterName = chapterName))
+                                navController.navigate(ShareDestination(chapterNumber = chapterNumber))
                             }) {
                                 Icon(Icons.Default.Share, contentDescription = "share")
                             }
@@ -149,7 +152,7 @@ fun ReadingScreen(
                 )
             } else {
                 CenterAlignedTopAppBar(
-                    title = { Text(chapterName, fontFamily = uthmaniFont) },
+                    title = { },
 
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
@@ -166,8 +169,6 @@ fun ReadingScreen(
                 )
             }
         }
-
-        Spacer(Modifier.height(20.dp))
 
         if (showBottomSheet.value) {
             ModalBottomSheet(onDismissRequest = {
@@ -191,7 +192,9 @@ fun ReadingScreen(
 
             }
         }
+
         var layoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+
         HorizontalPager(
             state = pagerState,
             pageSpacing = 10.dp,
@@ -207,17 +210,44 @@ fun ReadingScreen(
                     .padding(bottom = 100.dp)
             ) {
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     if (page == 0) {
-                        Image(
-                            painter = painterResource(if (chapterNumber != 9) R.drawable.basmallah else R.drawable.a3ooz),
-                            contentDescription = "basmallah",
-                            modifier = Modifier.width(250.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                        )
+                        Box(contentAlignment = Alignment.Center, ) {
+                            Box(contentAlignment = Alignment.BottomEnd) {
+                                Text(
+                                    text = "118",
+                                    fontFamily = chapterCaliFontFamily,
+                                    fontSize = 93.sp,
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.fillMaxWidth().height(150.dp)
+                                )
+                                Text(
+                                    text = if (chapterNumber != 9) "115" else "116",
+                                    fontFamily = chapterCaliFontFamily,
+                                    fontSize = 80.sp,
+                                    textAlign = TextAlign.Center,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                            Text(
+                                text = chapterNumber.toString(),
+                                fontFamily = chapterCaliFontFamily,
+                                fontSize = 30.sp,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.W500,
+                                modifier = Modifier.height(90.dp)
+                            )
+
+
+
+                        }
+
                     }
+
 
                     val annotatedString = buildAnnotatedString {
                         pageVerses.forEach { verse ->
@@ -225,21 +255,20 @@ fun ReadingScreen(
                             val isSelected = selectedVerses.contains(verse)
                             withStyle(
                                 style = SpanStyle(
-                                    background = if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Unspecified
+                                    background = if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Unspecified,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             ) {
                                 append(verse.text)
                             }
-
                             withStyle(
                                 style = SpanStyle(
                                     background = if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.Unspecified,
-                                    color = MaterialTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.secondary,
                                 )
                             ) {
                                 append(" ${displayVerseNumber(verse.verse)} ")
                             }
-
                             val end = length
                             addStringAnnotation(
                                 tag = verse.verse.toArabicNumbers(),
@@ -250,7 +279,6 @@ fun ReadingScreen(
                         }
                     }
                     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-
                         Text(
                             text = annotatedString,
                             textAlign = TextAlign.Justify,
@@ -266,71 +294,20 @@ fun ReadingScreen(
                                         onTap = { offset ->
                                             layoutResult?.let { layout ->
                                                 val position = layout.getOffsetForPosition(offset)
-                                                val clickedAnnotation = annotatedString
+                                                annotatedString
                                                     .getStringAnnotations(position, position)
-                                                    .firstOrNull()
-
-                                                clickedAnnotation?.let { annotation ->
-                                                    // Find the corresponding verse from pageVerses
-                                                    val clickedVerse = pageVerses.find {
-                                                        it.verse.toArabicNumbers() == annotation.tag
-                                                    }
-
-                                                    clickedVerse?.let { verse ->
-                                                        when {
-                                                            // If verse is already selected, deselect it
-                                                            selectedVerses.contains(verse) -> {
-                                                                selectedVerses -= verse
-                                                            }
-                                                            // If we haven't reached max selection limit
-                                                            selectedVerses.size < 7 -> {
-                                                                if (selectedVerses.isEmpty()) {
-                                                                    // First selection
-                                                                    selectedVerses += verse
-                                                                } else {
-                                                                    // Find the range
-                                                                    val minSelectedVerse =
-                                                                        selectedVerses.minOf { it.verse }
-                                                                    val maxSelectedVerse =
-                                                                        selectedVerses.maxOf { it.verse }
-
-                                                                    when {
-                                                                        // Clicking before the current selection
-                                                                        verse.verse < minSelectedVerse -> {
-                                                                            val versesToAdd =
-                                                                                pageVerses
-                                                                                    .filter {
-                                                                                        it.verse in verse.verse..minSelectedVerse &&
-                                                                                                !selectedVerses.contains(
-                                                                                                    it
-                                                                                                )
-                                                                                    }
-                                                                                    .take(7 - selectedVerses.size)
-                                                                            selectedVerses += versesToAdd
-                                                                        }
-                                                                        // Clicking after the current selection
-                                                                        verse.verse > maxSelectedVerse -> {
-                                                                            val versesToAdd =
-                                                                                pageVerses
-                                                                                    .filter {
-                                                                                        it.verse in maxSelectedVerse..verse.verse &&
-                                                                                                !selectedVerses.contains(
-                                                                                                    it
-                                                                                                )
-                                                                                    }
-                                                                                    .take(7 - selectedVerses.size)
-                                                                            selectedVerses += versesToAdd
-                                                                        }
-
-                                                                        else -> {
-                                                                            selectedVerses += verse
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
+                                                    .firstOrNull().let { annotation ->
+                                                        val verse = Verse(
+                                                            text = annotation!!.item,
+                                                            verse = annotation.tag.toInt(),
+                                                            chapter = chapterNumber
+                                                        )
+                                                        if (selectedVerses.contains(verse)) {
+                                                            selectedVerses -= verse
+                                                        } else {
+                                                            selectedVerses += verse
                                                         }
                                                     }
-                                                }
                                             }
                                         }, onLongPress = { offset ->
                                             layoutResult?.let { layout ->
@@ -352,73 +329,67 @@ fun ReadingScreen(
                                 }
                         )
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = if (pagerState.currentPage == 0) Arrangement.End  else Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth(),
-
-
-                            ) {
-                            AnimatedVisibility(
-                                visible = pagerState.currentPage != 0,
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-
-
-                            ) {
-                                IconButton(
-
-                                    onClick = {
-                                        scope.launch {
-                                            pagerState.animateScrollToPage(
-                                                pagerState.currentPage - 1,
-                                                animationSpec = tween(300)
-                                            )
-                                        }
-
-                                    }) {
-                                    Icon(
-                                        Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = "back",
-
-                                        )
-                                }
-
-                            }
-                            AnimatedVisibility(
-                                visible = pagerState.currentPage != pagerState.pageCount - 1,
-                                modifier = Modifier
-                                    .padding(horizontal = 16.dp)
-
-                            ) {
-                                IconButton(
-
-                                    onClick = {
-                                        scope.launch {
-                                            pagerState.animateScrollToPage(
-                                                pagerState.currentPage + 1,
-                                                animationSpec = tween(300)
-                                            )
-                                        }
-
-                                    }) {
-                                    Icon(
-                                        Icons.AutoMirrored.Filled.ArrowForward,
-                                        contentDescription = "forward",
-
-                                        )
-                                }
-
-
-                            }
-                        }
-
-
                     }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = if (pagerState.currentPage == 0) Arrangement.End else Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        AnimatedVisibility(
+                            visible = pagerState.currentPage != 0,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(
+                                            pagerState.currentPage - 1,
+                                            animationSpec = tween(300)
+                                        )
+                                    }
+                                }) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "back",
+
+                                    )
+                            }
+
+                        }
+                        AnimatedVisibility(
+                            visible = pagerState.currentPage != pagerState.pageCount - 1,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+
+                        ) {
+                            IconButton(
+
+                                onClick = {
+                                    scope.launch {
+                                        pagerState.animateScrollToPage(
+                                            pagerState.currentPage + 1,
+                                            animationSpec = tween(300)
+                                        )
+                                    }
+
+                                }) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = "forward",
+
+                                    )
+                            }
+
+
+                        }
+                    }
+
                 }
             }
         }
     }
+
 }
 
 
@@ -429,4 +400,45 @@ fun displayVerseNumber(verse: Int): String {
     }
     return verse.toArabicNumbers()
 
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LSD() {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier) {
+        val chapterNumber = 18
+        Box(contentAlignment = Alignment.Center, ) {
+            Box(contentAlignment = Alignment.BottomEnd) {
+                Text(
+                    text = "118",
+                    fontFamily = chapterCaliFontFamily,
+                    fontSize = 93.sp,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth().height(150.dp)
+                )
+                Text(
+                    text = if (chapterNumber != 9) "115" else "116",
+                    fontFamily = chapterCaliFontFamily,
+                    fontSize = 80.sp,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            Text(
+                text = chapterNumber.toString(),
+                fontFamily = chapterCaliFontFamily,
+                fontSize = 35.sp,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                fontWeight = FontWeight.W500,
+                modifier = Modifier.height(93.dp)
+            )
+
+
+
+        }
+
+    }
 }

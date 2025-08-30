@@ -9,6 +9,8 @@ val kufamFontFamily = FontFamily(Font(R.font.kufam))
 val uthmaniFont = FontFamily(Font(R.font.uthmani))
 val productFontFamily = FontFamily(Font(R.font.product))
 
+val chapterCaliFontFamily = FontFamily(Font(R.font.surah_names))
+
 // Set of Material typography styles to start with
 
 

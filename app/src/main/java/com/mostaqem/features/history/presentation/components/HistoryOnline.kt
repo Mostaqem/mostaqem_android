@@ -77,8 +77,6 @@ fun HistoryOnline(
     val randomSurahs = state.randomSurah
 
     Column {
-
-
         if (!loading) {
             Text(
                 stringResource(R.string.recommended),
@@ -166,7 +164,7 @@ fun HistoryOnline(
 
 
                                     Text(
-                                        if (!isArabic) audio.recitation.reciter.englishName else audio.recitation.reciter.arabicName,
+                                        (if (!isArabic) audio.recitation.reciter?.englishName else audio.recitation.reciter?.arabicName).toString(),
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                         fontSize = 14.sp,

@@ -37,7 +37,6 @@ class OfflineViewModel @Inject constructor(
 
     val downloadUiState: StateFlow<Map<String, DownloadUiState>> = manager.downloadState
 
-
     private val _isPaused: MutableStateFlow<Boolean> = MutableStateFlow(value = false)
     val isPaused: StateFlow<Boolean> = _isPaused
 

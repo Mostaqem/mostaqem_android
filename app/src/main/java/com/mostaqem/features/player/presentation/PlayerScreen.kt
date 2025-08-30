@@ -28,16 +28,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -74,15 +71,13 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.mostaqem.R
 import com.mostaqem.dataStore
+import com.mostaqem.features.offline.domain.toArabicNumbers
 import com.mostaqem.features.player.data.BottomSheetType
-import com.mostaqem.features.player.data.toAudioData
 import com.mostaqem.features.player.domain.AppShapes
-import com.mostaqem.features.player.domain.Octagon
 import com.mostaqem.features.player.presentation.components.PlayButtons
 import com.mostaqem.features.player.presentation.components.PlayOptions
 import com.mostaqem.features.player.presentation.components.QueuePlaylist
 import com.mostaqem.features.player.presentation.components.sleep.SleepViewModel
-import com.mostaqem.features.reciters.presentation.ReciterScreen
 import com.mostaqem.features.reciters.presentation.ReciterViewModel
 import com.mostaqem.features.reciters.presentation.recitations.RecitationList
 import com.mostaqem.features.settings.data.AppSettings
@@ -145,11 +140,6 @@ fun PlayerScreen(
     val languageCode =
         LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
     val isArabic = languageCode == "ar"
-    val isFavorited by playerViewModel.isFavorited.collectAsState()
-    val uniqueID = "${playerSurah.surah?.id}-${playerSurah.recitationID}"
-    val downloadState by playerViewModel.downloadState.collectAsState()
-    val downloadProgress = downloadState[uniqueID]
-    Log.d("Download", "PlayerScreen: ${downloadProgress?.progress}")
     Box(
         modifier = Modifier
             .navigationBarsPadding()
@@ -220,6 +210,7 @@ fun PlayerScreen(
 
                                 Slider(
                                     value = percentage,
+
                                     onValueChange = { playerViewModel.seekToPosition(it) },
                                     modifier = Modifier.padding(horizontal = 20.dp)
                                 )
@@ -250,15 +241,15 @@ fun PlayerScreen(
                                                 playerViewModel = playerViewModel
                                             )
 
-                                            BottomSheetType.Reciters -> ReciterScreen(
-                                                playerViewModel = playerViewModel
-                                            )
-
                                             BottomSheetType.None -> Box {}
                                             BottomSheetType.Recitations -> RecitationList(
                                                 viewModel = reciterViewModel,
+                                                selectedReciter = playerSurah.reciter,
+
                                                 playerViewModel = playerViewModel
-                                            )
+                                            ) {
+                                                playerViewModel.changeRecitation(it.id)
+                                            }
                                         }
                                     }
                                 }
@@ -283,35 +274,42 @@ fun PlayerScreen(
 
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
+
                     Column(modifier = Modifier.padding(vertical = 10.dp)) {
                         BoxWithConstraints(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                            val size = if (maxHeight <= 640.dp) 170.dp else 260.dp
-                            AsyncImage(
-                                model = playerSurah.surah?.image,
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop,
+                            val size = if (maxHeight <= 640.dp) 170.dp else 300
+                                .dp
+                            Box(
+
                                 modifier = Modifier
                                     .padding(16.dp)
                                     .clip(
                                         AppShapes.entries.find { it.id == customShapeData.shapeID }?.shape?.toShape()
                                             ?: AppShapes.RECT.shape.toShape()
                                     )
+                                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
                                     .size(size)
                             )
                         }
                         Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp),
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                            Column(modifier = Modifier.padding(20.dp)) {
+                            Column(
+                                modifier = Modifier
+                                    .padding(20.dp)
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                            ) {
                                 playerSurah.surah?.let {
                                     Text(
                                         text = it.arabicName,
                                         fontSize = 30.sp,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold,
-                                        fontFamily = MaterialTheme.typography.titleLarge.fontFamily
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        style = MaterialTheme.typography.headlineLarge
 
                                     )
                                 }
@@ -319,31 +317,16 @@ fun PlayerScreen(
                                     text = playerSurah.reciter.arabicName,
                                     fontFamily = MaterialTheme.typography.titleLarge.fontFamily,
 
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
-                            IconButton(
-                                onClick = {
-                                    playerViewModel.favorite(playerSurah.toAudioData())
-                                },
-                                shape = IconButtonDefaults.largeRoundShape,
-                                colors = IconButtonDefaults.iconButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
-                                        alpha = 0.3f
-                                    )
-                                ),
-                                modifier = Modifier
-                                    .padding(horizontal = 20.dp)
-                            ) {
-                                Icon(
-                                    if (isFavorited) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                    contentDescription = "favorite",
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                )
-                            }
+
                         }
+
+
                         Slider(
                             value = percentage,
+
                             onValueChange = { playerViewModel.seekToPosition(it) },
                             modifier = Modifier.padding(horizontal = 20.dp)
                         )
@@ -355,15 +338,20 @@ fun PlayerScreen(
                         ) {
                             Text(
                                 text = progress.toHoursMinutesSeconds(),
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.titleMediumEmphasized
+
                             )
                             Text(
                                 text = duration.toHoursMinutesSeconds(),
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                style = MaterialTheme.typography.titleMediumEmphasized
+
                             )
                         }
                         Spacer(modifier = Modifier.height(18.dp))
                         PlayButtons(playerViewModel = playerViewModel, isArabic = isArabic)
+
                     }
                     if (bottomSheetType != BottomSheetType.None) {
                         ModalBottomSheet(
@@ -377,14 +365,13 @@ fun PlayerScreen(
                                     playerViewModel = playerViewModel
                                 )
 
-                                BottomSheetType.Reciters -> ReciterScreen(
-                                    playerViewModel = playerViewModel
-                                )
-
                                 BottomSheetType.None -> Box {}
                                 BottomSheetType.Recitations -> RecitationList(
+                                    selectedReciter = playerSurah.reciter,
                                     viewModel = reciterViewModel, playerViewModel = playerViewModel
-                                )
+                                ) {
+                                    playerViewModel.changeRecitation(it.id)
+                                }
                             }
                         }
                     }

@@ -1,8 +1,8 @@
 [versions]
 agp = "8.11.0"
 coilCompose = "2.7.0"
-coilSvg = "3.2.0"
-constraintlayoutCompose = "1.1.0"
+coilSvg = "3.3.0"
+constraintlayoutCompose = "1.1.1"
 datastore = "1.1.7"
 glanceAppwidget = "1.1.1"
 graphicsShapes = "1.0.1"
@@ -16,9 +16,10 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 lifecycleRuntimeKtx = "2.9.0"
 activityCompose = "1.10.1"
-composeBom = "2025.06.01"
+composeBom = "2025.08.00"
 lifecycleViewmodelCompose = "2.9.0"
 material3WindowSizeClass = "1.3.2"
+materialKolor = "3.0.1"
 mockitoCore = "5.18.0"
 mockitoKotlin = "6.0.0"
 pagingCompose = "3.3.6"
@@ -30,7 +31,7 @@ serialization = "1.9.0"
 uiautomator = "2.3.0"
 baselineprofile = "1.3.4"
 profileinstaller = "1.4.1"
-media3 = "1.7.1"
+media3 = "1.8.0"
 loggingInterceptor = "5.0.0"
 hiltCommon = "1.2.0"
 workRuntimeKtx = "2.10.2"
@@ -62,6 +63,7 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "room" }
 androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
+material-kolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
 material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }

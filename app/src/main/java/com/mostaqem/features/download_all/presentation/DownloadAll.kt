@@ -52,7 +52,6 @@ import com.mostaqem.R
 import com.mostaqem.features.download_all.presentation.components.DownloadingScreen
 import com.mostaqem.features.offline.presentation.OfflineViewModel
 import com.mostaqem.features.personalization.presentation.components.LargeTopBar
-import com.mostaqem.features.personalization.presentation.components.reciter.ReciterOption
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import kotlinx.coroutines.launch
 
@@ -152,9 +151,6 @@ fun DownloadAlLScreen(
                     stringResource(R.string.download_all_chapters_description),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Spacer(Modifier.height(10.dp))
-                ReciterOption(playerViewModel = playerViewModel)
-
                 Spacer(Modifier.height(20.dp))
 
                 FlowRow(
@@ -267,7 +263,10 @@ fun DownloadAlLScreen(
                         contentDescription = "sd",
                         Modifier.size(200.dp)
                     )
-                    Text(stringResource(R.string.no_downloads), style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        stringResource(R.string.no_downloads),
+                        style = MaterialTheme.typography.titleLarge
+                    )
 
                 }
 

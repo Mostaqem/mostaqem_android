@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,7 +20,6 @@ import com.mostaqem.R
 import com.mostaqem.core.network.NetworkConnectivityObserver
 import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.core.network.models.Result
-import com.mostaqem.core.ui.controller.SnackbarAction
 import com.mostaqem.core.ui.controller.SnackbarController
 import com.mostaqem.core.ui.controller.SnackbarEvents
 import com.mostaqem.features.favorites.data.FavoritedAudio
@@ -29,7 +27,6 @@ import com.mostaqem.features.favorites.data.toMediaItem
 import com.mostaqem.features.language.domain.LanguageManager
 import com.mostaqem.features.offline.data.DownloadUiState
 import com.mostaqem.features.offline.domain.OfflineManager
-import com.mostaqem.features.offline.domain.OfflineRepository
 import com.mostaqem.features.personalization.domain.PersonalizationRepository
 import com.mostaqem.features.player.data.BottomSheetType
 import com.mostaqem.features.player.data.PlayerSurah
@@ -65,7 +62,6 @@ class PlayerViewModel @Inject constructor(
     private val personalizationRepository: PersonalizationRepository,
     private val networkObserver: NetworkConnectivityObserver,
     private val languageManager: LanguageManager,
-    private val manager: OfflineManager
 ) : ViewModel() {
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         exception.printStackTrace()
@@ -85,11 +81,17 @@ class PlayerViewModel @Inject constructor(
             initialValue = defaultReciter
         )
 
-    val defaultRecitationID: StateFlow<Int> = personalizationRepository.getDefaultRecitationID()
+    val defaultRecitation: StateFlow<RecitationData> = personalizationRepository.getDefaultRecitation()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
-            initialValue = 176
+            initialValue = RecitationData(
+                id = 178,
+                reciter = defaultReciter,
+                reciterID = defaultReciter.id,
+                name = "حفص عن عاصم",
+                englishName = "Hafs An Assem"
+            )
         )
 
     val playerState = mutableStateOf(PlayerSurah(reciter = defaultReciter))
@@ -115,8 +117,6 @@ class PlayerViewModel @Inject constructor(
     private val _duration = MutableStateFlow(0L)
     val duration: StateFlow<Long> = _duration
     var isCached = false
-
-    val downloadState: StateFlow<Map<String, DownloadUiState>> = manager.downloadState
 
     private val _isFavorited = MutableStateFlow(false)
     val isFavorited: StateFlow<Boolean> = _isFavorited
@@ -299,10 +299,10 @@ class PlayerViewModel @Inject constructor(
         val isDefaultEnglish = languageManager.getLanguageCode() == "en"
         val surahName = if (isDefaultEnglish) data.surah.complexName else data.surah.arabicName
         val reciterName =
-            if (isDefaultEnglish) data.recitation.reciter.englishName else data.recitation.reciter.arabicName
+            if (isDefaultEnglish) data.recitation.reciter?.englishName else data.recitation.reciter?.arabicName
         val metadata: MediaMetadata =
             MediaMetadata.Builder().setTitle(surahName)
-                .setAlbumTitle(data.recitation.reciter.id.toString())
+                .setAlbumTitle(data.recitation.reciter?.id.toString())
                 .setAlbumArtist(data.recitation.id.toString()).setArtist(reciterName)
                 .setArtworkUri(data.surah.image.toUri()).build()
         return MediaItem.Builder().setUri(data.url.toUri()).setMediaMetadata(metadata)
@@ -325,7 +325,7 @@ class PlayerViewModel @Inject constructor(
 
         val previousJobs = previousChapters.map { id ->
             viewModelScope.async(errorHandler) {
-                val recitationID = defaultRecitationID.value
+                val recitationID = defaultRecitation.value.id
                 val downloadedMediaItem =
                     playerRepository.getDownloadedMediaItem(id, recitationID)
                 if (downloadedMediaItem != null) {
@@ -346,7 +346,7 @@ class PlayerViewModel @Inject constructor(
 
         val nextJobs = nextChapters.map { id ->
             viewModelScope.async(errorHandler) {
-                val recitationID = personalizationRepository.getDefaultRecitationID().first()
+                val recitationID = personalizationRepository.getDefaultRecitation().first().id
                 val downloadedMediaItem =
                     playerRepository.getDownloadedMediaItem(id, recitationID)
                 if (downloadedMediaItem != null) {
@@ -380,7 +380,7 @@ class PlayerViewModel @Inject constructor(
         val surahID: Int = surahId ?: playerState.value.surah!!.id
         val reciterID: Int = reciterId ?: defaultReciter.id
         viewModelScope.launch {
-            val recitationID = recID ?: defaultRecitationID.value
+            val recitationID = recID ?:  defaultRecitation.value.id
 
             val downloadedMediaItem =
                 playerRepository.getDownloadedMediaItem(surahID, recitationID)
@@ -416,7 +416,7 @@ class PlayerViewModel @Inject constructor(
         mediaController?.play()
         isCached = false
         viewModelScope.launch {
-            getQueueUrls(data.surah!!.id, data.recitation.reciter.id)
+            getQueueUrls(data.surah.id, data.recitation.reciter!!.id)
         }
     }
 
@@ -458,7 +458,7 @@ class PlayerViewModel @Inject constructor(
         if (currentMediaItemIndex != null) {
             viewModelScope.launch {
                 val recID: Int =
-                    recitationID ?: defaultRecitationID.value
+                    recitationID ?:  defaultRecitation.value.id
                 val downloadedMediaItem =
                     playerRepository.getDownloadedMediaItem(surahID, recID)
 
@@ -522,7 +522,7 @@ class PlayerViewModel @Inject constructor(
         val reID: Int = reciterID ?: defaultReciter.id
         viewModelScope.launch {
             val recID: Int =
-                recitationID ?: defaultRecitationID.value
+                recitationID ?: defaultRecitation.value.id
             val downloadedMediaItem =
                 playerRepository.getDownloadedMediaItem(surahID, recID)
 

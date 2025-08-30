@@ -54,7 +54,7 @@ class SurahRepositoryImpl(
 
     ): Result<List<AudioData>, DataError.Network> {
         val defaultReciter = personalizationRepository.getDefaultReciter().first()
-        val defaultRecitationID = personalizationRepository.getDefaultRecitationID().first()
+        val defaultRecitationID = personalizationRepository.getDefaultRecitation().first().id
         return coroutineScope {
             val deferredResults = (1..114).map { surahId ->
                 async {

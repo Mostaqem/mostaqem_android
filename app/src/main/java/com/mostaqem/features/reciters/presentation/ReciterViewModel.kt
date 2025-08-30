@@ -42,6 +42,8 @@ class ReciterViewModel @Inject constructor(
         MutableStateFlow(value = false)
     val loading: StateFlow<Boolean> = _loading
 
+    val showDefaultOption = mutableStateOf(false)
+
 
     init {
         viewModelScope.launch(errorHandler) {
@@ -69,15 +71,6 @@ class ReciterViewModel @Inject constructor(
                     dao.deleteReciter(event.reciter)
                 }
             }
-        }
-    }
-
-    fun onSearchReciters(query: String?) {
-        viewModelScope.launch(errorHandler) {
-            repository.getRemoteReciters(query).distinctUntilChanged().cachedIn(viewModelScope)
-                .collect {
-                    _reciterState.value = it
-                }
         }
     }
 

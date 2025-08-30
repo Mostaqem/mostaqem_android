@@ -9,16 +9,20 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOne
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Shuffle
+import androidx.compose.material.icons.outlined.Bedtime
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,6 +47,7 @@ import androidx.navigation.NavController
 import com.mostaqem.R
 import com.mostaqem.core.navigation.models.DownloadDestination
 import com.mostaqem.core.navigation.models.ReadingDestination
+import com.mostaqem.core.navigation.models.ReciterDestination
 import com.mostaqem.features.player.data.BottomSheetType
 import com.mostaqem.features.player.data.PlayerSurah
 import com.mostaqem.features.player.data.toAudioData
@@ -94,27 +99,10 @@ fun PlayOptions(
                 Icon(
                     painter = painterResource(id = R.drawable.outline_playlist_play_24),
                     contentDescription = "playlist",
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
-            Spacer(modifier = Modifier.width(15.dp))
 
-            if (remainingTime == 0L) {
-                IconButton(onClick = {
-                    showSleepDialog.value = true
-                }) {
-                    Icon(
-                        painter = painterResource(R.drawable.bedtime),
-                        contentDescription = "sleep_timer",
-
-                        )
-                }
-            } else {
-                TextButton(onClick = {
-                    showSleepDialog.value = true
-                }) {
-                    Text(remainingTime.toMinSec())
-                }
-            }
             Spacer(modifier = Modifier.width(15.dp))
 
             IconButton(onClick = {
@@ -150,6 +138,24 @@ fun PlayOptions(
                     tint = if (!isShuffle) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.primary,
                 )
             }
+            Spacer(modifier = Modifier.width(15.dp))
+
+            val isFavorited by playerViewModel.isFavorited.collectAsState()
+
+            IconButton(
+                onClick = {
+                    playerViewModel.favorite(playerSurah.toAudioData())
+                },
+                shape = IconButtonDefaults.largeRoundShape,
+
+
+            ) {
+                Icon(
+                    if (isFavorited) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = "favorite",
+                    tint = if (!isFavorited) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.primary,
+                )
+            }
 
             Spacer(modifier = Modifier.width(15.dp))
             Box {
@@ -157,7 +163,8 @@ fun PlayOptions(
                 IconButton(onClick = { expanded = !expanded }) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_more_horiz_24),
-                        contentDescription = "menu"
+                        contentDescription = "menu",
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
                 DropdownMenu(
@@ -219,7 +226,7 @@ fun PlayOptions(
                             )
                         },
                         onClick = {
-                            playerViewModel.showBottomSheet(BottomSheetType.Reciters)
+                            navController.navigate(ReciterDestination)
                             expanded = false
 
                         }
@@ -234,6 +241,20 @@ fun PlayOptions(
                         },
                         onClick = {
                             playerViewModel.showBottomSheet(BottomSheetType.Recitations)
+                            expanded = false
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Timer") },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Bedtime,
+                                contentDescription = "sleep_timer",
+
+                                )
+                        },
+                        onClick = {
+                            showSleepDialog.value = true
                             expanded = false
                         }
                     )

@@ -30,7 +30,6 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -55,7 +54,6 @@ import com.mostaqem.core.ui.controller.SnackbarEvents
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.core.ui.theme.productFontFamily
 import com.mostaqem.dataStore
-import com.mostaqem.features.player.domain.Octagon
 import com.mostaqem.features.settings.data.AppSettings
 import kotlinx.coroutines.launch
 

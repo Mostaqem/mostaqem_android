@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LoadingIndicator
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SearchBar
@@ -54,6 +55,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.graphics.shapes.RoundedPolygon
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
@@ -167,7 +169,7 @@ fun SurahsScreen(
 
                             selectedSurahID = selectedSurahID,
                             context = context
-                            ) {
+                        ) {
                             isOptionsShown = false
                         }
                     }
@@ -247,6 +249,7 @@ fun SurahsScreen(
                             val currentPlayedSurah: Surah? = player.surah
                             val isCurrentSurahPlayed: Boolean =
                                 currentPlayedSurah != null && (currentPlayedSurah.arabicName == surahs[index]?.complexName || currentPlayedSurah.arabicName == surahs[index]?.arabicName)
+
                             if (surahs[index] != null) {
                                 SurahListItem(
                                     surah = surahs[index]!!,

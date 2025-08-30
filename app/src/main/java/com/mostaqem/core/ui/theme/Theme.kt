@@ -48,7 +48,6 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun MostaqemTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
@@ -90,6 +89,7 @@ fun MostaqemTheme(
     MaterialExpressiveTheme(
         colorScheme = colorScheme,
         typography = typography,
-        content = content
+        content = content,
+
     )
 }

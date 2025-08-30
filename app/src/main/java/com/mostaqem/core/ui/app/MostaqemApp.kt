@@ -3,13 +3,13 @@ package com.mostaqem.core.ui.app
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,11 +27,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +55,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.mostaqem.core.navigation.models.AppearanceDestination
-import com.mostaqem.core.navigation.models.BoardingDestination
 import com.mostaqem.core.navigation.models.BottomScreens
 import com.mostaqem.core.navigation.models.DonationDestination
 import com.mostaqem.core.navigation.models.DownloadDestination
@@ -68,6 +66,8 @@ import com.mostaqem.core.navigation.models.NotificationsDestination
 import com.mostaqem.core.navigation.models.OfflineSettingsDestination
 import com.mostaqem.core.navigation.models.PlayerDestination
 import com.mostaqem.core.navigation.models.ReadingDestination
+import com.mostaqem.core.navigation.models.ReciterDestination
+import com.mostaqem.core.navigation.models.SearchDestination
 import com.mostaqem.core.navigation.models.SettingsDestination
 import com.mostaqem.core.navigation.models.ShapesDestination
 import com.mostaqem.core.navigation.models.ShareDestination
@@ -76,7 +76,6 @@ import com.mostaqem.core.navigation.models.UpdateDestination
 import com.mostaqem.core.ui.controller.ObserveAsEvents
 import com.mostaqem.core.ui.controller.SnackbarController
 import com.mostaqem.features.auth.presentation.LoginScreen
-import com.mostaqem.features.boarding.presentation.BoardingScreen
 import com.mostaqem.features.donate.presentation.DonateScreen
 import com.mostaqem.features.download_all.presentation.DownloadAlLScreen
 import com.mostaqem.features.favorites.presentation.FavoritesScreen
@@ -92,6 +91,9 @@ import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.player.presentation.components.PlayerBarModalSheet
 import com.mostaqem.features.player.presentation.components.sleep.SleepViewModel
 import com.mostaqem.features.reading.presentation.ReadingScreen
+import com.mostaqem.features.reciters.presentation.ReciterScreen
+import com.mostaqem.features.reciters.presentation.ReciterViewModel
+import com.mostaqem.features.search.presentation.SearchScreen
 import com.mostaqem.features.settings.presentation.SettingsScreen
 import com.mostaqem.features.share.ShareScreen
 import com.mostaqem.features.share.ShareViewModel
@@ -99,7 +101,7 @@ import com.mostaqem.features.surahs.presentation.SurahsScreen
 import com.mostaqem.features.update.presentation.UpdateScreen
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MostaqemApp() {
     val items = listOf(
@@ -118,13 +120,13 @@ fun MostaqemApp() {
     val showBottomBar =
         !isSearchExpanded && items.any { it.route::class.qualifiedName == currentRoute }
     val bottomBarHeight = 56.dp
-    var hidePlayer by rememberSaveable {
-        mutableStateOf(false)
-    }
+    val hidePlayerDestination = listOf(PlayerDestination, ShareDestination, ReciterDestination)
+    val hidePlayer =
+        hidePlayerDestination.all{ currentRoute != it::class.qualifiedName}
+
     val bottomBarOffset by animateFloatAsState(
-        targetValue = if (showBottomBar) 0f else 1.4f, animationSpec = tween(
-            durationMillis = 300, easing = FastOutSlowInEasing
-        ), label = "bottomBarOffset"
+        animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec(),
+        targetValue = if (showBottomBar) 0f else 1.4f, label = "bottomBarOffset"
     )
 
     ObserveAsEvents(flow = SnackbarController.events, snackbarHostState) { event ->
@@ -154,11 +156,7 @@ fun MostaqemApp() {
             layoutType = if (showBottomBar) NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
                 adaptiveInfo
             ) else NavigationSuiteType.None,
-            navigationSuiteColors = NavigationSuiteDefaults.colors(
-                navigationBarContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
-                    3.dp
-                )
-            ),
+
             navigationSuiteItems = {
                 items.forEach { screen ->
                     val isSelected: Boolean = screen.route::class.qualifiedName == currentRoute
@@ -207,7 +205,7 @@ fun MostaqemApp() {
             val shareViewModel: ShareViewModel = viewModel()
             val sleepViewModel: SleepViewModel = hiltViewModel<SleepViewModel>()
             val personalizationViewModel: PersonalizationViewModel = hiltViewModel()
-
+            val reciterViewModel: ReciterViewModel = hiltViewModel()
             SharedTransitionLayout {
                 Box(
                     contentAlignment = Alignment.BottomCenter,
@@ -219,7 +217,7 @@ fun MostaqemApp() {
                     ) {
                         NavHost(
                             navController = navController,
-                            startDestination = BoardingDestination,
+                            startDestination = HomeDestination,
                             enterTransition = {
                                 fadeIn(animationSpec = tween(durationMillis = 300)) + scaleIn(
                                     initialScale = 0.9f,
@@ -251,7 +249,6 @@ fun MostaqemApp() {
                                 HistoryScreen(
                                     playerViewModel = playerViewModel,
                                     navController = navController,
-                                    paddingValues = padding,
                                     onHideBottom = { isSearchExpanded = it }
                                 )
                             }
@@ -287,8 +284,8 @@ fun MostaqemApp() {
                                     navController = navController,
                                     surahId = surahID,
                                     recitationID = recitationID,
-                                    onBack = { hidePlayer = false },
-                                    onShowBar = { hidePlayer = true }
+                                    onBack = { },
+                                    onShowBar = { }
                                 )
                             }
                             composable<ReadingDestination> {
@@ -305,10 +302,8 @@ fun MostaqemApp() {
                                 ShareScreen(
                                     shareViewModel = shareViewModel,
                                     navController = navController,
-                                    chapterName = args.chapterName,
+                                    chapterNumber = args.chapterNumber.toString(),
                                     playerViewModel = playerViewModel,
-                                    onShowPlayer = { hidePlayer = false },
-                                    onHidePlayer = { hidePlayer = true }
                                 )
                             }
                             composable<OfflineSettingsDestination> {
@@ -340,30 +335,37 @@ fun MostaqemApp() {
                             }
                             composable<ShapesDestination> {
                                 ShapesScreen(
-                                    navController=navController,
+                                    navController = navController,
                                     viewModel = personalizationViewModel
                                 )
                             }
-                            composable<BoardingDestination> {
-                                BoardingScreen()
+                            composable<ReciterDestination> {
+                                ReciterScreen(
+                                    playerViewModel = playerViewModel,
+                                    navController = navController,
+                                    viewModel = reciterViewModel,
+                                    personViewModel = personalizationViewModel
+                                )
+                            }
+                            composable<SearchDestination> {
+                                SearchScreen(
+                                    playerViewModel = playerViewModel,
+                                    navController = navController,
+                                    reciterViewModel = reciterViewModel,
+                                    personViewModel = personalizationViewModel
+                                )
                             }
                         }
                     }
 
-                    val surah = playerViewModel.playerState.value.surah
-                    if (surah != null) {
-                        AnimatedVisibility(visible = !hidePlayer) {
-                            PlayerBarModalSheet(
-                                playerViewModel = playerViewModel,
-                                navController = navController,
-                                sharedTransitionScope = this@SharedTransitionLayout,
-                                animatedVisibilityScope = this
-                            ) {
-                                hidePlayer = true
-                            }
-                        }
-
+                    if (hidePlayer) {
+                        PlayerBarModalSheet(
+                            playerViewModel = playerViewModel,
+                            navController = navController,
+                        )
                     }
+
+
                 }
             }
 
