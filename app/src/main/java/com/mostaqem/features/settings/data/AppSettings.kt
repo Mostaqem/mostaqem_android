@@ -1,6 +1,8 @@
 package com.mostaqem.features.settings.data
 
 import com.mostaqem.features.language.domain.AppLanguages
+import com.mostaqem.features.reciters.data.Recitation
+import com.mostaqem.features.reciters.data.RecitationData
 import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.surahs.data.SurahSortBy
 import kotlinx.serialization.Serializable
@@ -16,7 +18,13 @@ data class AppSettings(
         englishName = "AbdulBaset AbdulSamad",
         image = "https://upload.wikimedia.org/wikipedia/ar/7/73/%D8%B5%D9%88%D8%B1%D8%A9_%D8%B4%D8%AE%D8%B5%D9%8A%D8%A9_%D8%B9%D8%A8%D8%AF_%D8%A7%D9%84%D8%A8%D8%A7%D8%B3%D8%B7_%D8%B9%D8%A8%D8%AF_%D8%A7%D9%84%D8%B5%D9%85%D8%AF.png",
     ),
-    val recitationID: Int = 178,
+    val recitation: RecitationData = RecitationData(
+        id = 178,
+        reciter = reciterSaved,
+        reciterID = reciterSaved.id,
+        name = "حفص عن عاصم",
+        englishName = "Hafs An Assem"
+    ),
     val fridayNotificationEnabled: Boolean = true,
     val almulkNotificationEnabled: Boolean = true,
 

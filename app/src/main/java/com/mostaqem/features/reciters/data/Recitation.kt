@@ -20,5 +20,5 @@ data class RecitationData(
     val englishName: String?,
     @SerializedName("reciter_id")
     val reciterID: Int,
-    val reciter: Reciter
+    val reciter: Reciter?
 )

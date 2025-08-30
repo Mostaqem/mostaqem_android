@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mostaqem.dataStore
 import com.mostaqem.features.personalization.domain.PersonalizationRepository
+import com.mostaqem.features.reciters.data.RecitationData
 import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.settings.data.AppSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +22,6 @@ class PersonalizationViewModel @Inject constructor(
     private val repository: PersonalizationRepository
 ) : ViewModel() {
 
-
     val userSettings: StateFlow<AppSettings> =
         repository.appSettings.stateIn(
             scope = viewModelScope,
@@ -35,9 +35,9 @@ class PersonalizationViewModel @Inject constructor(
         }
     }
 
-    fun changeRecitationID(id: Int) {
+    fun changeRecitationID(data: RecitationData) {
         viewModelScope.launch {
-            repository.changeRecitationID(id)
+            repository.changeRecitationID(data)
         }
     }
 

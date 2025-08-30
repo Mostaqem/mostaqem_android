@@ -86,11 +86,11 @@ class OfflineManager
                                 surahID = audio.surah.id.toString(),
                                 size = download.bytesDownloaded,
                                 title = audio.surah.arabicName,
-                                reciter = audio.recitation.reciter.arabicName,
+                                reciter = audio.recitation.reciter?.arabicName ?: "",
                                 recitationID = audio.recitationID.toString(),
                                 remoteUrl = audio.url,
                                 id = download.request.id,
-                                reciterID = audio.recitation.reciter.id.toString()
+                                reciterID = audio.recitation.reciter?.id.toString()
                             )
                             downloadedAudioDao.saveDownloadedAudio(entity)
 

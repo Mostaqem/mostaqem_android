@@ -9,6 +9,9 @@ object LoginDestination
 object HomeDestination
 
 @Serializable
+object ReciterDestination
+
+@Serializable
 object SettingsDestination
 
 @Serializable
@@ -44,7 +47,7 @@ object DonationDestination
 
 @Serializable
 data class ShareDestination(
-    val chapterName: String
+    val chapterNumber: Int
 )
 
 @Serializable
@@ -57,4 +60,4 @@ object FavoritesDestination
 object ShapesDestination
 
 @Serializable
-object BoardingDestination
+object SearchDestination

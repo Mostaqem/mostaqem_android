@@ -16,8 +16,8 @@ android {
         applicationId = "com.mostaqem"
         minSdk = 26
         targetSdk = 36
-        versionCode = 12
-        versionName = "1.4.1"
+        versionCode = 13
+        versionName = "1.5.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -103,6 +103,7 @@ dependencies {
     implementation(libs.androidx.material3.window.size.class1)
     implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.material3.adaptive.navigation.suite)
+    implementation(libs.material.kolor)
 
     // Room
     ksp(libs.androidx.room.compiler)

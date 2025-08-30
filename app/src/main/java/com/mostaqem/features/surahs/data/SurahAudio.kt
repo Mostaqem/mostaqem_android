@@ -27,8 +27,8 @@ data class AudioData(
 fun AudioData.toFavoritedAudio(): FavoritedAudio {
     return FavoritedAudio(
         surahID = this.surah.id.toString(),
-        reciter = this.recitation.reciter.arabicName,
-        reciterID = this.recitation.reciter.id.toString(),
+        reciter = this.recitation.reciter?.arabicName ?: "",
+        reciterID = this.recitation.reciter?.id.toString(),
         surahName = this.surah.arabicName,
         recitationID = this.recitationID.toString(),
         remoteUrl = this.url,

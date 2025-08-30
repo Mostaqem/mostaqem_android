@@ -123,7 +123,7 @@
     <string name="delete_all_downloads_description">This will delete everything including downloaded content.</string>
     <string name="change_reciter">Change reciter</string>
     <string name="change_recitation">Change recitation</string>
-
+    <string name="shortcut">Shuffle</string>
 
 
 </resources>

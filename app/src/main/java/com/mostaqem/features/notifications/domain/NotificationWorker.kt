@@ -37,10 +37,10 @@ class FridayWorker @AssistedInject constructor(
                 return Result.failure()
             }
         }
-        val recitationId =
-            context.dataStore.data.map { it.recitationID }.first()
+        val recitation =
+            context.dataStore.data.map { it.recitation }.first()
         service.showReminderNotification(
-            defaultRecitationID = recitationId,
+            defaultRecitationID = recitation.id,
             details = context.getString(R.string.listen_friday),
             chapterNumber = 18,
             heading = context.getString(R.string.friday_await)
@@ -73,10 +73,10 @@ class NightsWorker @AssistedInject constructor(
                 return Result.failure()
             }
         }
-        val recitationId =
-            context.dataStore.data.map { it.recitationID }.first()
+        val recitation =
+            context.dataStore.data.map { it.recitation }.first()
         service.showReminderNotification(
-            defaultRecitationID = recitationId,
+            defaultRecitationID = recitation.id,
             details = context.getString(R.string.nights_await),
             chapterNumber = 67,
             heading = context.getString(R.string.listen_almulk)

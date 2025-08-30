@@ -1,11 +1,10 @@
 package com.mostaqem.features.player.presentation.components
 
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,37 +19,29 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.mostaqem.features.player.domain.AppShapes
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PlayerBar(
     modifier: Modifier = Modifier,
-    image: Any,
     playerIcon: Int,
     onPlayPause: () -> Unit,
     surahName: String,
     reciterName: String,
     progress: Float,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope
 ) {
-
     Box(
         contentAlignment = Alignment.BottomEnd,
         modifier = modifier
@@ -63,34 +54,33 @@ fun PlayerBar(
                 .padding(15.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                with(sharedTransitionScope) {
-                    AsyncImage(
-                        model = image,
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
+                    Box(
+                        contentAlignment = Alignment.Center,
                         modifier = Modifier
-                            .sharedElement(
-                                rememberSharedContentState(key = "image"),
-                                animatedVisibilityScope = animatedVisibilityScope
-                            )
                             .size(50.dp)
-                            .clip(
-                                AppShapes.RECT.shape.toShape()
-                            )
-                    )
-                }
+                            .clip(MaterialShapes.Square.toShape())
+                            .background(MaterialTheme.colorScheme.primary)
+                    ){
+                        Box(
+                            modifier = Modifier
+                                .size(25.dp)
+                                .clip(MaterialShapes.Flower.toShape())
+                                .background(MaterialTheme.colorScheme.onPrimary)
+                        )
+                    }
+
                 Spacer(modifier = Modifier.width(10.dp))
                 Column(verticalArrangement = Arrangement.Center) {
                     Text(
                         text = surahName,
                         fontWeight = FontWeight.W600,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 15.sp)
+                        color = MaterialTheme.colorScheme.surfaceTint,
+                        style = MaterialTheme.typography.titleMediumEmphasized
                     )
                     Text(
                         text = reciterName,
                         color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
             }
@@ -111,8 +101,10 @@ fun PlayerBar(
         )
         LinearProgressIndicator(
             progress = { progressAnimation },
-            trackColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp),
+            trackColor = MaterialTheme.colorScheme.surfaceContainer,
+
             modifier = Modifier
+                .padding(horizontal = 10.dp)
                 .fillMaxWidth()
                 .height(1.dp)
         )

@@ -1,9 +1,12 @@
 package com.mostaqem.features.personalization.domain
 
 import android.content.Context
+import android.util.Log
 import com.mostaqem.dataStore
 import com.mostaqem.features.language.data.Language
 import com.mostaqem.features.language.domain.AppLanguages
+import com.mostaqem.features.reciters.data.Recitation
+import com.mostaqem.features.reciters.data.RecitationData
 import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.reciters.domain.ReciterRepository
 import com.mostaqem.features.settings.data.AppSettings
@@ -31,12 +34,9 @@ class PersonalizationRepository @Inject constructor(
         context.dataStore.updateData {
             it.copy(reciterSaved = reciter)
         }
-        val defaultReciter = getDefaultReciter().first()
         val firstRecitation =
-            reciterRepository.getRemoteRecitations(defaultReciter.id).response.first {
-                it.name.contains("حفص عن عاصم")
-            }
-        changeRecitationID(firstRecitation.id)
+            reciterRepository.getRemoteRecitations(reciter.id).response.first().copy(reciter = reciter)
+        changeRecitationID(recitationData = firstRecitation)
     }
 
 
@@ -46,14 +46,14 @@ class PersonalizationRepository @Inject constructor(
         }
     }
 
-    suspend fun changeRecitationID(id: Int) {
+    suspend fun changeRecitationID(recitationData: RecitationData) {
         context.dataStore.updateData { settings ->
-            settings.copy(recitationID = id)
+            settings.copy(recitation = recitationData)
         }
     }
 
-    fun getDefaultRecitationID(): Flow<Int> = context.dataStore.data.map {
-        it.recitationID
+    fun getDefaultRecitation(): Flow<RecitationData> = context.dataStore.data.map {
+        it.recitation
     }
 
     suspend fun changeLanguageDatastore(language: AppLanguages) {

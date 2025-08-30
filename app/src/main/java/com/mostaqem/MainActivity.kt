@@ -1,5 +1,6 @@
 package com.mostaqem
 
+import android.app.ComponentCaller
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -11,11 +12,14 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.datastore.dataStore
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.mostaqem.core.ui.app.MostaqemApp
 import com.mostaqem.core.ui.theme.MostaqemTheme
 import com.mostaqem.features.language.domain.LanguageManager
 import com.mostaqem.features.notifications.domain.NotificationService
+import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.settings.domain.AppSettingsSerializer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
@@ -29,6 +33,7 @@ val Context.dataStore by dataStore(
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
@@ -48,7 +53,6 @@ class MainActivity : ComponentActivity() {
         val contextWithLocale = getContextForLanguage(newBase, languageTag)
         super.attachBaseContext(contextWithLocale)
     }
-
 
 }
 
@@ -81,4 +85,3 @@ fun getContextForLanguage(context: Context, languageTag: String): Context {
 
     return context.createConfigurationContext(configuration)
 }
-

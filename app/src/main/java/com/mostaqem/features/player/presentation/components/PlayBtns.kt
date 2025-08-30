@@ -70,10 +70,10 @@ fun PlayButtons(
             Icon(
                 painter = painterResource(id = R.drawable.outline_skip_next_24),
                 contentDescription = "previous",
-                tint = MaterialTheme.colorScheme.onTertiary,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.tertiary)
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
                     .padding(15.dp)
                     .clickable {
                         if (isArabic) playerViewModel.seekPrevious() else playerViewModel.seekNext()
@@ -98,10 +98,10 @@ fun PlayButtons(
             Icon(
                 painter = painterResource(id = R.drawable.outline_skip_previous_24),
                 contentDescription = "next",
-                tint = MaterialTheme.colorScheme.onTertiary,
+                tint = MaterialTheme.colorScheme.onSecondaryContainer,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.tertiary)
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
                     .padding(15.dp)
                     .clickable {
                         if (isArabic) playerViewModel.seekNext() else playerViewModel.seekPrevious()
