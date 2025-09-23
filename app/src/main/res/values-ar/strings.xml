@@ -28,13 +28,18 @@
     <string name="uthmani">عثماني</string>
     <string name="all">الكل</string>
     <string name="search_reciters_chapters">ابحث عن سور، شيوخ…</string>
-
+    <string name="now_playing">يُشغَّل الآن</string>
     <string name="change_language">تغيير اللغة</string>
     <string name="player_decsription">تغير شكل المشغل و الشيخ الافتراضي و ألخ</string>
 
     <string name="search_reciter">ابحث عن الشيخ</string>
     <string name="reciter">شيخ</string>
     <string name="reciters">شيوخ</string>
+    <string name="reciter_description">يمكنك الضغط لتغيير القارئ الحالي</string>
+    <string name="make_default_reciter">اضغط مطولًا على القارئ الذي تريده ليكون الافتراضي</string>
+    <string name="change_later">يمكنك دائمًا تغيير ذلك لاحقًا</string>
+    <string name="search">البحث</string>
+    <string name="change_default_recitation">تغيير التلاوة المفضلة</string>
 
     <string name="offline">اوفلاين</string>
     <string name="offline_description">تغير طريقة تشغيل بدون انترنت, عرض المساحة</string>
@@ -68,7 +73,7 @@
 
     <string name="apperanace">السمات</string>
     <string name="default_reciter">الشيخ المفضل</string>
-    <string name="change_default_reciter">تغير الشيخ المفضل لديك و يمكنك الضغط طويلا لتغير التلاوة المفضلة لديك</string>
+    <string name="change_default_reciter">القارئ الذي ستستمع إليه غالبًا، اضغط على "تعديل" لتغييره</string>
 
     <string name="recitations">تلاوات</string>
     <string name="change_shape">تغير شكل عرض السورة في المشغل</string>

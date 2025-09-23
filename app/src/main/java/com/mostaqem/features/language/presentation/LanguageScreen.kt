@@ -1,6 +1,5 @@
 package com.mostaqem.features.language.presentation
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
@@ -30,7 +28,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,8 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mostaqem.R
-import com.mostaqem.core.ui.theme.kufamFontFamily
-import com.mostaqem.core.ui.theme.productFontFamily
 import com.mostaqem.dataStore
 import com.mostaqem.features.language.domain.AppLanguages
 import com.mostaqem.features.player.presentation.PlayerViewModel
@@ -63,14 +58,12 @@ fun LanguageScreen(
     val selectedLanguageCode =
         context.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
     val isPlaying = playerViewModel.playerState.value.surah != null
-    val fontFamily = remember(selectedLanguageCode) {
-        if (selectedLanguageCode == "en") productFontFamily else kufamFontFamily
-    }
+
     LazyColumn {
         item {
             LargeFlexibleTopAppBar(
                 title = {
-                    Text(stringResource(R.string.language), fontFamily = fontFamily)
+                    Text(stringResource(R.string.language), fontFamily = MaterialTheme.typography.headlineLarge.fontFamily)
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {

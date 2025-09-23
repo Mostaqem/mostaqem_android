@@ -61,10 +61,9 @@ fun MostaqemTheme(
         else -> LightColorScheme
     }
     val context = LocalContext.current
-    val languageCode = context.dataStore.data.map { it.language.code }
-        .collectAsStateWithLifecycle(initialValue = "en")
+    val languageCode = context.resources.configuration.locales[0].language
 
-    val adaptiveFontFamily = if (languageCode.value == "ar") {
+    val adaptiveFontFamily = if (languageCode == "ar") {
         kufamFontFamily
     } else {
         productFontFamily

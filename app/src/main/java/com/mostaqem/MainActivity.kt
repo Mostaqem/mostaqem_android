@@ -1,6 +1,7 @@
 package com.mostaqem
 
 import android.app.ComponentCaller
+import android.app.LocaleManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -13,6 +14,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.mostaqem.core.ui.app.MostaqemApp
@@ -69,13 +71,17 @@ private fun startCrashReportActivity(context: Context, th: Throwable) {
 
 }
 
-fun getSavedLanguage(context: Context): String {
+fun getSavedLanguage(context: Context): String? {
     return LanguageManager(context).getLanguageCode()
 }
 
-fun getContextForLanguage(context: Context, languageTag: String): Context {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) return context
-    if (languageTag.isEmpty()) return context
+fun getContextForLanguage(context: Context, languageTag: String?): Context {
+    if (languageTag.isNullOrEmpty()) {
+        // Use system locale (no override)
+        return context
+    }
+    if (languageTag == "system") return context
+
 
     val locale = Locale.forLanguageTag(languageTag)
     Locale.setDefault(locale)

@@ -20,8 +20,7 @@ import javax.inject.Inject
 class LanguageViewModel @Inject constructor(
     private val manager: LanguageManager,
     private val personalizationRepository: PersonalizationRepository
-) :
-    ViewModel() {
+) : ViewModel() {
 
     fun changeLanguage(languageCode: String) {
         val appLanguage = AppLanguages.entries.find { it.code == languageCode }

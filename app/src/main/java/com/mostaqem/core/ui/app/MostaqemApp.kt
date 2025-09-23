@@ -1,5 +1,7 @@
+
 package com.mostaqem.core.ui.app
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -120,9 +122,14 @@ fun MostaqemApp() {
     val showBottomBar =
         !isSearchExpanded && items.any { it.route::class.qualifiedName == currentRoute }
     val bottomBarHeight = 56.dp
-    val hidePlayerDestination = listOf(PlayerDestination, ShareDestination, ReciterDestination)
-    val hidePlayer =
-        hidePlayerDestination.all{ currentRoute != it::class.qualifiedName}
+    val hidePlayerDestinations = listOf(
+        "Player",
+        "Share",
+        "Reciter",
+        "Reading"
+    )
+    val hidePlayer = hidePlayerDestinations.any { currentRoute?.contains(it) == true }
+
 
     val bottomBarOffset by animateFloatAsState(
         animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec(),
@@ -358,7 +365,7 @@ fun MostaqemApp() {
                         }
                     }
 
-                    if (hidePlayer) {
+                    if (!hidePlayer) {
                         PlayerBarModalSheet(
                             playerViewModel = playerViewModel,
                             navController = navController,

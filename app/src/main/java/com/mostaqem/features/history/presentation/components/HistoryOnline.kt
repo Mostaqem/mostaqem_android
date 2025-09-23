@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import com.mostaqem.R
+import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.core.network.models.Result
 import com.mostaqem.features.history.data.HistoryState
 import com.mostaqem.features.player.presentation.PlayerViewModel
@@ -67,6 +68,7 @@ fun HistoryOnline(
     isArabic: Boolean,
     fontFamily: FontFamily,
     state: HistoryState,
+    isConnected : Boolean,
     onCardClick: (Surah) -> Unit,
     onAddSurah: (AudioData) -> Unit,
     onFetchData: () -> Unit
@@ -77,14 +79,13 @@ fun HistoryOnline(
     val randomSurahs = state.randomSurah
 
     Column {
-        if (!loading) {
+        if (!loading && isConnected) {
             Text(
                 stringResource(R.string.recommended),
                 fontSize = 20.sp,
                 style = MaterialTheme.typography.titleLarge,
                 fontFamily = fontFamily,
                 modifier = Modifier.padding(horizontal = 30.dp),
-
                 )
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 30.dp, vertical = 20.dp),

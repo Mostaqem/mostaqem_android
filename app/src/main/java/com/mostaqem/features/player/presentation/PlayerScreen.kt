@@ -3,10 +3,13 @@ package com.mostaqem.features.player.presentation
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.util.Log
+import android.widget.Space
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -42,6 +45,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.material3.toShape
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
@@ -140,6 +144,12 @@ fun PlayerScreen(
     val languageCode =
         LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
     val isArabic = languageCode == "ar"
+    val playIcon by playerViewModel.playPauseIcon.collectAsState()
+    val isPaused = playIcon == R.drawable.outline_play_arrow_24
+    val animatedSize by animateDpAsState(
+        targetValue = if (isPaused) 200.dp else 300.dp,
+        animationSpec = MaterialTheme.motionScheme.slowSpatialSpec()
+    )
     Box(
         modifier = Modifier
             .navigationBarsPadding()
@@ -277,19 +287,23 @@ fun PlayerScreen(
 
                     Column(modifier = Modifier.padding(vertical = 10.dp)) {
                         BoxWithConstraints(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                            val size = if (maxHeight <= 640.dp) 170.dp else 300
-                                .dp
+                            val size = if (maxHeight <= 640.dp) 170.dp else animatedSize
                             Box(
+                                modifier = Modifier.size(300.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(16.dp)
+                                        .clip(
+                                            AppShapes.entries.find { it.id == customShapeData.shapeID }?.shape?.toShape()
+                                                ?: AppShapes.RECT.shape.toShape()
+                                        )
+                                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                                        .size(size)
+                                )
+                            }
 
-                                modifier = Modifier
-                                    .padding(16.dp)
-                                    .clip(
-                                        AppShapes.entries.find { it.id == customShapeData.shapeID }?.shape?.toShape()
-                                            ?: AppShapes.RECT.shape.toShape()
-                                    )
-                                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                                    .size(size)
-                            )
                         }
                         Row(
                             modifier = Modifier

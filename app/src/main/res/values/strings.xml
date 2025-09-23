@@ -64,11 +64,16 @@
     <string name="thank_you">Thank you for using Mostaqem</string>
     <string name="thank_you_details">You can donate to mostaqem to help us keep maintaining the project or show your appreciation and may Allah reward you</string>
     <string name="star_us">Star us</string>
-
+    <string name="now_playing">Now Playing</string>
 
     <string name="apperanace">Appearance</string>
     <string name="default_reciter">Default Reciter</string>
-    <string name="change_default_reciter">Change your default reciter, long press to change recitations too</string>
+    <string name="change_default_reciter">The reciter that you will hear mostly, click on edit to change</string>
+    <string name="reciter_description">You can click to change current playing reciter</string>
+    <string name="make_default_reciter">Press and hold on the reciter you want to set as default</string>
+    <string name="change_later">You can always change that later</string>
+    <string name="search">Search</string>
+    <string name="change_default_recitation">Change Default Recitation</string>
 
     <string name="recitations">Recitations</string>
     <string name="change_shape">Change image shape</string>

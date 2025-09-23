@@ -18,7 +18,9 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Mostaqem">
+        android:localeConfig="@xml/locale_config"
+        android:theme="@style/Theme.Mostaqem"
+        tools:targetApi="33">
         <profileable
             android:shell="true"
             tools:targetApi="29" />

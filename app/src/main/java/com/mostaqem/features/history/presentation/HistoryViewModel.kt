@@ -3,10 +3,13 @@ package com.mostaqem.features.history.presentation
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.observe
 import androidx.lifecycle.viewModelScope
 import com.mostaqem.core.database.dao.ReciterDao
 import com.mostaqem.core.database.dao.SurahDao
+import com.mostaqem.core.network.NetworkConnectivityObserver
 import com.mostaqem.core.network.models.DataError
+import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.core.network.models.Result
 import com.mostaqem.features.history.data.AllFilter
 import com.mostaqem.features.history.data.ChapterFilter
@@ -23,7 +26,9 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,7 +38,8 @@ class HistoryViewModel @Inject constructor(
     private val surahDao: SurahDao,
     private val reciterDao: ReciterDao,
     private val surahRepository: SurahRepository,
-    private val reciterRepository: ReciterRepository
+    private val reciterRepository: ReciterRepository,
+    private val networkConnectivityObserver: NetworkConnectivityObserver
 ) : ViewModel() {
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         exception.printStackTrace()
@@ -41,6 +47,14 @@ class HistoryViewModel @Inject constructor(
     }
     private val _state = MutableStateFlow(HistoryState())
     val uiState: StateFlow<HistoryState> = _state
+
+    val networkStatus: StateFlow<NetworkStatus> =
+        networkConnectivityObserver.observe()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000), // Adjust timeout as needed
+                initialValue = NetworkStatus.Unavailable // Or determine initial state synchronously
+            )
 
     init {
         viewModelScope.launch(errorHandler) {

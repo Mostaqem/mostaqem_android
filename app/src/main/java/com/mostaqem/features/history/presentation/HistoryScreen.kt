@@ -51,6 +51,7 @@ import com.materialkolor.ktx.harmonizeWithPrimary
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
 import com.mostaqem.core.navigation.models.FavoritesDestination
+import com.mostaqem.core.network.models.NetworkStatus
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.core.ui.theme.productFontFamily
 import com.mostaqem.dataStore
@@ -78,8 +79,9 @@ fun HistoryScreen(
     navController: NavController,
     onHideBottom: (Boolean) -> Unit,
 ) {
-    val languageCode =
-        LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
+    val context = LocalContext.current
+
+    val languageCode = context.resources.configuration.locales[0].language
     val isArabic = languageCode == "ar"
     val fontFamily = MaterialTheme.typography.titleLarge.fontFamily
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -87,9 +89,9 @@ fun HistoryScreen(
     var openOptionsSheet by remember { mutableStateOf(false) }
     val defaultReciter by playerViewModel.defaultReciterState.collectAsState()
     val defaultReciterName = if (isArabic) defaultReciter.arabicName else defaultReciter.englishName
-    val context = LocalContext.current
-    Scaffold(
+    val networkStatus by playerViewModel.networkStatus.collectAsState()
 
+    Scaffold(
         topBar = {
             AdvancedSearch(
                 onSearchQueryChange = { viewModel.onSearchQueryChange(it) },
@@ -231,6 +233,7 @@ fun HistoryScreen(
                         )
                     openOptionsSheet = true
                 },
+                isConnected = networkStatus == NetworkStatus.Available,
                 onAddSurah = { audio ->
                     playerViewModel.playAudioData(audio)
                     surahViewModel.onSurahEvents(

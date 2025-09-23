@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,17 +44,20 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mostaqem.R
 import com.mostaqem.core.navigation.models.PlayerDestination
+import com.mostaqem.dataStore
 import com.mostaqem.features.offline.domain.toArabicNumbers
 import com.mostaqem.features.personalization.presentation.PersonalizationViewModel
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.reciters.domain.ReciterEvents
 import com.mostaqem.features.reciters.presentation.ReciterViewModel
+import com.mostaqem.features.settings.data.AppSettings
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -69,6 +73,10 @@ fun SearchScreen(
     val focusRequester = remember { FocusRequester() }
     var expanded by remember { mutableStateOf(true) }
     var isDefaultOptionClicked by reciterViewModel.showDefaultOption
+    val languageCode =
+        LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
+    val isArabic = languageCode == "ar"
+
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -129,9 +137,7 @@ fun SearchScreen(
     ) {
         if (query.isNotEmpty() && queryReciters.value.isNotEmpty()) {
             val reciters = queryReciters.value
-            val reciterCount: String = reciters.size.toArabicNumbers()
-            val reciterArabic: String =
-                if (reciters.size > 1) stringResource(R.string.reciters) else stringResource(R.string.reciter)
+
 
             LazyColumn {
                 items(reciters) { reciter ->
@@ -147,7 +153,7 @@ fun SearchScreen(
                         },
                         headlineContent = {
                             Text(
-                                reciter.englishName,
+                                if (isArabic) reciter.arabicName else reciter.englishName,
                                 style = MaterialTheme.typography.titleMediumEmphasized
                             )
                         },

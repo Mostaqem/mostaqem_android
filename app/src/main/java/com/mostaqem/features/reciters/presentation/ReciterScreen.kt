@@ -1,5 +1,6 @@
 package com.mostaqem.features.reciters.presentation
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -54,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.customActions
@@ -68,6 +70,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.mostaqem.R
 import com.mostaqem.core.navigation.models.SearchDestination
 import com.mostaqem.dataStore
 import com.mostaqem.features.personalization.presentation.PersonalizationViewModel
@@ -92,6 +95,7 @@ fun ReciterScreen(
     val languageCode =
         LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
     val isArabic = languageCode == "ar"
+
     val currentPlayer = playerViewModel.playerState.value
 
     val defaultReciter by playerViewModel.defaultReciterState.collectAsState()
@@ -140,9 +144,9 @@ fun ReciterScreen(
                             )
                         }
                         Text(
-                            "Now Playing",
+                            stringResource(R.string.now_playing),
                             style = MaterialTheme.typography.titleLargeEmphasized,
-                            modifier = Modifier.padding(18.dp)
+                            modifier = Modifier.padding(16.dp)
                         )
                         ListItem(
                             headlineContent = {
@@ -181,13 +185,13 @@ fun ReciterScreen(
                         ListItem(
                             headlineContent = {
                                 Text(
-                                    "Default Reciter",
+                                    stringResource(R.string.default_reciter),
                                     style = MaterialTheme.typography.titleLargeEmphasized,
                                 )
                             },
                             supportingContent = {
                                 Text(
-                                    "The reciter that you will hear mostly, click on edit to change",
+                                    stringResource(R.string.change_default_reciter),
                                     style = MaterialTheme.typography.titleSmallEmphasized,
                                 )
                             }
@@ -236,13 +240,13 @@ fun ReciterScreen(
                         ListItem(
                             headlineContent = {
                                 Text(
-                                    "Reciters",
+                                    stringResource(R.string.reciters),
                                     style = MaterialTheme.typography.titleLargeEmphasized,
                                 )
                             },
                             supportingContent = {
                                 Text(
-                                    "You can click to change current playing reciter",
+                                    stringResource(R.string.reciter_description),
                                     style = MaterialTheme.typography.titleSmallEmphasized,
 
                                     )
@@ -255,16 +259,16 @@ fun ReciterScreen(
             } else {
                 item {
                     ListItem(
-                        modifier = Modifier.padding(18.dp),
+                        modifier = Modifier.padding(16.dp),
                         headlineContent = {
                             Text(
-                                "Press long on the reciter you want to make it default",
+                                stringResource(R.string.make_default_reciter),
                                 style = MaterialTheme.typography.titleLargeEmphasized,
                             )
                         },
                         supportingContent = {
                             Text(
-                                "You can always change that later",
+                                stringResource(R.string.change_later),
                                 style = MaterialTheme.typography.titleSmallEmphasized,
                             )
                         }
@@ -302,12 +306,7 @@ fun ReciterScreen(
                                 Icon(Icons.Outlined.PlayArrow, "play")
                             },
                             headlineContent = {
-                                if (isArabic) reciter?.arabicName else reciter?.englishName?.let {
-                                    Text(
-                                        it ,
-                                        style = MaterialTheme.typography.titleMediumEmphasized
-                                    )
-                                }
+                                Text(if (isArabic) reciter!!.arabicName else reciter!!.englishName)
                             },
                             leadingContent = {
                                 if (currentPlayingReciter) {
@@ -375,11 +374,13 @@ fun ReciterScreen(
             listOf(
                 ReciterOption(
                     icon = Icons.Outlined.Book,
-                    name = if (isDefaultOptionClicked) "Change Default Recitation" else "Change Recitation",
+                    name = if (isDefaultOptionClicked) stringResource(R.string.change_default_recitation) else stringResource(
+                        R.string.change_recitation
+                    ),
                     onClick = { showRecitations = true }),
                 ReciterOption(
                     icon = Icons.Outlined.Search,
-                    name = "Search",
+                    name = stringResource(R.string.search),
                     onClick = { navController.navigate(SearchDestination) }),
 
                 )
@@ -448,11 +449,3 @@ fun ReciterScreen(
     }
 }
 
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Preview
-@Composable
-private fun ReciterScreenPreview() {
-
-
-}
