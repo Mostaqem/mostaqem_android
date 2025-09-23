@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AppSettings(
     val shapeID: String = "rect",
-    val language: AppLanguages = AppLanguages.ENGLISH,
+    val language: AppLanguages = AppLanguages.SYSTEM,
     val sortBy: SurahSortBy = SurahSortBy.ID,
     val reciterSaved: Reciter = Reciter(
         id = 1,

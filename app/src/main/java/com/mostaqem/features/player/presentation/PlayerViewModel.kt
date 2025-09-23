@@ -62,7 +62,8 @@ class PlayerViewModel @Inject constructor(
     private val personalizationRepository: PersonalizationRepository,
     private val networkObserver: NetworkConnectivityObserver,
     private val languageManager: LanguageManager,
-) : ViewModel() {
+
+    ) : ViewModel() {
     private val errorHandler = CoroutineExceptionHandler { _, exception ->
         exception.printStackTrace()
     }
@@ -81,18 +82,20 @@ class PlayerViewModel @Inject constructor(
             initialValue = defaultReciter
         )
 
-    val defaultRecitation: StateFlow<RecitationData> = personalizationRepository.getDefaultRecitation()
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = RecitationData(
-                id = 178,
-                reciter = defaultReciter,
-                reciterID = defaultReciter.id,
-                name = "حفص عن عاصم",
-                englishName = "Hafs An Assem"
+    val defaultRecitation: StateFlow<RecitationData> =
+        personalizationRepository.getDefaultRecitation()
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = RecitationData(
+                    id = 178,
+                    reciter = defaultReciter,
+                    reciterID = defaultReciter.id,
+                    name = "حفص عن عاصم",
+                    englishName = "Hafs An Assem"
+                )
             )
-        )
+
 
     val playerState = mutableStateOf(PlayerSurah(reciter = defaultReciter))
 
@@ -114,6 +117,11 @@ class PlayerViewModel @Inject constructor(
     private val _currentBottomSheet = MutableStateFlow<BottomSheetType>(BottomSheetType.None)
     val currentBottomSheet: StateFlow<BottomSheetType> = _currentBottomSheet
 
+    val networkStatus: StateFlow<NetworkStatus> = networkObserver.observe().stateIn(
+        scope = viewModelScope,
+        initialValue = NetworkStatus.Unavailable,
+        started = SharingStarted.Eagerly
+    )
     private val _duration = MutableStateFlow(0L)
     val duration: StateFlow<Long> = _duration
     var isCached = false
@@ -129,12 +137,12 @@ class PlayerViewModel @Inject constructor(
         viewModelScope.launch {
             restoreCachedState()
             if (!playerState.value.isLocal) {
-                networkObserver.observe().collect {
-                    if (it == NetworkStatus.Available) {
-                        if (isCached) applyCachedState()
 
-                    }
+                if (networkStatus.value == NetworkStatus.Available) {
+                    if (isCached) applyCachedState()
+
                 }
+
             }
         }
         setupMediaController()
@@ -368,7 +376,7 @@ class PlayerViewModel @Inject constructor(
             previousJobs.awaitAll()
             nextJobs.awaitAll()
             mediaController?.run {
-                addMediaItems(currentMediaItemIndex,previousMediaItems.toList())
+                addMediaItems(currentMediaItemIndex, previousMediaItems.toList())
                 addMediaItems(nextMediaItems.toList())
 
             }
@@ -380,13 +388,13 @@ class PlayerViewModel @Inject constructor(
         val surahID: Int = surahId ?: playerState.value.surah!!.id
         val reciterID: Int = reciterId ?: defaultReciter.id
         viewModelScope.launch {
-            val recitationID = recID ?:  defaultRecitation.value.id
+            val recitationID = recID ?: defaultRecitation.value.id
 
             val downloadedMediaItem =
                 playerRepository.getDownloadedMediaItem(surahID, recitationID)
             isCached = false
 
-            if (downloadedMediaItem != null ) {
+            if (downloadedMediaItem != null) {
                 val mediaItem = playerRepository.getLocalMetadata(downloadedMediaItem)
                 mediaController?.setMediaItem(mediaItem!!)
                 mediaController?.prepare()
@@ -458,7 +466,7 @@ class PlayerViewModel @Inject constructor(
         if (currentMediaItemIndex != null) {
             viewModelScope.launch {
                 val recID: Int =
-                    recitationID ?:  defaultRecitation.value.id
+                    recitationID ?: defaultRecitation.value.id
                 val downloadedMediaItem =
                     playerRepository.getDownloadedMediaItem(surahID, recID)
 
@@ -536,34 +544,24 @@ class PlayerViewModel @Inject constructor(
                 )
 
             } else {
-                networkObserver.observe().collect {
-                    if (it == NetworkStatus.Available) {
-                        val data = playerRepository.getMediaURL(
-                            surahID = surahID, reciterID = reID, recitationID = recID
-                        )
-                        if (data is Result.Success) {
-                            val mediaItem = setMetadata(data.data.response)
-                            mediaController?.addMediaItem(mediaItem)
-                        }
+                if (networkStatus.value == NetworkStatus.Available) {
 
-                        SnackbarController.sendEvent(
-                            events = SnackbarEvents(
-                                message = context.getString(R.string.added_queue)
-                            )
-                        )
-                    } else {
-                        SnackbarController.sendEvent(
-                            events = SnackbarEvents(
-                                message = "No Internet"
-                            )
-                        )
+                    val data = playerRepository.getMediaURL(
+                        surahID = surahID, reciterID = reID, recitationID = recID
+                    )
+                    if (data is Result.Success) {
+                        val mediaItem = setMetadata(data.data.response)
+                        mediaController?.addMediaItem(mediaItem)
                     }
+
+                    SnackbarController.sendEvent(
+                        events = SnackbarEvents(
+                            message = context.getString(R.string.added_queue)
+                        )
+                    )
+
                 }
-
-
             }
-
-
         }
     }
 
@@ -681,7 +679,7 @@ class PlayerViewModel @Inject constructor(
     }
 
     fun isDownloaded(surahID: Int?, recitationID: Int?): Boolean {
-        if (surahID == null || recitationID == null ) return false
+        if (surahID == null || recitationID == null) return false
         val mediaItem = playerRepository.getDownloadedMediaItem(surahID, recitationID)
         return mediaItem != null
     }

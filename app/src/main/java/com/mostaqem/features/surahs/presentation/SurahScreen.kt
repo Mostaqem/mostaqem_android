@@ -64,6 +64,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
+import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.dataStore
 import com.mostaqem.features.offline.domain.toArabicNumbers
 import com.mostaqem.features.player.presentation.PlayerViewModel
@@ -98,14 +99,12 @@ fun SurahsScreen(
     val downloadedSurahs by viewModel.downloadedAudios.collectAsState()
     var showDownloads by remember { mutableStateOf(false) }
     val player = playerViewModel.playerState.value
-    val languageCode =
-        LocalContext.current.dataStore.data.collectAsState(initial = AppSettings()).value.language.code
+    val context = LocalContext.current
 
-    val isArabic = languageCode == "ar"
+    val isArabic = MaterialTheme.typography.titleLarge.fontFamily == kufamFontFamily
 
     val isBottomSheetShown = remember { mutableStateOf(false) }
 
-    val context = LocalContext.current
     val defaultSortBy = context.dataStore.data.collectAsState(AppSettings()).value.sortBy
     val defaultReciter by playerViewModel.defaultReciterState.collectAsState()
     val defaultReciterName = if (isArabic) defaultReciter.arabicName else defaultReciter.englishName
