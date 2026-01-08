@@ -38,7 +38,8 @@ import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.mostaqem.BuildConfig
 import com.mostaqem.R
-import com.mostaqem.core.navigation.models.DonationDestination
+import com.mostaqem.core.navigation.models.Destination
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.core.ui.controller.SnackbarController
 import com.mostaqem.core.ui.controller.SnackbarEvents
 import kotlinx.coroutines.launch
@@ -47,7 +48,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AboutScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
+    navController: Navigator,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -191,7 +192,7 @@ fun AboutScreen(
             ListItem(
                 modifier = Modifier.clickable {
                     onBack()
-                    navController.navigate(DonationDestination)
+                    navController.navigate(Destination.DonationDestination)
                 },
                 headlineContent = {
                     Text(

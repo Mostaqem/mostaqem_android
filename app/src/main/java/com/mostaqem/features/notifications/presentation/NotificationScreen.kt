@@ -40,6 +40,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.mostaqem.R
+import com.mostaqem.core.ui.app.Navigator
+import com.mostaqem.core.ui.app.rememberNavigationState
 import com.mostaqem.core.ui.theme.MostaqemTheme
 import com.mostaqem.dataStore
 import com.mostaqem.features.notifications.domain.NotificationService
@@ -48,14 +50,14 @@ import com.mostaqem.features.settings.data.AppSettings
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun NotificationsScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun NotificationsScreen(modifier: Modifier = Modifier, goBack:()->Unit) {
     val context = LocalContext.current
     val viewModel: NotificationViewModel = hiltViewModel()
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
         LargeFlexibleTopAppBar(
             title = { Text(stringResource(R.string.notifications)) },
             navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
+                IconButton(onClick = goBack) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
                 }
             },
@@ -85,11 +87,4 @@ fun NotificationsScreen(modifier: Modifier = Modifier, navController: NavControl
 }
 
 
-@Preview
-@Composable
-private fun NotificationScreenPreview() {
-    MostaqemTheme {
-        NotificationsScreen(navController = rememberNavController())
-    }
-}
 

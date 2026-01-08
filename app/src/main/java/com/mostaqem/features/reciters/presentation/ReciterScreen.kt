@@ -71,7 +71,8 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mostaqem.R
-import com.mostaqem.core.navigation.models.SearchDestination
+import com.mostaqem.core.navigation.models.Destination
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.dataStore
 import com.mostaqem.features.personalization.presentation.PersonalizationViewModel
 import com.mostaqem.features.player.presentation.PlayerViewModel
@@ -86,7 +87,7 @@ import com.mostaqem.features.settings.data.AppSettings
 @Composable
 fun ReciterScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
+    navController: Navigator,
     playerViewModel: PlayerViewModel,
     personViewModel: PersonalizationViewModel,
     viewModel: ReciterViewModel,
@@ -136,7 +137,7 @@ fun ReciterScreen(
 
                     Column {
                         IconButton(
-                            onClick = { navController.popBackStack() },
+                            onClick = { navController.goBack() },
                         ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
@@ -381,7 +382,7 @@ fun ReciterScreen(
                 ReciterOption(
                     icon = Icons.Outlined.Search,
                     name = stringResource(R.string.search),
-                    onClick = { navController.navigate(SearchDestination) }),
+                    onClick = { navController.navigate(Destination.SearchDestination) }),
 
                 )
 

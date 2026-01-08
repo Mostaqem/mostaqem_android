@@ -3,12 +3,8 @@ package com.mostaqem.features.player.presentation
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.util.Log
-import android.widget.Space
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,7 +41,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.material3.toShape
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.runtime.Composable
@@ -74,8 +69,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.mostaqem.R
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.dataStore
-import com.mostaqem.features.offline.domain.toArabicNumbers
 import com.mostaqem.features.player.data.BottomSheetType
 import com.mostaqem.features.player.domain.AppShapes
 import com.mostaqem.features.player.presentation.components.PlayButtons
@@ -97,16 +92,14 @@ import kotlin.math.roundToInt
 fun PlayerScreen(
     playerViewModel: PlayerViewModel,
     sleepViewModel: SleepViewModel,
-    navController: NavController,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedVisibilityScope: AnimatedVisibilityScope,
+    navigator: Navigator,
     surahId: Int? = null,
     recitationID: Int? = null,
     onBack: () -> Unit,
     onShowBar: () -> Unit,
 ) {
     BackHandler {
-        navController.popBackStack()
+        navigator.goBack()
         onBack()
     }
     LaunchedEffect(surahId, key2 = recitationID) {
@@ -160,7 +153,7 @@ fun PlayerScreen(
                 }, onDragEnd = {
                     if (offset > dismissThreshold) {
                         onBack()
-                        navController.popBackStack()
+                        navigator.goBack()
                     } else {
                         offset = 0f
                     }
@@ -181,23 +174,18 @@ fun PlayerScreen(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        with(sharedTransitionScope) {
-                            AsyncImage(
-                                model = playerSurah.surah?.image,
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .sharedElement(
-                                        rememberSharedContentState(key = "image"),
-                                        animatedVisibilityScope = animatedVisibilityScope
-                                    )
-                                    .clip(
-                                        AppShapes.entries.find { it.id == customShapeData.shapeID }?.shape?.toShape()
-                                            ?: AppShapes.RECT.shape.toShape()
-                                    )
-                                    .size(300.dp)
-                            )
-                        }
+                        AsyncImage(
+                            model = playerSurah.surah?.image,
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+
+                                .clip(
+                                    AppShapes.entries.find { it.id == customShapeData.shapeID }?.shape?.toShape()
+                                        ?: AppShapes.RECT.shape.toShape()
+                                )
+                                .size(300.dp)
+                        )
                         Spacer(Modifier.width(30.dp))
                         VerticalDivider()
                         Spacer(Modifier.width(30.dp))
@@ -267,7 +255,7 @@ fun PlayerScreen(
                                     playerViewModel = playerViewModel,
                                     viewModel = sleepViewModel,
                                     playerSurah = playerSurah,
-                                    navController = navController
+                                    navigator = navigator
                                 )
                             }
                         }
@@ -393,7 +381,7 @@ fun PlayerScreen(
                         playerViewModel = playerViewModel,
                         viewModel = sleepViewModel,
                         playerSurah = playerSurah,
-                        navController = navController
+                        navigator = navigator
                     )
                 }
             }

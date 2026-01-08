@@ -49,6 +49,7 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import androidx.navigation.NavController
 import com.mostaqem.R
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.features.download_all.presentation.components.DownloadingScreen
 import com.mostaqem.features.offline.presentation.OfflineViewModel
 import com.mostaqem.features.personalization.presentation.components.LargeTopBar
@@ -60,8 +61,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DownloadAlLScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
-    playerViewModel: PlayerViewModel,
+    navController: Navigator,
     viewModel: OfflineViewModel = hiltViewModel()
 ) {
     val state by viewModel.downloadUiState.collectAsState()

@@ -54,7 +54,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.random.Random
 
-@UnstableApi
 @HiltViewModel
 class PlayerViewModel @Inject constructor(
     private val mediaControllerFuture: ListenableFuture<MediaController>,

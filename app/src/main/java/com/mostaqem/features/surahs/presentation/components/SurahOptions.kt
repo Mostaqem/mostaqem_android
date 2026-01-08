@@ -14,7 +14,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,15 +22,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
-import androidx.navigation.NavController
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import coil.compose.AsyncImage
 import com.mostaqem.R
-import com.mostaqem.core.navigation.models.ReadingDestination
+import com.mostaqem.core.navigation.models.Destination
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.features.player.presentation.PlayerViewModel
-import com.mostaqem.features.reciters.data.reciter.Reciter
-import com.mostaqem.features.surahs.data.Surah
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -40,16 +40,16 @@ fun SurahOptions(
     selectedSurahID: Int,
     context: Context,
     selectedReciter: String? = null,
-    selectedReciterID: Int? =null,
+    selectedReciterID: Int? = null,
     selectedRecitation: Int? = null,
     playerViewModel: PlayerViewModel,
-    navController: NavController,
+    onRead: () -> Unit,
     onDismiss: () -> Unit,
 
 
     ) {
-    val defaultReciter by playerViewModel.defaultReciterState.collectAsState()
-    val defaultRecitation by playerViewModel.defaultRecitation.collectAsState()
+    val defaultReciter by playerViewModel.defaultReciterState.collectAsStateWithLifecycle()
+    val defaultRecitation by playerViewModel.defaultRecitation.collectAsStateWithLifecycle()
     val isArabic = MaterialTheme.typography.titleLarge.fontFamily == kufamFontFamily
     LazyColumn {
         item {
@@ -141,14 +141,7 @@ fun SurahOptions(
                 },
                 headlineContent = { Text(text = stringResource(R.string.read_chapter)) },
                 modifier = Modifier.clickable {
-                    selectedSurah?.let {
-                        navController.navigate(
-                            ReadingDestination(
-                                surahID = selectedSurahID,
-                                surahName = it
-                            )
-                        )
-                    }
+                    onRead()
                     onDismiss()
 
                 },

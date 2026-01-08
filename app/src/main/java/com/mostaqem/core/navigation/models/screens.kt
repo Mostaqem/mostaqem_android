@@ -1,43 +1,29 @@
 package com.mostaqem.core.navigation.models
 
 import androidx.annotation.StringRes
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import com.mostaqem.R
 import kotlinx.serialization.Serializable
 
+data class BottomNavItem(val icon: Int, val title: Int, val selectedIcon: Int)
 
-@Serializable
-sealed class BottomScreens<T>(
-    val icon: Int,
-    val route: T,
-    val selectedIcon: Int,
-    val id: Int,
-) {
-    @Serializable
-    data object Home : BottomScreens<HomeDestination>(
-        id = R.string.history,
-        icon = R.drawable.outline_home_24,
-        route = HomeDestination,
-        selectedIcon = R.drawable.baseline_home_24,
-    )
-
-    @Serializable
-    data object Surah : BottomScreens<SurahsDestination>(
-        id = R.string.surahs,
+val TOP_LEVEL_DESTINATIONS = mapOf(
+    Destination.HomeDestination to BottomNavItem(
+        title = R.string.history,
+        icon = R.drawable.outline_home_24, selectedIcon = R.drawable.baseline_home_24,
+    ),
+    Destination.SurahsDestination to BottomNavItem(
+        title = R.string.surahs,
         icon = R.drawable.quran_book,
-        route = SurahsDestination,
         selectedIcon = R.drawable.quran_book,
 
-        )
-
-    @Serializable
-    data object Settings : BottomScreens<SettingsDestination>(
-        id = R.string.settings,
+        ),
+    Destination.SettingsDestination to BottomNavItem(
+        title = R.string.settings,
         icon = R.drawable.outline_settings_24,
-        route = SettingsDestination,
         selectedIcon = R.drawable.baseline_settings_24,
 
-        )
+        ),
 
-
-}
+    )

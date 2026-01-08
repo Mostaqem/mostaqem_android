@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import com.mostaqem.R
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.core.ui.controller.SnackbarController
 import com.mostaqem.core.ui.controller.SnackbarEvents
 import com.mostaqem.core.ui.theme.kufamFontFamily
@@ -59,7 +60,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun DonateScreen(modifier: Modifier = Modifier, navController: Navigator) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val languageCode =
@@ -77,7 +78,7 @@ fun DonateScreen(modifier: Modifier = Modifier, navController: NavController) {
                 Text(stringResource(R.string.donate), fontFamily = fontFamily)
             },
             navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
+                IconButton(onClick = { navController.goBack() }) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
                 }
             },

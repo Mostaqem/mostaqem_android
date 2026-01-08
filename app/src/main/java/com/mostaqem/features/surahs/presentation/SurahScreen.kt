@@ -27,7 +27,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.LoadingIndicator
-import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SearchBar
@@ -55,7 +54,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.graphics.shapes.RoundedPolygon
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
@@ -64,6 +62,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.dataStore
 import com.mostaqem.features.offline.domain.toArabicNumbers
@@ -80,7 +79,6 @@ import com.mostaqem.features.surahs.presentation.components.SurahSortBottomSheet
 fun SurahsScreen(
     viewModel: SurahsViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel,
-    navController: NavController,
     onHideBottom: (Boolean) -> Unit,
 ) {
     var query by rememberSaveable { mutableStateOf("") }
@@ -161,16 +159,16 @@ fun SurahsScreen(
                     ModalBottomSheet(
                         onDismissRequest = { isOptionsShown = false }, sheetState = bottomSheetState
                     ) {
-                        SurahOptions(
-                            selectedSurah = selectedSurahName,
-                            playerViewModel = playerViewModel,
-                            navController = navController,
-
-                            selectedSurahID = selectedSurahID,
-                            context = context
-                        ) {
-                            isOptionsShown = false
-                        }
+//                        SurahOptions(
+//                            selectedSurah = selectedSurahName,
+//                            playerViewModel = playerViewModel,
+//                            backStack = navController,
+//
+//                            selectedSurahID = selectedSurahID,
+//                            context = context
+//                        ) {
+//                            isOptionsShown = false
+//                        }
                     }
                 }
             }

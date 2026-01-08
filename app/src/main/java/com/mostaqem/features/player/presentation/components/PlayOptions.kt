@@ -45,9 +45,9 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.navigation.NavController
 import com.mostaqem.R
-import com.mostaqem.core.navigation.models.DownloadDestination
-import com.mostaqem.core.navigation.models.ReadingDestination
-import com.mostaqem.core.navigation.models.ReciterDestination
+import com.mostaqem.core.navigation.models.Destination
+import com.mostaqem.core.ui.app.Navigator
+
 import com.mostaqem.features.player.data.BottomSheetType
 import com.mostaqem.features.player.data.PlayerSurah
 import com.mostaqem.features.player.data.toAudioData
@@ -65,7 +65,7 @@ fun PlayOptions(
     playerSurah: PlayerSurah,
     viewModel: SleepViewModel,
 
-    navController: NavController
+    navigator: Navigator
 ) {
     var isDownloading by remember { mutableStateOf(false) }
     val showSleepDialog = remember { mutableStateOf(false) }
@@ -184,8 +184,8 @@ fun PlayOptions(
                                 val surahName = playerSurah.surah.arabicName
                                 expanded = false
 
-                                navController.navigate(
-                                    ReadingDestination(
+                                navigator.navigate(
+                                    Destination.ReadingDestination(
                                         surahID = surahID,
                                         surahName = surahName.toString()
                                     )
@@ -226,7 +226,7 @@ fun PlayOptions(
                             )
                         },
                         onClick = {
-                            navController.navigate(ReciterDestination)
+                            navigator.navigate(Destination.ReciterDestination)
                             expanded = false
 
                         }
@@ -272,7 +272,7 @@ fun PlayOptions(
                                     audio = playerSurah.toAudioData(),
                                     context
                                 )
-                                navController.navigate(DownloadDestination)
+                                navigator.navigate(Destination.DownloadDestination)
                                 isDownloading = true
                                 expanded = false
                             }

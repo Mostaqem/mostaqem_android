@@ -50,7 +50,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mostaqem.R
-import com.mostaqem.core.navigation.models.PlayerDestination
+import com.mostaqem.core.navigation.models.Destination
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.dataStore
 import com.mostaqem.features.offline.domain.toArabicNumbers
 import com.mostaqem.features.personalization.presentation.PersonalizationViewModel
@@ -63,7 +64,7 @@ import com.mostaqem.features.settings.data.AppSettings
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
+    navController: Navigator,
     playerViewModel: PlayerViewModel,
     personViewModel: PersonalizationViewModel,
     reciterViewModel: ReciterViewModel
@@ -101,7 +102,7 @@ fun SearchScreen(
                 },
                 leadingIcon = {
                     IconButton(
-                        onClick = { navController.popBackStack() },
+                        onClick = { navController.goBack() },
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
@@ -114,7 +115,7 @@ fun SearchScreen(
                         IconButton(
                             onClick = {
                                 query = ""
-                                navController.popBackStack()
+                                navController.goBack()
                             },
                         ) {
                             Icon(
@@ -131,7 +132,7 @@ fun SearchScreen(
         onExpandedChange = {
             expanded = it
             if (!expanded) {
-                navController.popBackStack()
+                navController.goBack()
             }
         },
     ) {
@@ -188,7 +189,7 @@ fun SearchScreen(
                                         if (playerViewModel.playerState.value.surah != null) {
                                             playerViewModel.changeReciter(reciter)
                                         }
-                                        navController.popBackStack()
+                                        navController.goBack()
                                         isDefaultOptionClicked = false
                                     } else {
                                         playerViewModel.changeReciter(reciter)
@@ -197,9 +198,8 @@ fun SearchScreen(
                                                 reciter
                                             )
                                         )
-                                        navController.popBackStack(
-                                            route = PlayerDestination,
-                                            inclusive = false
+                                        navController.goBack(
+
                                         )
                                     }
 
@@ -210,7 +210,7 @@ fun SearchScreen(
                                         playerViewModel.changeReciter(reciter)
                                     }
                                     isDefaultOptionClicked = false
-                                    navController.popBackStack()
+                                    navController.goBack()
 
                                 })
                             }

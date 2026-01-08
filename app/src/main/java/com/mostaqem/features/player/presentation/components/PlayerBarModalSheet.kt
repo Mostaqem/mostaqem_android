@@ -1,9 +1,6 @@
 package com.mostaqem.features.player.presentation.components
 
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
@@ -16,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
@@ -26,22 +23,25 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.mostaqem.core.navigation.models.PlayerDestination
-import com.mostaqem.features.player.presentation.PlayerViewModel
+import com.mostaqem.core.navigation.models.Destination
+import com.mostaqem.core.ui.app.Navigator
+import com.mostaqem.features.player.data.PlayerSurah
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun PlayerBarModalSheet(
+    navigator: Navigator,
+    playerState: PlayerSurah,
+    positionPercentage: State<Float>,
+    playPauseIcon: State<Int>,
+    onPlayPause: () -> Unit,
+    onClear: () -> Unit,
     modifier: Modifier = Modifier,
-    navController: NavController,
-    playerViewModel: PlayerViewModel,
-) {
-    val playerIcon by playerViewModel.playPauseIcon.collectAsState()
-    val surah = playerViewModel.playerState.value.surah
-    val reciter = playerViewModel.playerState.value.reciter
-    val progress by playerViewModel.positionPercentage.collectAsState()
+
+    ) {
+    val surah = playerState.surah
+    val reciter = playerState.reciter
     var offset by remember { mutableFloatStateOf(0f) }
 
     val dismissThreshold = 100
@@ -53,7 +53,7 @@ fun PlayerBarModalSheet(
                 .pointerInput(Unit) {
                     detectTapGestures(
                         onTap = {
-                            navController.navigate(PlayerDestination)
+                            navigator.navigate(Destination.PlayerDestination)
                         }
                     )
                 }
@@ -64,10 +64,10 @@ fun PlayerBarModalSheet(
                         },
                         onDragEnd = {
                             if (offset > dismissThreshold) {
-                                playerViewModel.clear()
+                                onClear()
                             } else {
                                 offset = 0f
-                                navController.navigate(PlayerDestination)
+                                navigator.navigate(Destination.PlayerDestination)
                             }
                         }
                     )
@@ -84,11 +84,11 @@ fun PlayerBarModalSheet(
 
         ) {
             PlayerBar(
-                playerIcon = playerIcon,
-                onPlayPause = { playerViewModel.handlePlayPause() },
+                playerIcon = playPauseIcon.value,
+                onPlayPause = onPlayPause,
                 surahName = surah.arabicName,
                 reciterName = reciter.arabicName,
-                progress = progress,
+                progress = positionPercentage.value,
             )
         }
     }

@@ -38,10 +38,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.mostaqem.R
-import com.mostaqem.core.navigation.models.AppearanceDestination
-import com.mostaqem.core.navigation.models.LanguagesDestination
-import com.mostaqem.core.navigation.models.NotificationsDestination
-import com.mostaqem.core.navigation.models.OfflineSettingsDestination
+import com.mostaqem.core.navigation.models.Destination
+import com.mostaqem.core.navigation.models.Destination.*
+import com.mostaqem.core.ui.app.Navigator
+
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.core.ui.theme.productFontFamily
 import com.mostaqem.dataStore
@@ -51,7 +51,7 @@ import com.mostaqem.features.settings.data.Options
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(navController: Navigator,hideBottomBar:()->Unit) {
     var showSheet by remember { mutableStateOf(false) }
 
     val options = listOf(
@@ -60,6 +60,8 @@ fun SettingsScreen(navController: NavController) {
             description = stringResource(R.string.change_language),
             icon = Icons.Outlined.Translate,
             onClick = {
+                hideBottomBar()
+
                 navController.navigate(LanguagesDestination)
             }),
         Options(
@@ -67,14 +69,20 @@ fun SettingsScreen(navController: NavController) {
             description = stringResource(R.string.notifications_desc),
             icon = Icons.Outlined.Notifications,
             onClick = {
+                hideBottomBar()
+
                 navController.navigate(NotificationsDestination)
+
             }),
         Options(
             name = stringResource(R.string.player),
             description = stringResource(R.string.player_decsription),
             icon = Icons.Outlined.PlayArrow,
             onClick = {
+                hideBottomBar()
+
                 navController.navigate(AppearanceDestination)
+
             }),
 
         Options(
@@ -82,7 +90,10 @@ fun SettingsScreen(navController: NavController) {
             description = stringResource(R.string.offline_description),
             icon = Icons.Outlined.Folder,
             onClick = {
+                hideBottomBar()
+
                 navController.navigate(OfflineSettingsDestination)
+
             }),
 
         Options(

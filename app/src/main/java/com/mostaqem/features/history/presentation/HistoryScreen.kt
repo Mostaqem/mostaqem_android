@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -23,16 +20,12 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.IconButtonShapes
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,25 +38,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
-import androidx.navigation.NavController
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import com.materialkolor.ktx.harmonize
-import com.materialkolor.ktx.harmonizeWithPrimary
 import com.mostaqem.R
 import com.mostaqem.core.database.events.SurahEvents
-import com.mostaqem.core.navigation.models.FavoritesDestination
+import com.mostaqem.core.navigation.models.Destination
 import com.mostaqem.core.network.models.NetworkStatus
-import com.mostaqem.core.ui.theme.kufamFontFamily
-import com.mostaqem.core.ui.theme.productFontFamily
-import com.mostaqem.dataStore
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.features.history.presentation.components.AdvancedSearch
 import com.mostaqem.features.history.presentation.components.HistoryOnline
 import com.mostaqem.features.player.presentation.PlayerViewModel
-import com.mostaqem.features.reciters.data.reciter.Reciter
 import com.mostaqem.features.reciters.domain.ReciterEvents
 import com.mostaqem.features.reciters.presentation.ReciterViewModel
-import com.mostaqem.features.settings.data.AppSettings
 import com.mostaqem.features.surahs.data.SelectedSurahState
-import com.mostaqem.features.surahs.data.Surah
 import com.mostaqem.features.surahs.presentation.SurahsViewModel
 import com.mostaqem.features.surahs.presentation.components.SurahOptions
 
@@ -76,7 +64,7 @@ fun HistoryScreen(
     viewModel: HistoryViewModel = hiltViewModel(),
     surahViewModel: SurahsViewModel = hiltViewModel(),
     reciterViewModel: ReciterViewModel = hiltViewModel(),
-    navController: NavController,
+    navigator: Navigator,
     onHideBottom: (Boolean) -> Unit,
 ) {
     val context = LocalContext.current
@@ -87,9 +75,9 @@ fun HistoryScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var selectedState: SelectedSurahState? by remember { mutableStateOf(null) }
     var openOptionsSheet by remember { mutableStateOf(false) }
-    val defaultReciter by playerViewModel.defaultReciterState.collectAsState()
+    val defaultReciter by playerViewModel.defaultReciterState.collectAsStateWithLifecycle()
     val defaultReciterName = if (isArabic) defaultReciter.arabicName else defaultReciter.englishName
-    val networkStatus by playerViewModel.networkStatus.collectAsState()
+    val networkStatus by playerViewModel.networkStatus.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -133,15 +121,15 @@ fun HistoryScreen(
                         openOptionsSheet = false
                     }
                 ) {
-                    SurahOptions(
-                        playerViewModel = playerViewModel,
-                        navController = navController,
-                        selectedSurah = selectedState!!.surahName,
-                        selectedSurahID = selectedState!!.surahID,
-                        context = context
-                    ) {
-                        openOptionsSheet = false
-                    }
+//                    SurahOptions(
+//                        playerViewModel = playerViewModel,
+//                        backStack = backStack,
+//                        selectedSurah = selectedState!!.surahName,
+//                        selectedSurahID = selectedState!!.surahID,
+//                        context = context
+//                    ) {
+//                        openOptionsSheet = false
+//                    }
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -156,7 +144,9 @@ fun HistoryScreen(
             ) {
                 IconButton(
                     shape = IconButtonDefaults.extraLargePressedShape,
-                    onClick = { navController.navigate(FavoritesDestination) },
+                    onClick = {
+                        navigator.navigate(Destination.FavoritesDestination)
+                    },
                     modifier = Modifier.size(
                         height = 100.dp,
                         width = 200.dp

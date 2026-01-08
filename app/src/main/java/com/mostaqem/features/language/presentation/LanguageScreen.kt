@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mostaqem.R
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.dataStore
 import com.mostaqem.features.language.domain.AppLanguages
 import com.mostaqem.features.player.presentation.PlayerViewModel
@@ -50,9 +51,9 @@ import com.mostaqem.features.settings.data.AppSettings
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun LanguageScreen(
-    navController: NavController,
     viewModel: LanguageViewModel = hiltViewModel(),
-    playerViewModel: PlayerViewModel
+    playerViewModel: PlayerViewModel,
+    onBack:()->Unit
 ) {
     val context = LocalContext.current
     val selectedLanguageCode =
@@ -66,7 +67,7 @@ fun LanguageScreen(
                     Text(stringResource(R.string.language), fontFamily = MaterialTheme.typography.headlineLarge.fontFamily)
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick =  onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back")
                     }
                 },

@@ -50,7 +50,6 @@ android {
             matchingFallbacks += listOf("release")
             isDebuggable = false
             proguardFiles("benchmark-rules.pro")
-
         }
     }
     compileOptions {
@@ -65,9 +64,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.15"
     }
     packaging {
         resources {
@@ -88,10 +84,13 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.coil.compose)
-    implementation(libs.navigation.compose)
     implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.paging.compose)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.kotlinx.serialization.core)
 
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.coil.svg)

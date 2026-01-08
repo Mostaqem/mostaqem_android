@@ -1,5 +1,5 @@
 [versions]
-agp = "8.11.0"
+agp = "8.13.2"
 coilCompose = "2.7.0"
 coilSvg = "3.3.0"
 constraintlayoutCompose = "1.1.1"
@@ -10,13 +10,13 @@ gson = "2.13.1"
 hiltAndroid = "2.56.2"
 hiltNavigationCompose = "1.2.0"
 kotlin = "2.2.0"
-coreKtx = "1.16.0"
+coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.9.0"
+lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.10.1"
-composeBom = "2025.08.00"
+composeBom = "2025.12.01"
 lifecycleViewmodelCompose = "2.9.0"
 material3WindowSizeClass = "1.3.2"
 materialKolor = "3.0.1"
@@ -24,9 +24,8 @@ mockitoCore = "5.18.0"
 mockitoKotlin = "6.0.0"
 pagingCompose = "3.3.6"
 retrofit = "3.0.0"
-room = "2.7.2"
-composeNavigation = "2.9.0"
-runner = "1.6.2"
+room = "2.8.4"
+runner = "1.7.0"
 serialization = "1.9.0"
 uiautomator = "2.3.0"
 baselineprofile = "1.3.4"
@@ -34,12 +33,16 @@ profileinstaller = "1.4.1"
 media3 = "1.8.0"
 loggingInterceptor = "5.0.0"
 hiltCommon = "1.2.0"
-workRuntimeKtx = "2.10.2"
+workRuntimeKtx = "2.11.0"
 materialIconsExtended = "1.7.8"
-material3 = "1.4.0-alpha17"
-composeAnimation = "1.8.1"
+material3 = "1.5.0-alpha11"
+composeAnimation = "1.10.0"
 appcompat = "1.7.1"
 junitKtx = "1.2.1"
+nav3Core = "1.0.0"
+lifecycleViewmodelNav3 = "2.10.0"
+kotlinxSerializationCore = "1.9.0"
+material3AdaptiveNav3 = "1.3.0-alpha05"
 
 [libraries]
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
@@ -57,6 +60,10 @@ androidx-material3-window-size-class1 = { module = "androidx.compose.material3:m
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
 androidx-media3-exoplayer-dash = { module = "androidx.media3:media3-exoplayer-dash", version.ref = "media3" }
 androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
+androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runtime", version.ref = "nav3Core" }
+androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycleViewmodelNav3" }
+androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "nav3Core" }
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinxSerializationCore" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
@@ -90,7 +97,6 @@ mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockitoCore
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockitoKotlin" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "composeAnimation" }
-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "composeNavigation" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
 androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "baselineprofile" }
@@ -99,7 +105,6 @@ androidx-media3-session = { group = "androidx.media3", name = "media3-session", 
 androidx-hilt-common = { group = "androidx.hilt", name = "hilt-common", version.ref = "hiltCommon" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
-
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

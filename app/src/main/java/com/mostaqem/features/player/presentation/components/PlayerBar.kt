@@ -35,13 +35,14 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun PlayerBar(
-    modifier: Modifier = Modifier,
     playerIcon: Int,
     onPlayPause: () -> Unit,
     surahName: String,
     reciterName: String,
     progress: Float,
-) {
+    modifier: Modifier = Modifier,
+
+    ) {
     Box(
         contentAlignment = Alignment.BottomEnd,
         modifier = modifier

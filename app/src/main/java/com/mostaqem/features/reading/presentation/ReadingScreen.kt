@@ -70,7 +70,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mostaqem.R
-import com.mostaqem.core.navigation.models.ShareDestination
+import com.mostaqem.core.navigation.models.Destination
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.core.ui.theme.chapterCaliFontFamily
 import com.mostaqem.core.ui.theme.uthmaniFont
 import com.mostaqem.dataStore
@@ -85,10 +86,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun ReadingScreen(
     chapterNumber: Int,
-    chapterName: String,
     readingViewModel: ReadingViewModel = hiltViewModel(),
     sharingViewModel: ShareViewModel,
-    navController: NavController,
+    navController: Navigator,
 ) {
     val versesPerPage = 10
 
@@ -142,7 +142,7 @@ fun ReadingScreen(
                         if (selectedVerses.isNotEmpty()) {
                             IconButton(onClick = {
                                 sharingViewModel.updateVerses(selectedVerses)
-                                navController.navigate(ShareDestination(chapterNumber = chapterNumber))
+                                navController.navigate(Destination.ShareDestination(chapterNumber = chapterNumber))
                             }) {
                                 Icon(Icons.Default.Share, contentDescription = "share")
                             }
@@ -155,7 +155,7 @@ fun ReadingScreen(
                     title = { },
 
                     navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
+                        IconButton(onClick = { navController.goBack() }) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, "back")
                         }
                     },

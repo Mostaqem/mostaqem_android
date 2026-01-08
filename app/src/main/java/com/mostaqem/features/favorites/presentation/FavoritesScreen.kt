@@ -28,7 +28,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,10 +41,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.mostaqem.R
+import com.mostaqem.core.navigation.models.Destination
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.features.personalization.presentation.components.LargeTopBar
 import com.mostaqem.features.player.presentation.PlayerViewModel
 import com.mostaqem.features.surahs.data.SelectedSurahState
@@ -55,12 +57,12 @@ import com.mostaqem.features.surahs.presentation.components.SurahOptions
 @Composable
 fun FavoritesScreen(
     modifier: Modifier = Modifier,
-    navController: NavController,
+    navController: Navigator,
     viewModel: FavoritesViewModel = hiltViewModel(),
     playerViewModel: PlayerViewModel
 ) {
-    val favorites by viewModel.favorities.collectAsState()
-    val isPlaying = playerViewModel.playerState.value.surah != null
+    val favorites by viewModel.favorities.collectAsStateWithLifecycle()
+    val isPlaying by remember { derivedStateOf { playerViewModel.playerState.value.surah != null } }
     val animatedPadding by animateIntAsState(
         targetValue = if (isPlaying) 100 else 0,
         label = "animate_float_padding",
@@ -96,13 +98,20 @@ fun FavoritesScreen(
                 ) {
                     SurahOptions(
                         playerViewModel = playerViewModel,
-                        navController = navController,
                         selectedSurah = selectedState!!.surahName,
                         selectedSurahID = selectedState!!.surahID,
                         selectedReciter = selectedReciterName,
                         selectedReciterID = selectedReciterID,
                         selectedRecitation = selectedRecitationID,
-                        context = context
+                        context = context,
+                        onRead = {
+                            navController.navigate(
+                                Destination.ReadingDestination(
+                                    surahID = selectedState!!.surahID,
+                                    surahName = selectedState!!.surahName
+                                )
+                            )
+                        }
                     ) {
                         openOptionsSheet = false
                     }

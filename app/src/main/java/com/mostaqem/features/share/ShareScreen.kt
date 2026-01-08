@@ -101,8 +101,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.core.view.drawToBitmap
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.mostaqem.R
+import com.mostaqem.core.ui.app.Navigator
 import com.mostaqem.core.ui.theme.chapterCaliFontFamily
 import com.mostaqem.core.ui.theme.kufamFontFamily
 import com.mostaqem.core.ui.theme.productFontFamily
@@ -122,7 +124,7 @@ import java.io.FileOutputStream
 fun ShareScreen(
     modifier: Modifier = Modifier,
     shareViewModel: ShareViewModel,
-    navController: NavController,
+    navController: Navigator,
     playerViewModel: PlayerViewModel,
     chapterNumber: String,
 
@@ -132,7 +134,7 @@ fun ShareScreen(
     var composableBounds by remember { mutableStateOf<Rect?>(null) }
     val context = LocalContext.current
     var isButtonVisible by remember { mutableStateOf(true) }
-    val verses by shareViewModel.verses.collectAsState()
+    val verses by shareViewModel.verses.collectAsStateWithLifecycle()
     val colorScheme = MaterialTheme.colorScheme
     val colors = listOf(
         SelectedColor(
@@ -271,7 +273,7 @@ fun ShareScreen(
                     TopAppBar(
                         title = { Text("Sharing") },
                         navigationIcon = {
-                            IconButton(onClick = { navController.popBackStack() }) {
+                            IconButton(onClick = { navController.goBack() }) {
                                 Icon(
                                     Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "back"

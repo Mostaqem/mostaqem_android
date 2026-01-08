@@ -12,11 +12,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.glance.layout.RowScope
 import androidx.navigation.NavController
+import com.mostaqem.core.ui.app.Navigator
 
 @Composable
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalMaterial3Api::class)
 fun LargeTopBar(
-    navController: NavController,
+    navController: Navigator,
     title: String,
     actions: @Composable androidx.compose.foundation.layout.RowScope.() -> Unit = {},
 ) {
@@ -25,7 +26,7 @@ fun LargeTopBar(
     LargeFlexibleTopAppBar(
         title = { Text(text = title, fontFamily = fontFamily) },
         navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
+            IconButton(onClick = { navController.goBack() }) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "back ")
             }
         },
